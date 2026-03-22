@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, status
+import logging
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -9,10 +10,14 @@ from app.dependencies import get_db, get_current_user
 from app import models, schemas
 from app.auth import (hash_password, verify_password, create_access_token,
                       generate_totp_secret, verify_totp, get_totp_uri)
+from app.password_reset import router as password_reset_router
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 Base.metadata.create_all(bind=engine)
-
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="JurisAI Auth API")
@@ -20,6 +25,8 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+app.include_router(password_reset_router)
 
 
 @app.post("/auth/register", response_model=schemas.UserResponse)
@@ -58,7 +65,7 @@ def logout(request: Request, db: Session = Depends(get_db), current_user=Depends
 def setup_2fa(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     secret = generate_totp_secret()
     current_user.totp_secret = secret
-    current_user.is_2fa_enabled = False  # ativa só após verify
+    current_user.is_2fa_enabled = False
     db.commit()
     return {"secret": secret, "qr_uri": get_totp_uri(secret, current_user.email)}
 
