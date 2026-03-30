@@ -1,3 +1,9 @@
-venv/ 
-__pycache__/ 
-*.pyc 
+venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+.env.*.local
+.venv/
+*.pem
+*.key
