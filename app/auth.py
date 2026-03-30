@@ -2,10 +2,17 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 import pyotp
+import os
+from dotenv import load_dotenv
 
-SECRET_KEY = "jurisai-super-secret-key-troque-em-producao"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY não foi definida nas variáveis de ambiente!")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
