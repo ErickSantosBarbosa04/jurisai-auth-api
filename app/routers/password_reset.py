@@ -4,8 +4,8 @@ import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
-from . import models
-from .dependencies import get_db  # ← CORRIGIDO aqui
+from .. import models
+from ..core.dependencies import get_db  # ← CORRIGIDO aqui
 
 router = APIRouter(prefix="/auth", tags=["password-reset"])
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class ResetPasswordRequest(BaseModel):
 
 @router.post("/forgot-password")
 def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == data.email).first()
+    user = db.query(models.UserModel).filter(models.UserModel.email == data.email).first()
 
     logger.info(f"Solicitação de recuperação de senha para: {data.email}")
 
@@ -62,7 +62,7 @@ def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
         logger.warning(f"Token expirado para user_id={reset_token.user_id}")
         raise HTTPException(status_code=400, detail="Token expirado.")
 
-    user = db.query(models.User).filter(models.User.id == reset_token.user_id).first()
+    user = db.query(models.UserModel).filter(models.UserModel.id == reset_token.user_id).first()
     user.hashed_password = pwd_context.hash(data.new_password)
 
     reset_token.used = True
