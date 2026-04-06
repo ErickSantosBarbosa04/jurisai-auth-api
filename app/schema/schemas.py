@@ -33,3 +33,10 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr

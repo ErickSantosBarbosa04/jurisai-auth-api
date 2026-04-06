@@ -54,3 +54,43 @@ ________________________________________________________________________________
 Uso de tokens criptograficamente seguros (secrets.token_urlsafe).
 
 Validação de expiração e uso único do token (Requisitos 2.2 a 2.5).___________________________________________________________________________________________________________________
+9. Implementação da Camada de Serviço (app/services/)
+Migramos toda a lógica de negócio dos Controllers (Routers) para classes de serviço dedicadas (AuthService, UserService, MFAService, PasswordService).
+
+Padronização: O Router agora apenas recebe a requisição e delega o processamento.
+
+Desacoplamento: A lógica de validação de 2FA, geração de tokens e hashes Bcrypt agora é independente das rotas HTTP.
+
+Garantia: Atende ao Requisito 6.2 (Arquitetura Limpa), facilitando testes unitários e futuras expansões do JurisAI.
+___________________________________________________________________________________________________________________
+10. Correções de Compatibilidade e Ambiente (Python 3.13)
+Ajuste de Hashing: Corrigimos a integração do passlib com o bcrypt para garantir compatibilidade com o Python 3.13, evitando erros de AttributeError.
+
+Tratamento de Timezone: Padronizamos o uso de datetime.now(timezone.utc) em todos os serviços de Token (MFA e Reset), garantindo que a expiração funcione corretamente independente da localização do servidor.
+___________________________________________________________________________________________________________________
+
+
+Porque mudei a estrutura?
+    Schema (Pydantic): Limpa e valida o dado na entrada.
+
+    Router (Controller): O "olho" que vê a requisição e valida o acesso.
+
+    Service (Server): O "cérebro" que aplica a regra de negócio e limpa o processo.
+
+    Model/DB: Onde o dado descansa.
+
+Explicando:
+    Schema (Pydantic): O Contrato, que limpa e valida a integridade do dado logo na entrada.
+
+    Router (Controller): A Portaria, que gerencia o tráfego e valida as permissões de acesso.
+
+    Service (Business Layer): O Cérebro, que executa a lógica de negócio e orquestra os processos de segurança.
+
+    Model (DB): O Repositório, onde o dado é persistido com integridade.
+
+___________________________________________________________________________________________________________________
+
+Aplicando o Padronização PEP 8
+Regaturei seguindo a PEP 8 (Python Enhancement Proposal 8).
+
+O que isso significa? Significa que o código agora segue o padrão internacional de legibilidade do Python. Usamos nomes de funções claros, organização de pastas lógica e espaçamentos padronizados. Isso transforma o código de um "amontoado de linhas" em uma documentação viva, pronta para auditorias técnicas e futuras expansões.

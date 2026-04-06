@@ -1,0 +1,68 @@
+import logging
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+from app import models
+from app.schema import schemas
+from app.core.security import hash_password, verify_password, create_access_token, verify_totp
+from app.core.crypto import decrypt
+
+logger = logging.getLogger(__name__)
+
+class AuthService:
+    @staticmethod
+    def register_user(db: Session, data: schemas.RegisterRequest):
+        """
+        Lógica de criação de conta com verificação de duplicidade.
+        Atende Requisito 1.1 e 1.3.
+        """
+        if db.query(models.User).filter(models.User.email == data.email).first():
+            logger.warning(f"SERVICE: Tentativa de cadastro com e-mail já existente: {data.email}")
+            raise HTTPException(status_code=400, detail="Email já cadastrado")
+        
+        user = models.User(email=data.email, hashed_password=hash_password(data.password))
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        logger.info(f"SERVICE: Novo usuário registrado: {data.email}")
+        return user
+
+    @staticmethod
+    def authenticate_user(db: Session, data: schemas.LoginRequest):
+        """
+        Valida credenciais e 2FA, retornando o Token de Acesso.
+        Atende Requisito 1.9 e 1.5.
+        """
+        user = db.query(models.User).filter(models.User.email == data.email).first()
+        
+        # Validação de senha
+        if not user or not verify_password(data.password, user.hashed_password):
+            logger.warning(f"SERVICE: Falha de autenticação para: {data.email}")
+            raise HTTPException(status_code=401, detail="Credenciais inválidas")
+        
+        # Validação de 2FA (se estiver ativo)
+        if user.is_2fa_enabled:
+            if not data.totp_code:
+                raise HTTPException(status_code=401, detail="Código 2FA obrigatório")
+            
+            raw_secret = decrypt(user.totp_secret)
+            if not verify_totp(raw_secret, data.totp_code):
+                logger.warning(f"SERVICE: 2FA inválido para: {data.email}")
+                raise HTTPException(status_code=401, detail="Código 2FA inválido")
+                
+        # Geração do Token
+        token = create_access_token({"sub": str(user.id)})
+        logger.info(f"SERVICE: Login bem-sucedido: {data.email}")
+        return {"access_token": token, "token_type": "bearer"}
+
+    @staticmethod
+    def blacklist_token(db: Session, request, current_user):
+        """
+        Invalida o token atual (Logout).
+        Atende Requisito de Segurança de Sessão.
+        """
+        raw_token = request.headers.get("Authorization", "").replace("Bearer ", "")
+        if raw_token:
+            db.add(models.TokenBlacklist(token=raw_token))
+            db.commit()
+            logger.info(f"SERVICE: Token invalidado para o usuário: {current_user.id}")
+        return {"message": "Logout realizado com sucesso"}

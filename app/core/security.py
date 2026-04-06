@@ -1,4 +1,5 @@
 from passlib.context import CryptContext
+import bcrypt
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 import pyotp
@@ -6,16 +7,28 @@ import pyotp
 from app.core.config import settings 
 
 # Configuração do algoritmo de Hash (Requisito 1.1)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__ident="2b")
 
 # --- LÓGICA DE SENHAS ---
 def hash_password(password: str) -> str:
-    """Gera o hash da senha usando bcrypt (Requisito 1.1 e 1.3)."""
-    return pwd_context.hash(password)
+    """Gera o hash da senha usando bcrypt direto (Resolve bug do Python 3.13)."""
+    # Transforma a senha em bytes
+    pwd_bytes = password.encode('utf-8')
+    # Gera o salt e o hash
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(pwd_bytes, salt)
+    # Retorna como string para salvar no banco
+    return hashed.decode('utf-8')
 
 def verify_password(plain: str, hashed: str) -> bool:
-    """Verifica se a senha plana coincide com o hash (Requisito 1.1)."""
-    return pwd_context.verify(plain, hashed)
+    """Verifica se a senha plana coincide com o hash."""
+    try:
+        return bcrypt.checkpw(
+            plain.encode('utf-8'), 
+            hashed.encode('utf-8')
+        )
+    except Exception:
+        return False
 
 # --- LÓGICA DE TOKENS (JWT) ---
 def create_access_token(data: dict) -> str:

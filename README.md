@@ -30,18 +30,40 @@ Sistema de autenticação RESTful que implementa:
 
 ##  Estrutura do Projeto
 
-juris-auth/
-├── app/
-│ ├── init.py
-│ ├── main.py # Rotas FastAPI
-│ ├── auth.py # bcrypt + JWT + TOTP
-│ ├── database.py # Conexão PostgreSQL
-│ ├── models.py # User + TokenBlacklist
-│ ├── schemas.py # Validação Pydantic
-│ └── dependencies.py # get_db, get_current_user
-├── requirements.txt
-├── README.md
-└── venv/
+jurisai-auth-api/                
+├── app/                         
+│   ├── core/                    #Camada de Infraestrutura e Segurança
+│   │   ├── db/
+│   │   │   └── database.py      # Conexão SQLAlchemy e SessionLocal
+│   │   ├── config.py            # Validação de Variáveis de Ambiente (.env)
+│   │   ├── crypto.py            # Criptografia AES-256 (Fernet) para Repouso
+│   │   ├── security.py          # Lógica de JWT, Hash Bcrypt e TOTP
+│   │   └── dependencies.py      # Injeção de Dependência (get_db, get_current_user)
+│   │
+│   ├── models/                  # -Camada de Dados (Entidades do Banco)
+│   │   ├── __init__.py          # Exporta os modelos para o SQLAlchemy
+│   │   ├── user_model.py        # Tabela de Usuários
+│   │   ├── token_blacklist.py   # Tabela para Invalidação de Logout
+│   │   └── password_reset.py    # Tabela de Tokens de Recuperação
+│   │
+│   ├── services/                # -Camada de Serviço (Regras de Negócio/Server)
+│   │   ├── user_service.py      # Lógica de LGPD (Exportar, Deletar, Perfil)
+│   │   └── auth_service.py      # Lógica de Login, Registro e 2FA
+│   │
+│   ├── routers/                 # -Camada de Interface (Controllers/Endpoints)
+│   │   ├── auth.py              # Rotas de Autenticação
+│   │   ├── mfa.py               # Rotas de Segundo Fator
+│   │   ├── user.py              # Rotas de Perfil e Conformidade LGPD
+│   │   └── password_reset.py    # Rotas de Recuperação de Senha
+│   │
+│   └── schema/                  # - Camada de Validação (Contratos Pydantic)
+│       └── schemas.py           # Definição de entrada/saída de dados
+│
+├── venv/                        # - Ambiente Virtual (Não vai para o Git)
+├── .env                         # - Segredos e Credenciais (DATABASE_URL, etc.)
+├── .gitignore                   # - Arquivos ignorados pelo Git
+├── main.py                      # - Ponto de Entrada (Inicialização e Middlewares)
+└── requirements.txt             # - Lista de Dependências do Projeto
 
 text
 
