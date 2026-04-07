@@ -31,7 +31,7 @@ class MFAService:
     def verify_2fa(db: Session, current_user: User, data: schemas.TOTPVerifyRequest):
         if not current_user.totp_secret:
             raise HTTPException(status_code=400, detail="2FA não configurado. Faça o setup primeiro.")
-        
+         
         # Descriptografa o segredo para poder validar o código enviado
         raw_secret = decrypt(current_user.totp_secret)   
         
