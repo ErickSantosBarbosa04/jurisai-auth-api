@@ -56,22 +56,31 @@ text
 ### Instalação
 
 ```cmd
-# 1. Acesse a pasta do projeto
+# 1. Criar o .Env na raiz:
+DATABASE_URL=sqlite:///./jurisai.db
+SECRET_KEY=9a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p
+FERNET_KEY= (ele muda)
+
+# 2. Para descobrir o fernet_key coloque no terminal:
+
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
+# 3. Acesse a pasta do projeto
 cd juris-auth
 
-# 2. Crie o ambiente virtual
+# 4. Crie o ambiente virtual
 python -m venv venv
 
-# 3. Ative o ambiente virtual
+# 5. Ative o ambiente virtual
 venv\Scripts\activate.bat       # CMD Windows
 # ou
 venv\Scripts\Activate.ps1       # PowerShell
 
-# 4. Instale as dependências
+# 6. Instale as dependências
 pip install -r requirements.txt
 
-# 5. Execute o servidor
-uvicorn app.main:app --reload
+# 7. Execute o servidor
+uvicorn main:app --reload
 Acesse
 API: http://127.0.0.1:8000
 
