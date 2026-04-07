@@ -15,9 +15,14 @@ def register(data: schemas.RegisterRequest, db: Session = Depends(get_db)):
     return AuthService.register_user(db, data)
 
 @router.post("/login", response_model=schemas.TokenResponse)
-#Delega a autenticação ao AuthService.
 def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
-    return AuthService.authenticate_user(db, data)
+    # PASSANDO SEM OS NOMES DAS VARIÁVEIS (POR POSIÇÃO)
+    return AuthService.authenticate_user(
+        db, 
+        data.email, 
+        data.password, 
+        data.totp_code
+    )
 
 #--- Implementando token blacklist (Requisito 1.10)
 @router.post("/logout")

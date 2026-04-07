@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login JurisAI</title>
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">JurisAI</div>
+    <ul class="nav-links">
+        <li><a href="#">Início</a></li>
+        <li><a href="#">Processos</a></li>
+        <li class="profile-container">
+            <button id="profileBtn" class="profile-btn">👤 Meu Perfil</button>
+            <div id="profileMenu" class="profile-dropdown">
+                <div class="profile-info">
+                    <p><strong>E-mail:</strong> <span id="userEmail">carregando...</span></p>
+                    <p><strong>Status 2FA:</strong> <span id="user2FA">Verificando...</span></p>
+                </div>
+                <hr>
+                <button onclick="confirmLogout()" class="btn-logout">Sair do Sistema</button>
+                <button onclick="confirmDeleteAccount()" class="btn-delete">Excluir Minha Conta</button>
+            </div>
+        </li>
+    </ul>
+</nav>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

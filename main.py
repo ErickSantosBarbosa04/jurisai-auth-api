@@ -1,7 +1,8 @@
 import logging
-from fastapi import FastAPI, Request
+import traceback # Para capturar erros detalhados
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -27,13 +28,27 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Middlewares de Segurança
-# CORS: Permite que o front-end acesse a API
+# CORS: Permite que o front-end acesse a API (Requisito 3.6)
 app.add_middleware(
     CORSMiddleware, 
-    allow_origins=["*"], 
+    allow_origins=["*"], # Permite todas as origens para facilitar o desenvolvimento do TCC
+    allow_credentials=True,
     allow_methods=["*"], 
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
+
+# Middleware de Captura de Erros 500 (Auxilia no Debug do PFC)
+@app.middleware("http")
+async def catch_exceptions_middleware(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except Exception as exc:
+        logging.error(f"ERRO CRÍTICO NA API: {exc}")
+        logging.error(traceback.format_exc()) # Imprime onde o erro aconteceu no terminal
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Erro interno no servidor. Verifique o terminal do Back-end."}
+        )
 
 # Forçar HTTPS em produção (Atende Requisito 3.1 e 3.2) 
 @app.middleware("http")

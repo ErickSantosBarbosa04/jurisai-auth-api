@@ -1,0 +1,57 @@
+/* Navbar básica */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1a2a3a;
+    padding: 10px 5%;
+    color: white;
+}
+
+.nav-links { display: flex; list-style: none; gap: 20px; align-items: center; }
+.nav-links a { color: white; text-decoration: none; }
+
+/* Container do Perfil */
+.profile-container { position: relative; }
+
+.profile-btn {
+    background: #34495e;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Janela que sobrepõe */
+.profile-dropdown {
+    display: none; /* Escondido por padrão */
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: white;
+    color: #333;
+    min-width: 220px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 15px;
+    z-index: 1000;
+}
+
+.profile-dropdown.active { display: block; }
+
+.profile-info p { font-size: 14px; margin-bottom: 8px; }
+
+/* Botões da Janela */
+.btn-logout, .btn-delete {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-logout { background: #f39c12; color: white; }
+.btn-delete { background: #e74c3c; color: white; }

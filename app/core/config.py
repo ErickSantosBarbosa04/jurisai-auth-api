@@ -15,7 +15,12 @@ class Settings:
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     FERNET_KEY: str = os.getenv("FERNET_KEY")
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+    
+    # Requisito 1.9: Tempo de expiração da sessão (JWT)
+    try:
+        ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 2))
+    except (ValueError, TypeError):
+        ACCESS_TOKEN_EXPIRE_MINUTES: int = 2 # Fallback caso o .env esteja mal formatado
 
     def __init__(self):
         # Validação Crítica (Requisito 1.12)
