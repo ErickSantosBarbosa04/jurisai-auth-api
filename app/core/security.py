@@ -19,6 +19,9 @@ def hash_password(password: str) -> str:
     # Retorna como string para salvar no banco
     return hashed.decode('utf-8')
 
+# APELIDO PARA O AUTH.PY ENCONTRAR (NÃO APAGAR)
+get_password_hash = hash_password
+
 def verify_password(plain: str, hashed: str) -> bool:
     # ---Verifica se a senha plana coincide com o hash.
     
@@ -50,9 +53,11 @@ def generate_totp_secret() -> str:
     return pyotp.random_base32()
 
 def verify_totp(secret: str, code: str) -> bool:
-    """Valida se o código inserido pelo usuário é válido para o segredo."""
+    """Valida se o código inserido pelo usuário é válido para o segredo com tolerância temporal."""
     totp = pyotp.TOTP(secret)
-    return totp.verify(code)
+    # valid_window=1 permite 1 ciclo de 30s antes e 1 depois do atual.
+    # Isso resolve problemas de sincronização de relógio e latência de rede.
+    return totp.verify(code, valid_window=1)
 
 def get_totp_uri(secret: str, email: str) -> str:
     """Gera a URI para o QR Code do Google Authenticator."""

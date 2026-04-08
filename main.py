@@ -23,12 +23,17 @@ Base.metadata.create_all(bind=engine)
 
 # Configuração do Rate Limit (Atende Requisito 1.11) 
 limiter = Limiter(key_func=get_remote_address)
-app = FastAPI(title=settings.PROJECT_NAME)
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    docs_url="/docs" if settings.ENVIRONMENT != "production" else None, # Esconde docs em produção
+    redoc_url=None
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Middlewares de Segurança
-# CORS: Permite que o front-end acesse a API (Requisito 3.6)
+# --- Middlewares ---
+
+# CORS (Requisito 3.6)
 app.add_middleware(
     CORSMiddleware, 
     allow_origins=["*"], # Permite todas as origens para facilitar o desenvolvimento do TCC
@@ -37,31 +42,46 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Middleware de Captura de Erros 500 (Auxilia no Debug do PFC)
+# Captura de Erros 500
 @app.middleware("http")
 async def catch_exceptions_middleware(request: Request, call_next):
     try:
         return await call_next(request)
     except Exception as exc:
         logging.error(f"ERRO CRÍTICO NA API: {exc}")
-        logging.error(traceback.format_exc()) # Imprime onde o erro aconteceu no terminal
+        logging.error(traceback.format_exc())
         return JSONResponse(
             status_code=500,
             content={"detail": "Erro interno no servidor. Verifique o terminal do Back-end."}
         )
 
-# Forçar HTTPS em produção (Atende Requisito 3.1 e 3.2) 
+# HTTPS em produção (Requisito 3.1 e 3.2)
 @app.middleware("http")
 async def enforce_https(request: Request, call_next):
     if settings.ENVIRONMENT == "production":
-        if request.url.scheme == "http":
+        proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+        if proto == "http":
             https_url = request.url.replace(scheme="https")
-            logging.warning(f"Conexão insegura bloqueada: {request.url}")
             return RedirectResponse(url=str(https_url), status_code=301)
     return await call_next(request)
 
-# Registro das Rotas (Arquitetura Modular - Requisito 6.2) 
-app.include_router(auth.router)           # Login, Register, Logout
-app.include_router(mfa.router)            # Setup e Verify do 2FA
-app.include_router(user.router)           # Perfil e LGPD (Export/Delete)
-app.include_router(password_reset.router) # Recuperação de senha
+# Headers de Segurança
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    if settings.ENVIRONMENT == "production":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000 ; includeSubDomains"
+    return response
+
+# --- Registro das Rotas (Requisito 6.2) ---
+
+app.include_router(auth.router)           
+app.include_router(mfa.router)            
+app.include_router(user.router)           
+app.include_router(password_reset.router) 
+
+@app.get("/", include_in_schema=False)
+async def root():
+    return {"message": f"API {settings.PROJECT_NAME} online", "status": "ok"}

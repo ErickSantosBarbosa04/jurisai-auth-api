@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Redefinir Senha - JurisAI</title>
+    <link rel="stylesheet" href="../css/registrar.css"> </head>
+<body>
+    <div class="auth-card">
+        <h3>Criar nova senha</h3>
+        <p id="userEmail" style="font-size: 14px; color: #666; margin-bottom: 20px;"></p>
+
+        <div id="mensagemStatus" style="display:none;"></div>
+
+        <div class="input-group">
+            <input type="password" id="newPassword" maxlength="25" placeholder="Nova senha" class="auth-input">
+            <div class="strength-meter">
+                <div id="strengthBar" class="bar"></div>
+            </div>
+            <small id="strengthText">Força: 0/5</small>
+        </div>
+
+        <div class="input-group">
+            <input type="password" id="confirmNewPassword" maxlength="25" placeholder="Confirme a nova senha" class="auth-input">
+        </div>
+
+        <div class="button-group">
+            <button type="button" id="btnSalvarSenha" class="btn-primary">Redefinir senha</button>
+        </div>
+    </div>
+
+    <script src="../js/redefinir.js"></script>
+</body>
+</html>

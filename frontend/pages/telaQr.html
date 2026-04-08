@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurar 2FA - JurisAI</title>
+    <link rel="stylesheet" href="../css/recuperar-2fa.css"> </head>
+<body>
+    <div class="auth-card">
+        <h2>Ative a Segurança em Duas Etapas</h2>
+        <p>A segurança da sua conta JurisAI é prioridade.</p>
+
+        <div class="auth-instruction">
+            <p>1. Abra o <strong>Google Authenticator</strong> no seu celular.</p>
+            <p>2. Toque no "+" e escolha <strong>"Ler código QR"</strong>.</p>
+        </div>
+
+        <div id="qrcode" style="display: flex; justify-content: center; margin: 20px 0;">
+            <p>Gerando seu QR Code personalizado...</p>
+        </div>
+
+        <div class="button-group">
+            <button onclick="irParaLogin()" class="btn-primary">Já escaneei, ir para o Login</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="../js/ativar-2fa.js"></script>
+</body>
+</html>

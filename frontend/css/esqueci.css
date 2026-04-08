@@ -1,0 +1,104 @@
+/* Importando uma fonte limpa */
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f2f2f2; /* Cinza claro de fundo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.auth-card {
+    background: #ffffff;
+    padding: 44px;
+    width: 100%;
+    max-width: 360px; /* Largura padrão Microsoft */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 2px;
+}
+
+.logo {
+    width: 100px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.back-link:hover { color: #000; }
+
+h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #1b1b1b;
+    font-weight: 600;
+}
+
+.instruction-text {
+    font-size: 15px;
+    color: #1b1b1b;
+    margin: 15px 0;
+}
+
+.auth-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #666;
+    padding: 8px 0;
+    font-size: 16px;
+    outline: none;
+    margin-bottom: 30px;
+    transition: border-bottom 0.2s;
+}
+
+.auth-input:focus {
+    border-bottom: 2px solid #0067b8; /* Azul Microsoft */
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-primary {
+    background-color: #0067b8;
+    color: white;
+    border: none;
+    padding: 10px 36px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 400;
+    min-width: 108px;
+}
+
+.btn-primary:hover {
+    background-color: #005da6;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Responsividade simples */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 30px;
+        box-shadow: none;
+        height: 100vh;
+        max-width: none;
+    }
+}
