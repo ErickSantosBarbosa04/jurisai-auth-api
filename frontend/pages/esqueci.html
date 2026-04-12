@@ -7,20 +7,20 @@
 </head>
 <body>
     <div class="auth-card">
-        
-        <div class="user-info">
-            <a href="login.html" class="back-link">←</a>
-            <h3>Recuperar conta</h3>
-        </div>
+    <a href="login.html" class="back-link-container">
+        <img src="../assets/botao-voltar.png" alt="Voltar para o Login" class="back-link-img">
+    </a>
 
-        <p class="instruction-text">Insira seu e-mail para enviarmos um código de verificação.</p>
-        
-        <input type="email" id="emailRecuperacao" placeholder="E-mail (ex: ...@alunos.br)" class="auth-input">
-
-        <div class="button-group">
-            <button onclick="irPara2FA()" class="btn-primary">Próximo</button>
-        </div>
+    <div class="user-info">
+        <h3>Recuperar conta</h3>
     </div>
+    <p class="instruction-text">Insira seu e-mail para enviarmos um código de verificação.</p>
+    <div id="mensagemStatus" style="display: none; font-size: 13px; margin-bottom: 10px;"></div>
+    <input type="email" id="emailRecuperacao" placeholder="E-mail (ex: ...@alunos.br)" class="auth-input">
+    <div class="button-group">
+        <button onclick="irPara2FA()" class="btn-primary">Próximo</button>
+    </div>
+</div>
 
     <script src="../js/esqueci.js"></script>
 </body>

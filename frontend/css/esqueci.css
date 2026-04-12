@@ -1,11 +1,11 @@
-/* Importando uma fonte limpa */
-@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap');
+/* Importando a fonte Inter para um ar mais moderno (opcional, mantive Segoe tbm) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Segoe+UI:wght@400;600&display=swap');
 
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f2f2f2; /* Cinza claro de fundo */
+    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f2f2f2;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,33 +16,39 @@ body {
     background: #ffffff;
     padding: 44px;
     width: 100%;
-    max-width: 360px; /* Largura padrão Microsoft */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border-radius: 2px;
+    max-width: 360px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Sombra um pouco mais suave */
+    border-radius: 4px; /* Leve arredondado para modernizar */
+    position: relative; /* ESSENCIAL para o botão de voltar se fixar aqui */
+    padding-top: 60px; /* Espaço extra para o botão de voltar no topo */
 }
 
-.logo {
-    width: 100px;
-    margin-bottom: 20px;
-    display: block;
+/* --- Estilo do Botão Voltar (Ajustado para dentro do Card) --- */
+.back-link-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    z-index: 10;
+}
+
+.back-link-img {
+    width: 28px; /* Tamanho levemente menor para não brigar com o título */
+    height: 28px;
+    object-fit: contain;
+}
+
+.back-link-container:hover {
+    transform: scale(1.1); /* Efeito de zoom suave */
+    opacity: 0.7;
 }
 
 .user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
-
-.back-link {
-    text-decoration: none;
-    color: #666;
-    font-size: 20px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.back-link:hover { color: #000; }
 
 h3 {
     margin: 0;
@@ -53,10 +59,12 @@ h3 {
 
 .instruction-text {
     font-size: 15px;
-    color: #1b1b1b;
-    margin: 15px 0;
+    color: #323130;
+    margin: 10px 0 25px 0;
+    line-height: 1.4;
 }
 
+/* --- Inputs estilo Microsoft --- */
 .auth-input {
     width: 100%;
     border: none;
@@ -64,14 +72,16 @@ h3 {
     padding: 8px 0;
     font-size: 16px;
     outline: none;
-    margin-bottom: 30px;
-    transition: border-bottom 0.2s;
+    margin-bottom: 35px;
+    transition: border-bottom 0.2s ease;
+    background: transparent;
 }
 
 .auth-input:focus {
-    border-bottom: 2px solid #0067b8; /* Azul Microsoft */
+    border-bottom: 2px solid #0067b8;
 }
 
+/* --- Grupo de Botões --- */
 .button-group {
     display: flex;
     justify-content: flex-end;
@@ -81,24 +91,39 @@ h3 {
     background-color: #0067b8;
     color: white;
     border: none;
-    padding: 10px 36px;
+    padding: 10px 32px;
     font-size: 15px;
     cursor: pointer;
-    font-weight: 400;
-    min-width: 108px;
+    font-weight: 600;
+    min-width: 100px;
+    transition: all 0.2s;
 }
 
 .btn-primary:hover {
     background-color: #005da6;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Responsividade simples */
+/* Estilo para Mensagens de Erro (Dinâmico via JS) */
+#mensagemStatus {
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Responsividade */
 @media (max-width: 480px) {
+    body { background-color: #fff; }
     .auth-card {
-        padding: 30px;
+        padding: 40px 24px;
         box-shadow: none;
         height: 100vh;
         max-width: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
+    .back-link-container { top: 40px; left: 24px; }
 }

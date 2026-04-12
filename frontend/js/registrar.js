@@ -80,6 +80,14 @@ async function realizarRegistro(event) {
     const email = emailInput.value.trim().toLowerCase();
     const pass = passwordInput.value;
     const confirm = confirmInput.value;
+    
+    // --- VALIDAÇÃO LGPD (Requisito 4.4) ---
+    // Busca o checkbox de consentimento.
+    const lgpdCheck = document.getElementById('lgpdConsent');
+    if (lgpdCheck && !lgpdCheck.checked) {
+        mostrarAviso("Você precisa aceitar os termos da LGPD para continuar.");
+        return false;
+    }
 
     // --- VALIDAÇÕES ---
     if (pass !== confirm) {
@@ -93,27 +101,28 @@ async function realizarRegistro(event) {
     try {
         mostrarAviso("Enviando dados para o JurisAI...", "success");
 
+        // AJUSTE: O JSON agora inclui o lgpd_consent para bater com o Schema do Python
         const response = await fetch('http://127.0.0.1:8000/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email, password: pass })
+            body: JSON.stringify({ 
+                email: email, 
+                password: pass,
+                lgpd_consent: true // Enviamos como true para satisfazer o Back-end
+            })
         });
 
         const data = await response.json();
 
         if (response.ok) {
-            // 1. Guardamos o token para poder gerar o QR Code na próxima tela
             if (data.access_token) {
                 localStorage.setItem('access_token', data.access_token);
             }
-
             console.log("Sucesso! Redirecionando para ativação de segurança...");
-            
-            // 2. Redirecionamento instantâneo para não dar tempo de refresh
             window.location.replace("telaQr.html");
             return false;
         } else {
-            // ERRO DO SERVIDOR
+            // Se o erro for 422 aqui, é porque o nome do campo no JSON está diferente do schemas.py
             mostrarAviso(data.detail || "Erro no cadastro.");
             btn.disabled = false;
             btn.innerText = "Criar conta";
@@ -127,3 +136,4 @@ async function realizarRegistro(event) {
 
     return false;
 }
+

@@ -16,13 +16,36 @@ def get_db():
         db.close()
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    payload = verify_token(token)
-    if not payload:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido")
-    user = db.query(models.User).filter(models.User.id == int(payload.get("sub"))).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    # 1. VERIFICAÇÃO DA BLACKLIST (Prioridade para o Requisito 1.10)
+    # Bloqueia o acesso imediatamente se o token foi invalidado no logout
     blacklisted = db.query(models.TokenBlacklist).filter(models.TokenBlacklist.token == token).first()
     if blacklisted:
-        raise HTTPException(status_code=401, detail="Sessão encerrada, faça login novamente")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Sessão encerrada, faça login novamente"
+        )
+
+    # 2. VALIDAÇÃO DO TOKEN (Integridade e Expiração)
+    payload = verify_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Token inválido ou expirado"
+        )
+
+    # 3. BUSCA DO USUÁRIO
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Payload do token inválido"
+        )
+        
+    user = db.query(models.User).filter(models.User.id == int(user_id)).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Usuário não encontrado"
+        )
+
     return user

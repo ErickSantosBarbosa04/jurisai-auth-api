@@ -7,37 +7,36 @@
 </head>
 <body>
     <div class="auth-card">
-        <h3>Criar conta</h3>
+    <a href="login.html" class="back-link-container">
+        <img src="../assets/botao-voltar.png" alt="Voltar para o Login" class="back-link-img">
+    </a>
 
-        <div id="mensagemStatus" style="display: none;"></div>
-        
-        <form onsubmit="return realizarRegistro(event)">
-            <div class="input-group">
-                <input type="email" id="regEmail" maxlength="35" placeholder="E-mail" class="auth-input" required>
-                <small id="emailError" style="color: red; display: none;">E-mail inválido.</small>
-            </div>
+    <h3>Criar conta</h3>
 
-            <div class="input-group">
-                <input type="password" id="regPassword" maxlength="25" placeholder="Senha" class="auth-input" required>
-                <div class="strength-meter">
-                    <div id="strengthBar" class="bar"></div>
-                </div>
-                <small id="strengthText">Força da senha: 0/5</small>
-            </div>
-
-            <div class="input-group">
-                <input type="password" id="confirmPassword" maxlength="25" placeholder="Confirme a senha" class="auth-input" required>
-                <small id="matchError" style="color: red; display: none;">As senhas não coincidem.</small>
-            </div>
-
-            <div class="button-group">
-                <button type="submit" class="btn-primary">Criar conta</button>
-            </div>
-        </form>
-        
-        <div class="footer-link">
-            <a href="login.html">Já tenho uma conta</a>
+    <div id="mensagemStatus" style="display: none;"></div>
+    
+    <form onsubmit="return realizarRegistro(event)">
+        <div class="input-group">
+            <input type="email" id="regEmail" maxlength="35" placeholder="E-mail" class="auth-input" required>
         </div>
+
+        <div class="input-group">
+            <input type="password" id="regPassword" maxlength="25" placeholder="Senha" class="auth-input" required>
+            <div class="strength-meter">
+                <div id="strengthBar" class="bar"></div>
+            </div>
+            <small id="strengthText">Força da senha: 0/5</small>
+        </div>
+
+        <div class="input-group">
+            <input type="password" id="confirmPassword" maxlength="25" placeholder="Confirme a senha" class="auth-input" required>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn-primary">Criar conta</button>
+        </div>
+    </form>
+    
     </div>
 
     <script src="../js/registrar.js"></script>

@@ -85,3 +85,42 @@ h3 {
     color: #0067b8;
     text-decoration: none;
 }
+.auth-card {
+    background: #fff;
+    padding: 44px;
+    width: 360px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 4px; /* Mantendo o padrão do sistema */
+    position: relative; /* ESSENCIAL para prender o botão dentro do card */
+    padding-top: 60px;  /* Espaço para o botão não encostar no título */
+}
+
+.back-link-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    z-index: 10;
+}
+
+.back-link-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.back-link-container:hover {
+    transform: scale(1.1);
+    opacity: 0.7;
+}
+
+h3 {
+    font-size: 24px;
+    margin: 0 0 25px 0;
+    color: #1b1b1b;
+    font-weight: 600;
+}
+

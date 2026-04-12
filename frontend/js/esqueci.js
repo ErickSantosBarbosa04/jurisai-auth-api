@@ -1,6 +1,5 @@
-// js/esqueci.js
-
-function irPara2FA() {
+// AJUSTE: Transformei em async para permitir o fetch (Requisito 2.1 e 2.7)
+async function irPara2FA() {
     const emailInput = document.getElementById('emailRecuperacao');
     const email = emailInput.value.trim();
 
@@ -18,9 +17,29 @@ function irPara2FA() {
         return;
     }
 
-    // Passa o e-mail para a próxima tela via URL
-    // encodeURIComponent garante que símbolos como '@' não quebrem a URL
-    window.location.href = `recuperar-2fa.html?email=${encodeURIComponent(email)}`;
+    try {
+        // VERIFICAÇÃO de email (Requisito 2.7) ---
+        const response = await fetch(`http://127.0.0.1:8000/auth/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Passa o e-mail para a próxima tela via URL
+            // encodeURIComponent garante que símbolos como '@' não quebrem a URL
+            window.location.href = `recuperar-2fa.html?email=${encodeURIComponent(email)}`;
+        } else {
+            // Caso o e-mail não exista ou haja erro, exibe o alerta (Requisito 5.2)
+            alert(data.detail || "E-mail não encontrado em nossa base.");
+        }
+
+    } catch (error) {
+        console.error("Erro na conexão:", error);
+        alert("Não foi possível conectar ao JurisAI. Verifique se o servidor está rodando.");
+    }
 }
 
 // Atalho: apertar Enter no teclado também dispara o botão

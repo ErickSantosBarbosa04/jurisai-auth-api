@@ -18,7 +18,6 @@ logging.basicConfig(
 )
 
 # Inicialização do Banco de Dados
-# Isso garante que as tabelas sejam criadas ao iniciar a API
 Base.metadata.create_all(bind=engine)
 
 # Configuração do Rate Limit (Atende Requisito 1.11) 
@@ -36,13 +35,14 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # CORS (Requisito 3.6)
 app.add_middleware(
     CORSMiddleware, 
-    allow_origins=["*"], # Permite todas as origens para facilitar o desenvolvimento do TCC
+    allow_origins=["*"], # Mantido "*" para facilitar o TCC, mas aceita credenciais
     allow_credentials=True,
     allow_methods=["*"], 
     allow_headers=["*"],
 )
 
 # Captura de Erros 500
+# DICA: Esse middleware é vital para o Requisito 5.2 (Registro de falhas)
 @app.middleware("http")
 async def catch_exceptions_middleware(request: Request, call_next):
     try:
