@@ -1,109 +1,48 @@
-/* Importando a fonte padrão */
-@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap');
+:root {
+    --primary: #165d7d;
+    --primary-hover: #104a64;
+    --surface: #ffffff;
+    --bg: #f4f6f8;
+    --text: #1d2733;
+    --muted: #667085;
+    --border: #c8d2dc;
+    --error: #b42318;
+    --success: #087443;
+}
+
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f2f2f2;
+    min-height: 100vh;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    padding: 24px;
+    color: var(--text);
 }
 
 .auth-card {
-    background: #fff;
-    padding: 44px;
-    width: 360px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-h3 {
-    font-size: 24px;
-    margin: 0 0 20px 0;
-    color: #1b1b1b;
-}
-
-.input-group {
-    margin-bottom: 15px;
-}
-
-.auth-input {
-    width: 100%;
-    border: none;
-    border-bottom: 1px solid #666;
-    padding: 8px 0;
-    font-size: 16px;
-    outline: none;
-    transition: border-bottom 0.2s;
-}
-
-.auth-input:focus {
-    border-bottom: 2px solid #0067b8;
-}
-
-/* LÓGICA DA BARRA DE FORÇA */
-.strength-meter {
-    width: 100%;
-    height: 5px;
-    background: #eee;
-    margin-top: 5px;
-    border-radius: 2px;
-}
-.bar {
-    height: 100%;
-    width: 0%;
-    transition: 0.3s;
-    border-radius: 2px;
-}
-.lvl-1 { width: 20%; background: #ff4d4d; }
-.lvl-2 { width: 40%; background: #ffad33; }
-.lvl-3 { width: 60%; background: #ffff66; }
-.lvl-4 { width: 80%; background: #add8e6; }
-.lvl-5 { width: 100%; background: #4caf50; }
-
-.button-group {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 25px;
-}
-
-.btn-primary {
-    background-color: #0067b8;
-    color: white;
-    border: none;
-    padding: 10px 24px;
-    cursor: pointer;
-}
-
-.footer-link {
-    margin-top: 20px;
-    font-size: 14px;
-}
-
-.footer-link a {
-    color: #0067b8;
-    text-decoration: none;
-}
-.auth-card {
-    background: #fff;
-    padding: 44px;
-    width: 360px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-radius: 4px; /* Mantendo o padrão do sistema */
-    position: relative; /* ESSENCIAL para prender o botão dentro do card */
-    padding-top: 60px;  /* Espaço para o botão não encostar no título */
+    width: min(100%, 520px);
+    background: var(--surface);
+    border: 1px solid #d9e0e7;
+    border-radius: 8px;
+    padding: 54px 34px 32px;
+    box-shadow: 0 12px 32px rgba(16, 39, 51, 0.08);
+    position: relative;
 }
 
 .back-link-container {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 18px;
+    left: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    z-index: 10;
 }
 
 .back-link-img {
@@ -112,15 +51,152 @@ h3 {
     object-fit: contain;
 }
 
-.back-link-container:hover {
-    transform: scale(1.1);
+h3 {
+    margin: 0 0 24px;
+    color: var(--text);
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.input-group {
+    margin-bottom: 14px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 12px;
+}
+
+.auth-input {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 10px;
+    background: #fff;
+    color: var(--text);
+    font: inherit;
+    outline: none;
+}
+
+.auth-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(22, 93, 125, 0.14);
+}
+
+.strength-meter {
+    width: 100%;
+    height: 5px;
+    background: #e5e8ec;
+    margin-top: 7px;
+    border-radius: 2px;
+}
+
+.bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.2s ease;
+    border-radius: 2px;
+}
+
+.lvl-1 { width: 20%; background: #d92d20; }
+.lvl-2 { width: 40%; background: #f79009; }
+.lvl-3 { width: 60%; background: #fdb022; }
+.lvl-4 { width: 80%; background: #2e90fa; }
+.lvl-5 { width: 100%; background: #12b76a; }
+
+small {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+}
+
+.consent-line {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.consent-line input {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    flex: 0 0 auto;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn-primary {
+    min-height: 42px;
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-primary:disabled {
+    cursor: wait;
     opacity: 0.7;
 }
 
-h3 {
-    font-size: 24px;
-    margin: 0 0 25px 0;
-    color: #1b1b1b;
-    font-weight: 600;
+#mensagemStatus {
+    padding: 10px;
+    margin-bottom: 14px;
+    border-radius: 6px;
+    font-size: 14px;
 }
 
+#mensagemStatus.success {
+    background: #dcfae6;
+    color: var(--success);
+    border: 1px solid #abefc6;
+}
+
+#mensagemStatus.error {
+    background: #fee4e2;
+    color: var(--error);
+    border: 1px solid #fecdca;
+}
+
+@media (max-width: 560px) {
+    body {
+        align-items: flex-start;
+        padding: 0;
+        background: #fff;
+    }
+
+    .auth-card {
+        width: 100%;
+        min-height: 100vh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .button-group,
+    .btn-primary {
+        width: 100%;
+    }
+}

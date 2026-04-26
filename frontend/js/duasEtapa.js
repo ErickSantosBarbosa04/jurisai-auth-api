@@ -18,8 +18,7 @@ async function confirmarLogin2FA() {
     try {
         console.log("Enviando código para /auth/2fa/verify...");
         
-        // No seu duasEtapa.js, mude a URL para:
-        const response = await fetch('http://127.0.0.1:8000/auth/2fa/login-verify', { 
+        const response = await fetch('/auth/2fa/login-verify', { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -78,7 +78,7 @@ async function salvarNovaSenha(e) {
 
     try {
         console.log("Iniciando envio para o servidor...");
-        const response = await fetch('http://127.0.0.1:8000/auth/redefinir-senha', {
+        const response = await fetch('/auth/redefinir-senha', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

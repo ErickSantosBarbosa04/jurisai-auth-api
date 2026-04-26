@@ -2,24 +2,30 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Configurar 2FA - JurisAI</title>
-    <link rel="stylesheet" href="../css/recuperar-2fa.css"> </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar 2FA | JurisAI</title>
+    <link rel="stylesheet" href="../css/recuperar-2fa.css">
+</head>
 <body>
     <div class="auth-card">
-        <h2>Ative a Segurança em Duas Etapas</h2>
-        <p>A segurança da sua conta JurisAI é prioridade.</p>
+        <h2>Ativar duas etapas</h2>
+
+        <div id="mensagemStatus" style="display:none; color: #d9534f; background: #f9f2f2; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 13px;"></div>
 
         <div class="auth-instruction">
-            <p>1. Abra o <strong>Google Authenticator</strong> no seu celular.</p>
-            <p>2. Toque no "+" e escolha <strong>"Ler código QR"</strong>.</p>
+            <p>Leia o QR Code no Authenticator e confirme o codigo gerado.</p>
         </div>
 
         <div id="qrcode" style="display: flex; justify-content: center; margin: 20px 0;">
-            <p>Gerando seu QR Code personalizado...</p>
+            <p>Gerando QR Code...</p>
+        </div>
+
+        <div class="totp-container">
+            <input type="text" id="totpCode" maxlength="6" placeholder="000000" class="totp-input" autofocus>
         </div>
 
         <div class="button-group">
-            <button onclick="irParaLogin()" class="btn-primary">Já escaneei, ir para o Login</button>
+            <button onclick="ativar2FA()" class="btn-primary">Ativar e entrar</button>
         </div>
     </div>
 

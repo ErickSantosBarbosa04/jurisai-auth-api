@@ -1,13 +1,15 @@
 import logging
+from pathlib import Path
 import traceback # Para capturar erros detalhados
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from app.core.db.database import Base, engine
+from app.core.db.database import Base, engine, ensure_user_profile_columns
 from app.core.config import settings 
 from app.routers import auth, mfa, user, password_reset
 
@@ -19,6 +21,7 @@ logging.basicConfig(
 
 # Inicialização do Banco de Dados
 Base.metadata.create_all(bind=engine)
+ensure_user_profile_columns()
 
 # Configuração do Rate Limit (Atende Requisito 1.11) 
 limiter = Limiter(key_func=get_remote_address)
@@ -82,6 +85,19 @@ app.include_router(mfa.router)
 app.include_router(user.router)           
 app.include_router(password_reset.router) 
 
+BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIR = BASE_DIR / "frontend"
+
+if FRONTEND_DIR.exists():
+    app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend")
+
 @app.get("/", include_in_schema=False)
 async def root():
+    login_page = FRONTEND_DIR / "pages" / "login.html"
+    if login_page.exists():
+        return RedirectResponse(url="/frontend/pages/login.html", status_code=302)
+    return {"message": f"API {settings.PROJECT_NAME} online", "status": "ok"}
+
+@app.get("/api/health", include_in_schema=False)
+async def health_check():
     return {"message": f"API {settings.PROJECT_NAME} online", "status": "ok"}

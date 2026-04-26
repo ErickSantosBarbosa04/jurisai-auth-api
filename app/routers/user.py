@@ -13,6 +13,14 @@ router = APIRouter(prefix="/auth", tags=["User Profile & LGPD"])
 def get_me(current_user=Depends(get_current_user)):
     return UserService.get_user_profile(current_user)
 
+@router.patch("/me", response_model=schemas.UserResponse)
+def update_me(
+    data: schemas.UserUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    return UserService.update_user_profile(db, current_user, data)
+
 @router.get("/export-data")
 #Solicita a exportação de dados ao Service. (Requisito 4.9)
 def export_user_data(current_user=Depends(get_current_user)):

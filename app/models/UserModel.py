@@ -10,6 +10,14 @@ class User(Base):
     totp_secret = Column(String, nullable=True)
     is_2fa_enabled = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, nullable=True, onupdate=lambda: datetime.now(timezone.utc))
+
+    # --- PERFIL EDITAVEL DO USUARIO ---
+    full_name = Column(String(120), nullable=True)
+    profile_type = Column(String(30), nullable=True)  # estudante, advogado ou outro
+    university = Column(String(160), nullable=True)
+    semester = Column(Integer, nullable=True)
+    legal_specialty = Column(String(80), nullable=True)
 
     # --- NOVOS CAMPOS PARA REQUISITO 1.11 ---
     failed_login_attempts = Column(Integer, default=0)

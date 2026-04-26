@@ -18,14 +18,20 @@ class AuthService:
         if not data.lgpd_consent:
             raise HTTPException(status_code=400, detail="O consentimento da LGPD é obrigatório para criar uma conta.")
 
-        user = db.query(models.User).filter(models.User.email == data.email).first()
+        normalized_email = data.email.lower().strip()
+        user = db.query(models.User).filter(models.User.email == normalized_email).first()
         if user:
             raise HTTPException(status_code=400, detail="E-mail já cadastrado.")
 
         # 2. Criação do usuário com metadados de consentimento (Requisito 4.5 e 4.7)
         new_user = models.User(
-            email=data.email, 
+            email=normalized_email,
             hashed_password=hash_password(data.password),
+            full_name=data.full_name,
+            profile_type=data.profile_type,
+            university=data.university,
+            semester=data.semester,
+            legal_specialty=data.legal_specialty,
             lgpd_consent=True,
             consent_purpose="Autenticação e segurança da conta JurisAI", 
             consent_date=datetime.now(timezone.utc), 
@@ -44,12 +50,18 @@ class AuthService:
             "token_type": "bearer",
             "id": new_user.id,
             "email": new_user.email,
-            "is_2fa_enabled": new_user.is_2fa_enabled
+            "is_2fa_enabled": new_user.is_2fa_enabled,
+            "full_name": new_user.full_name,
+            "profile_type": new_user.profile_type,
+            "university": new_user.university,
+            "semester": new_user.semester,
+            "legal_specialty": new_user.legal_specialty
         }
 
     @staticmethod
     # Valida credenciais e 2FA, retornando o Token de Acesso. (Requisito 1.9 e 1.5)
     def authenticate_user(db: Session, email: str, password: str, totp_code: str = None):
+        email = email.lower().strip()
         user = db.query(models.User).filter(models.User.email == email).first()
         
         if not user:

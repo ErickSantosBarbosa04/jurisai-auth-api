@@ -36,7 +36,7 @@ async function validarEVoltar() {
     try {
         // ATUALIZAÇÃO: Enviamos tudo no 'body' como um objeto JSON limpo.
         // Isso evita o erro 400 se o servidor estiver esperando um Schema/Modelo específico.
-        const response = await fetch(`http://127.0.0.1:8000/auth/recuperar-confirmar`, {
+        const response = await fetch(`/auth/recuperar-confirmar`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',

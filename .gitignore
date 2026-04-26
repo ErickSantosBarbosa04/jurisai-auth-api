@@ -1,4 +1,5 @@
 venv/
+.deps/
 __pycache__/
 *.pyc
 .env
@@ -7,3 +8,8 @@ __pycache__/
 .venv/
 *.pem
 *.key
+*.db
+*.sqlite
+*.sqlite3
+uvicorn_local.*.log
+DOCUMENTACAO.md

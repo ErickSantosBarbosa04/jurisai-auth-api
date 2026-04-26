@@ -3,30 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login JurisAI</title>
+    <title>Painel | JurisAI</title>
     <link rel="stylesheet" href="../css/dashboardStyle.css">
 </head>
 <body>
-    <span id="timerDisplay" style="color: #f39c12; font-weight: bold; margin-left: 15px;"></span>
-<nav class="navbar">
-    <div class="logo">JurisAI</div>
-    <ul class="nav-links">
-        <li><a href="#">Início</a></li>
-        <li><a href="#">Processos</a></li>
-        <li class="profile-container">
-            <button id="profileBtn" class="profile-btn">👤 Meu Perfil</button>
-            <div id="profileMenu" class="profile-dropdown">
-                <div class="profile-info">
-                    <p><strong>E-mail:</strong> <span id="userEmail">carregando...</span></p>
-                    <p><strong>Status 2FA:</strong> <span id="user2FA">Verificando...</span></p>
-                </div>
-                <hr>
-                <button onclick="confirmLogout()" class="btn-logout">Sair do Sistema</button>
-                <button onclick="confirmDeleteAccount()" class="btn-delete">Excluir Minha Conta</button>
+    <nav class="navbar">
+        <div class="brand">JurisAI</div>
+        <div class="nav-actions">
+            <span id="timerDisplay" class="session-timer">Sessao ativa</span>
+            <button id="logoutBtn" class="btn-secondary" type="button">Sair</button>
+        </div>
+    </nav>
+
+    <main class="page-shell">
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">Area do usuario</p>
+                <h1 id="welcomeTitle">Meu perfil</h1>
             </div>
-        </li>
-    </ul>
-</nav>
+            <button id="exportBtn" class="btn-outline" type="button">Exportar dados</button>
+        </header>
+
+        <section class="content-grid">
+            <section class="panel">
+                <div class="panel-heading">
+                    <h2>Dados academicos</h2>
+                    <span id="saveStatus" class="status-pill">Nao salvo</span>
+                </div>
+
+                <form id="profileForm" class="profile-form">
+                    <label for="full_name">Nome completo</label>
+                    <input id="full_name" name="full_name" type="text" maxlength="120" placeholder="Seu nome completo">
+
+                    <label for="profile_type">Tipo de perfil</label>
+                    <select id="profile_type" name="profile_type">
+                        <option value="estudante">Estudante</option>
+                        <option value="advogado">Advogado</option>
+                        <option value="outro">Outro</option>
+                    </select>
+
+                    <label for="university">Faculdade</label>
+                    <input id="university" name="university" type="text" maxlength="160" placeholder="Nome da faculdade">
+
+                    <label for="semester">Semestre</label>
+                    <select id="semester" name="semester">
+                        <option value="">Selecione</option>
+                    </select>
+
+                    <label for="legal_specialty">Area de interesse</label>
+                    <select id="legal_specialty" name="legal_specialty">
+                        <option value="">Selecione</option>
+                        <option>Direito Civil</option>
+                        <option>Direito do Trabalho</option>
+                        <option>Direito Penal</option>
+                        <option>Direito Empresarial</option>
+                        <option>Direito Tributario</option>
+                        <option>Direito Constitucional</option>
+                        <option>Direito Administrativo</option>
+                        <option>Direito do Consumidor</option>
+                        <option>Direito de Familia</option>
+                        <option>Direito Previdenciario</option>
+                        <option>Direito Ambiental</option>
+                        <option>Direito Digital</option>
+                    </select>
+
+                    <button class="btn-primary" type="submit">Salvar perfil</button>
+                </form>
+            </section>
+
+            <section class="panel">
+                <div class="panel-heading">
+                    <h2>Conta</h2>
+                    <span id="twoFactorStatus" class="status-pill">Verificando</span>
+                </div>
+
+                <dl class="account-list">
+                    <div>
+                        <dt>E-mail</dt>
+                        <dd id="userEmail">Carregando...</dd>
+                    </div>
+                    <div>
+                        <dt>Cadastro</dt>
+                        <dd id="createdAt">-</dd>
+                    </div>
+                    <div>
+                        <dt>Ultima atualizacao</dt>
+                        <dd id="updatedAt">-</dd>
+                    </div>
+                </dl>
+
+                <button id="deleteAccountBtn" class="btn-danger" type="button">Excluir minha conta</button>
+            </section>
+        </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
     <script src="../js/dashboard.js"></script>
 </body>
 </html>

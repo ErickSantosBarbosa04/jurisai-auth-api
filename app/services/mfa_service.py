@@ -48,6 +48,32 @@ class MFAService:
 
     @staticmethod
     # Nova função específica para o fluxo de LOGIN (Requisito 1.5)
+    def verify_2fa(db: Session, current_user: User, data: schemas.TOTPVerifyRequest):
+        if not current_user.totp_secret:
+            raise HTTPException(status_code=400, detail="2FA ainda nao foi configurado")
+
+        try:
+            raw_secret = decrypt(current_user.totp_secret)
+        except Exception as e:
+            logger.error(f"SERVICE: Erro ao descriptografar segredo para {current_user.id}: {str(e)}")
+            raise HTTPException(status_code=500, detail="Erro interno de seguranca")
+
+        if not verify_totp(raw_secret, data.code):
+            logger.warning(f"SERVICE: Codigo 2FA invalido na ativacao para usuario {current_user.id}")
+            raise HTTPException(status_code=400, detail="Codigo 2FA invalido")
+
+        user = db.query(User).filter(User.id == current_user.id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuario nao encontrado")
+
+        user.is_2fa_enabled = True
+        db.commit()
+        db.refresh(user)
+
+        logger.info(f"SERVICE: 2FA ativado para usuario {user.id}")
+        return {"message": "2FA ativado com sucesso"}
+
+    @staticmethod
     def verify_login_2fa(db: Session, email: str, code: str):
         # 1. Busca o usuário pelo e-mail (já que ele não está logado ainda)
         user = db.query(User).filter(User.email == email).first()
