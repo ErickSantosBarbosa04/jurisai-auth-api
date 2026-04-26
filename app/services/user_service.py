@@ -45,10 +45,16 @@ class UserService:
     def export_user_data(current_user: User):
         logger.info(f"SERVICE: Preparando exportação de dados para ID: {current_user.id}")
         
-        # Incluímos os metadados de LGPD para transparência total
+        # Incluímos os metadados de LGPD e Dados Acadêmicos para transparência total
         return {
             "user_id": current_user.id,
             "email": current_user.email,
+            "perfil_academico": {
+                "nome_completo": current_user.full_name,
+                "rgm": current_user.rgm_matriz,
+                "universidade": current_user.university,
+                "semestre": current_user.semester
+            },
             "is_2fa_enabled": current_user.is_2fa_enabled,
             "data_criacao": current_user.created_at,
             "data_atualizacao": current_user.updated_at,

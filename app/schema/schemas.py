@@ -42,6 +42,11 @@ class RegisterRequest(UserProfileFields):
     email: EmailStr
     password: str
     lgpd_consent: bool  
+    # --- NOVOS CAMPOS ACADÊMICOS ---
+    full_name: str
+    rgm_matriz: str
+    university: str
+    semester: int
 
 
 class LoginRequest(BaseModel):
@@ -73,8 +78,9 @@ class UserUpdateRequest(UserProfileFields):
 
 
 class UserResponse(BaseModel):
-    id: int
+    id: str # Alterado para str devido ao uso de UUID
     email: str
+    full_name: str # Adicionado para retorno no dashboard
     is_2fa_enabled: bool
     full_name: Optional[str] = None
     profile_type: Optional[str] = None

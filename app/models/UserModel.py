@@ -1,12 +1,20 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from datetime import datetime, timezone
 from app.core.db.database import Base
+import uuid
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+    
+    # --- DADOS DO ALUNO (Público-Alvo Atualizado) ---
+    full_name = Column(String, nullable=True)
+    rgm_matriz = Column(String, unique=True, index=True, nullable=True)
+    university = Column(String, nullable=True)
+    semester = Column(Integer, nullable=True)
+
     totp_secret = Column(String, nullable=True)
     is_2fa_enabled = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

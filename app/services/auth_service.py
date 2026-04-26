@@ -22,18 +22,22 @@ class AuthService:
         user = db.query(models.User).filter(models.User.email == normalized_email).first()
         if user:
             raise HTTPException(status_code=400, detail="E-mail já cadastrado.")
+            
+        # Verificação de duplicidade de RGM para integridade acadêmica
+        rgm_check = db.query(models.User).filter(models.User.rgm_matriz == data.rgm_matriz).first()
+        if rgm_check:
+            raise HTTPException(status_code=400, detail="Este RGM já está vinculado a uma conta.")
 
         # 2. Criação do usuário com metadados de consentimento (Requisito 4.5 e 4.7)
         new_user = models.User(
             email=normalized_email,
             hashed_password=hash_password(data.password),
-            full_name=data.full_name,
-            profile_type=data.profile_type,
-            university=data.university,
-            semester=data.semester,
-            legal_specialty=data.legal_specialty,
+            full_name=data.full_name,          # NOVO: Nome do Aluno
+            rgm_matriz=data.rgm_matriz,        # NOVO: Matrícula
+            university=data.university,        # NOVO: Instituição
+            semester=data.semester,            # NOVO: Semestre
             lgpd_consent=True,
-            consent_purpose="Autenticação e segurança da conta JurisAI", 
+            consent_purpose="Análise jurídica e personalização acadêmica", 
             consent_date=datetime.now(timezone.utc), 
             terms_version="2026.1"
         )
@@ -42,7 +46,7 @@ class AuthService:
         db.commit()
         db.refresh(new_user)
 
-        token = create_access_token({"sub": str(new_user.id)})
+        token = create_access_token({"sub": str(new_user.id)}) # ID agora é string (UUID)
         
         # RETORNO CORRIGIDO: Dados na raiz para o Front-end
         return {
@@ -50,51 +54,73 @@ class AuthService:
             "token_type": "bearer",
             "id": new_user.id,
             "email": new_user.email,
-            "is_2fa_enabled": new_user.is_2fa_enabled,
             "full_name": new_user.full_name,
-            "profile_type": new_user.profile_type,
-            "university": new_user.university,
-            "semester": new_user.semester,
-            "legal_specialty": new_user.legal_specialty
+            "is_2fa_enabled": new_user.is_2fa_enabled
         }
 
     @staticmethod
     # Valida credenciais e 2FA, retornando o Token de Acesso. (Requisito 1.9 e 1.5)
     def authenticate_user(db: Session, email: str, password: str, totp_code: str = None):
-        email = email.lower().strip()
+        # Busca o usuário pelo e-mail
         user = db.query(models.User).filter(models.User.email == email).first()
-        
+        msg_erro_padrao = "E-mail ou senha inválidos."
+
         if not user:
             logger.warning(f"SERVICE: Usuário não encontrado: {email}")
-            raise HTTPException(status_code=401, detail="senha ou email inválidos")
+            raise HTTPException(status_code=401, detail=msg_erro_padrao)
 
-        # 1. VERIFICA SE ESTÁ BLOQUEADO (Requisito 1.11)
+        # --- 1. LÓGICA DE BLOQUEIO (Requisito 1.11) ---
         if user.lockout_until:
             now = datetime.now(timezone.utc)
+            # Garante que o tempo do banco tenha fuso horário UTC para comparação exata
             lockout_time = user.lockout_until.replace(tzinfo=timezone.utc) if user.lockout_until.tzinfo is None else user.lockout_until
             
             if now < lockout_time:
-                minutos = int((lockout_time - now).total_seconds() / 60)
-                logger.warning(f"BLOQUEIO ATIVO: Tentativa em conta bloqueada: {email}")
+                # AINDA BLOQUEADO: Calcula o tempo restante real
+                segundos_restantes = int((lockout_time - now).total_seconds())
+                minutos = segundos_restantes // 60
+                
+                if minutos > 0:
+                    aviso = f"{minutos} minutos"
+                else:
+                    aviso = f"{segundos_restantes} segundos"
+                
+                logger.warning(f"BLOQUEIO ATIVO: Tentativa negada para {email}")
                 raise HTTPException(
                     status_code=403, 
-                    detail=f"Muitas tentativas. Tente novamente em {minutos} minutos."
+                    detail=f"Muitas tentativas falhas. Tente novamente em {aviso}."
                 )
-            
-        # 2. SE VIER O CÓDIGO 2FA, VALIDAMOS ELE PRIMEIRO (Requisito 1.5)
+            else:
+                # O TEMPO PASSOU: Forçamos o reset total com commit isolado
+                try:
+                    user.failed_login_attempts = 0
+                    user.lockout_until = None
+                    db.add(user)
+                    db.flush()
+                    db.commit()
+                    db.refresh(user)
+                    logger.info(f"SERVICE: Bloqueio expirado. Ficha limpa para {email}")
+                except Exception as e:
+                    db.rollback()
+                    logger.error(f"ERRO AO RESETAR DB: {str(e)}")
+
+        # --- 2. VALIDAÇÃO DE 2FA (Requisito 1.5) ---
+        # Se o 2FA estiver ativado e o código for enviado, validamos primeiro
         if user.is_2fa_enabled and totp_code and totp_code not in ["", "null"]:
             try:
                 raw_secret = decrypt(user.totp_secret)
                 if verify_totp(raw_secret, totp_code):
-                    # Sucesso: Reseta falhas e gera token
+                    # Sucesso no 2FA: Reseta falhas e gera token
                     user.failed_login_attempts = 0
                     user.lockout_until = None
+                    db.add(user)
                     db.commit()
 
                     token = create_access_token({"sub": str(user.id)})
                     logger.info(f"SERVICE: Login 2FA bem-sucedido: {email}")
                     return {"access_token": token, "token_type": "bearer"}
                 else:
+                    # Código 2FA errado conta como falha de segurança
                     AuthService._registrar_falha(db, user)
                     logger.warning(f"SERVICE: 2FA inválido para: {email}")
                     raise HTTPException(status_code=401, detail="Código 2FA inválido")
@@ -103,20 +129,23 @@ class AuthService:
                 logger.error(f"SERVICE: Erro ao processar 2FA: {str(e)}")
                 raise HTTPException(status_code=500, detail="Erro interno ao validar 2FA")
 
-        # 3. VALIDAÇÃO DA SENHA (Requisito 1.2 e 1.6)
+        # --- 3. VALIDAÇÃO DA SENHA (Requisito 1.2 e 1.6) ---
         if not verify_password(password, user.hashed_password):
+            # Registra a falha no banco de dados (incrementa tentativas)
             AuthService._registrar_falha(db, user)
             logger.warning(f"SERVICE: Falha de senha para: {email}")
-            raise HTTPException(status_code=401, detail="senha ou email inválidos")
+            raise HTTPException(status_code=401, detail=msg_erro_padrao)
         
-        # Se a senha está ok mas falta o 2FA
+        # Se a senha está correta, mas o 2FA é obrigatório e não foi enviado
         if user.is_2fa_enabled and not totp_code:
             logger.info(f"SERVICE: MFA solicitado (Senha OK) para: {email}")
             raise HTTPException(status_code=401, detail="Código 2FA obrigatório")
                 
-        # Login normal: Reseta falhas e gera token
+        # --- 4. SUCESSO NO LOGIN ---
+        # Login normal bem-sucedido: Reseta falhas e gera token
         user.failed_login_attempts = 0
         user.lockout_until = None
+        db.add(user)
         db.commit()
 
         token = create_access_token({"sub": str(user.id)})
@@ -125,11 +154,16 @@ class AuthService:
     
     @staticmethod
     def _registrar_falha(db: Session, user: models.User):
-        """Método auxiliar para gerenciar punições por falha (Requisito 1.11)"""
         user.failed_login_attempts += 1
         if user.failed_login_attempts >= 5:
-            user.lockout_until = datetime.now(timezone.utc) + timedelta(minutes=15)
-            logger.error(f"REQ 1.11: Conta {user.email} bloqueada por força bruta.")
+            # Usa UTC para salvar no banco (Requisito 1.11)
+            user.lockout_until = datetime.now(timezone.utc) + timedelta(minutes=1)
+            db.commit()
+            logger.error(f"REQ 1.11: Conta {user.email} bloqueada por 1 minuto.")
+            raise HTTPException(
+                status_code=403, 
+                detail="Muitas tentativas falhas. Bloqueado por 1 minuto."
+            )
         db.commit()
 
     @staticmethod
