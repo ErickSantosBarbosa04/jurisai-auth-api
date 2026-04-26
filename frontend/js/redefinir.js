@@ -1,3 +1,8 @@
+// js/redefinir.js
+
+// CONFIGURAÇÃO: URL do servidor Backend (Porta 8000 para o Python)
+const API_BASE_URL = "http://127.0.0.1:8000";
+
 window.onload = () => {
     console.log("Página de redefinição carregada com sucesso.");
 
@@ -44,18 +49,23 @@ window.onload = () => {
 };
 
 async function salvarNovaSenha(e) {
-    if (e) e.preventDefault();
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
     console.log("Função salvarNovaSenha disparada!");
 
     const passwordInput = document.getElementById('newPassword');
     const confirmInput = document.getElementById('confirmNewPassword');
+    const btn = document.getElementById('btnSalvarSenha');
     
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
 
     if (!passwordInput || !confirmInput) {
         mostrarAviso("Erro: Campos de senha não localizados.");
-        return;
+        return false;
     }
 
     const newPass = passwordInput.value; 
@@ -63,43 +73,74 @@ async function salvarNovaSenha(e) {
 
     if (!email) {
         mostrarAviso("Erro: E-mail não identificado.");
-        return;
+        return false;
     }
 
     if (newPass !== confirmPass) {
         mostrarAviso("As senhas não coincidem!");
-        return;
+        return false;
     }
 
     if (newPass.length < 6) {
         mostrarAviso("A senha deve ter no mínimo 6 caracteres.");
-        return;
+        return false;
     }
 
     try {
-        console.log("Iniciando envio para o servidor...");
-        const response = await fetch('/auth/redefinir-senha', {
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "Salvando...";
+        }
+
+        console.log("Iniciando envio para o servidor JurisAI na porta 8000...");
+        
+        const response = await fetch(`${API_BASE_URL}/auth/redefinir-senha`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify({
                 email: email,
-                new_password: newPass
+                new_password: newPass 
             })
         });
 
-        const data = await response.json();
+        const responseText = await response.text();
+        let data = {};
+        try {
+            data = responseText ? JSON.parse(responseText) : {};
+        } catch (err) {
+            console.error("Servidor não retornou JSON:", responseText);
+        }
 
         if (response.ok) {
-            console.log("Sucesso no servidor! Redirecionando...");
-            // Usamos o replace para ele não conseguir "voltar" para a tela de erro
-            window.location.replace("login.html");
+            console.log("Sucesso no servidor! Fuga relâmpago antes do Live Server recarregar...");
+            
+            // REDIRECIONAMENTO INSTANTÂNEO - SEM DELAY
+            // Ele muda a página antes do VS Code mandar o sinal de refresh
+            window.location.href = "login.html";
+            
+            return false;
         } else {
-            mostrarAviso(data.detail || "Erro ao redefinir senha.");
+            let erroMsg = data.detail || "Erro ao redefinir senha.";
+            if (typeof erroMsg !== 'string') erroMsg = JSON.stringify(erroMsg);
+            mostrarAviso(erroMsg);
+            
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Redefinir senha";
+            }
         }
     } catch (error) {
         console.error("ERRO NA CHAMADA FETCH:", error);
-        mostrarAviso("Não foi possível conectar ao servidor.");
+        mostrarAviso("Não foi possível conectar ao servidor JurisAI.");
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Redefinir senha";
+        }
     }
+    return false;
 }
 
 function mostrarAviso(msg, tipo = "error") {

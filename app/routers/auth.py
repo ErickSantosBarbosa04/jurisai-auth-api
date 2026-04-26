@@ -20,6 +20,20 @@ logger = logging.getLogger(__name__)
 def register(data: schemas.RegisterRequest, db: Session = Depends(get_db)):
     return AuthService.register_user(db, data)
 
+@router.post("/check-email")
+# Rota para verificar existência do e-mail antes de prosseguir para o 2FA (Requisito 2.7)
+def check_email(data: schemas.EmailRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == data.email).first()
+    if not user:
+        logger.warning(f"RECUPERAÇÃO: Tentativa com e-mail não cadastrado: {data.email}")
+        raise HTTPException(status_code=404, detail="E-mail não encontrado em nossa base.")
+    
+    # Se o usuário existe mas não tem 2FA, ele não conseguiria recuperar por esse fluxo
+    if not user.totp_secret:
+        raise HTTPException(status_code=400, detail="Este usuário não possui 2FA configurado.")
+
+    return {"message": "E-mail validado. Prossiga para o 2FA."}
+
 @router.post("/recuperar-confirmar")
 # Alterado de RecuperarSenhaRequest para ValidarRecuperacaoRequest
 def recuperar_confirmar(data: schemas.ValidarRecuperacaoRequest, db: Session = Depends(get_db)):

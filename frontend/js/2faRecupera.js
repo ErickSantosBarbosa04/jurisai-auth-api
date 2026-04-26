@@ -1,31 +1,32 @@
+// js/2faRecupera.js
+
+// CONFIGURAÇÃO: URL do servidor Backend
+const API_BASE_URL = "http://127.0.0.1:8000";
+
 window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     
-    // 1. Exibe o e-mail que veio da tela anterior
     const email = urlParams.get('email');
-    if (email) {
-        // Usei textContent por segurança contra scripts maliciosos
+    if (email && document.getElementById('displayEmail')) {
         document.getElementById('displayEmail').textContent = email;
     }
 
-    // 2. Verifica o status de inatividade (Requisito 1.10)
     if (urlParams.get('motivo') === 'inatividade') {
         const aviso = document.getElementById('mensagemStatus');
-        aviso.innerText = "Notamos falta de interação e desconectamos por segurança.";
-        aviso.style.display = "block";
+        if (aviso) {
+            aviso.innerText = "Notamos falta de interação e desconectamos por segurança.";
+            aviso.style.display = "block";
+        }
     }
 
-    // 3. Auto-focus no campo de código para melhorar a UX
     const inputCode = document.getElementById('totpCode');
     if (inputCode) inputCode.focus();
 };
 
 async function validarEVoltar() {
     const codeInput = document.getElementById('totpCode');
-    const code = codeInput.value.trim(); // Limpa espaços que o usuário possa digitar sem querer
+    const code = codeInput.value.trim();
     const urlParams = new URLSearchParams(window.location.search);
-    
-    // Pega o e-mail e limpa espaços
     const email = urlParams.get('email') ? urlParams.get('email').trim() : ''; 
 
     if (!code || code.length < 6) {
@@ -34,43 +35,50 @@ async function validarEVoltar() {
     }
 
     try {
-        // ATUALIZAÇÃO: Enviamos tudo no 'body' como um objeto JSON limpo.
-        // Isso evita o erro 400 se o servidor estiver esperando um Schema/Modelo específico.
-        const response = await fetch(`/auth/recuperar-confirmar`, {
+        console.log(`Enviando validação para ${email}...`);
+
+        // CORREÇÃO: Adicionado o API_BASE_URL para apontar para a porta 8000
+        const response = await fetch(`${API_BASE_URL}/auth/recuperar-confirmar`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
                 'Accept': 'application/json' 
             },
-            // AJUSTE REALIZADO: Mudamos 'token' para 'code' para bater com o schemas.py
             body: JSON.stringify({ 
                 email: email, 
                 code: code 
             })
         });
         
-        const data = await response.json();
+        // Lê a resposta como texto primeiro para evitar erro se não for JSON
+        const responseText = await response.text();
+        let data = {};
+        try {
+            data = responseText ? JSON.parse(responseText) : {};
+        } catch (e) {
+            console.error("Servidor não retornou JSON válido:", responseText);
+        }
 
         if (response.ok) {
             alert("Sucesso! 2FA validado.");
-            window.location.href = `redefinir.html?email=${email}`;
+            // Redireciona para a tela de redefinir a senha passando o email
+            window.location.href = `redefinir.html?email=${encodeURIComponent(email)}`;
         } else {
-            // Se der erro (como o 422 ou 400), tentamos mostrar a mensagem detalhada do Python
-            let mensagemErro = "Código incorreto ou expirado.";
-            if (data.detail) {
-                // Se o detalhe for uma lista (comum no erro 422), pegamos a primeira mensagem
-                mensagemErro = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
-            }
+            let mensagemErro = data.detail || "Código incorreto ou expirado.";
+            if (typeof mensagemErro !== 'string') mensagemErro = JSON.stringify(mensagemErro);
             alert("Erro: " + mensagemErro);
         }
 
     } catch (error) {
         console.error("Erro na chamada:", error);
-        alert("Não foi possível conectar ao servidor. Verifique se ele está rodando.");
+        alert("Não foi possível conectar ao JurisAI na porta 8000.");
     }
 }
 
-// Permitir que o usuário aperte "Enter" para validar
-document.getElementById('totpCode').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') validarEVoltar();
-});
+// Permitir o uso do Enter
+const inputCode = document.getElementById('totpCode');
+if (inputCode) {
+    inputCode.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') validarEVoltar();
+    });
+}
