@@ -1,6 +1,7 @@
 venv/
 .deps/
 __pycache__/
+.db
 *.pyc
 .env
 .env.local
