@@ -55,6 +55,7 @@ def redefinir_senha(data: schemas.NovaSenhaFinalRequest, db: Session = Depends(g
     logger.info(f"SERVICE: Senha alterada com sucesso para: {data.email}")
     
     return {"message": "Senha atualizada com sucesso! Faça login novamente."}
+
 @router.post("/login", response_model=schemas.TokenResponse)
 def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
     # PASSANDO SEM OS NOMES DAS VARIÁVEIS (POR POSIÇÃO)

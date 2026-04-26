@@ -3,29 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurar 2FA | JurisAI</title>
+    <title>Vincular Autenticador | JurisAI</title>
     <link rel="stylesheet" href="../css/recuperar-2fa.css">
+    <style>
+        /* Estilos rápidos para garantir a beleza do tutorial */
+        .tutorial-steps {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #555;
+            border-left: 4px solid #007bff;
+        }
+        .tutorial-steps p { margin: 5px 0; }
+        .tutorial-steps span { font-weight: bold; color: #007bff; }
+        
+        .qr-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .totp-input {
+            text-align: center;
+            font-size: 24px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+        .totp-input:focus { border-color: #007bff; outline: none; }
+        
+        .instruction-footer {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
     <div class="auth-card">
-        <h2>Ativar duas etapas</h2>
+        <h2 style="margin-bottom: 5px;">Vinculando ao Authenticator</h2>
+        
+        <div id="mensagemStatus" style="display:none; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 13px; text-align: center;"></div>
 
-        <div id="mensagemStatus" style="display:none; color: #d9534f; background: #f9f2f2; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 13px;"></div>
-
-        <div class="auth-instruction">
-            <p>Leia o QR Code no Authenticator e confirme o codigo gerado.</p>
+        <div class="tutorial-steps">
+            <p><strong>1.</strong> Abra o app Google Authenticator.</p>
+            <p><strong>2.</strong> Toque no <span>+</span> e escolha <span>"Ler código QR"</span>.</p>
+            <p><strong>3.</strong> Aponte a câmera para o código abaixo:</p>
         </div>
 
-        <div id="qrcode" style="display: flex; justify-content: center; margin: 20px 0;">
-            <p>Gerando QR Code...</p>
+        <div class="qr-wrapper">
+            <div id="qrcode">
+                <p style="font-size: 14px; color: #999;">Gerando código de segurança...</p>
+            </div>
         </div>
 
-        <div class="totp-container">
+        <p class="instruction-footer">Já escaneou? Digite o código de 6 dígitos gerado para confirmar:</p>
+
+        <div class="totp-container" style="margin-bottom: 20px;">
             <input type="text" id="totpCode" maxlength="6" placeholder="000000" class="totp-input" autofocus>
         </div>
 
         <div class="button-group">
-            <button onclick="ativar2FA()" class="btn-primary">Ativar e entrar</button>
+            <button type="button" id="btnAtivar" onclick="ativar2FA(event)" class="btn-primary" style="width: 100%;">
+                Vincular e Entrar
+            </button>
         </div>
     </div>
 

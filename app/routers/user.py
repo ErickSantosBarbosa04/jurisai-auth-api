@@ -5,13 +5,16 @@ from app.core.db.database import get_db
 from app.core.dependencies import get_current_user
 from app.schema import schemas
 from app.services.user_service import UserService
+# IMPORTANTE: Importar o modelo User para que o Depends(get_current_user) funcione
+from app.models.UserModel import User 
 
-router = APIRouter(prefix="/auth", tags=["User Profile & LGPD"])
+# O prefixo aqui é /user, então o endpoint completo será /user/me
+router = APIRouter(prefix="/user", tags=["User Profile & LGPD"])
 
 @router.get("/me", response_model=schemas.UserResponse)
 #Apenas encaminha o usuário autenticado para o Service. (Requisito 4.8)
-def get_me(current_user=Depends(get_current_user)):
-    return UserService.get_user_profile(current_user)
+def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
 
 @router.patch("/me", response_model=schemas.UserResponse)
 def update_me(

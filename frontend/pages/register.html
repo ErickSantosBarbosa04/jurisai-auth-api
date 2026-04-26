@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../css/registrar.css">
 </head>
 <body>
+
     <div class="auth-card">
         <a href="login.html" class="back-link-container">
             <img src="../assets/botao-voltar.png" alt="Voltar para o Login" class="back-link-img">
@@ -16,29 +17,59 @@
 
         <div id="mensagemStatus" style="display: none;"></div>
         
-        <form onsubmit="return realizarRegistro(event)">
+        <div>
             <div class="input-group">
-                <input type="text" id="regFullName" placeholder="Nome Completo" class="auth-input" required>
+                <input type="text" id="fullName" maxlength="120" placeholder="Nome completo" class="auth-input">
             </div>
 
             <div class="input-group">
-                <input type="email" id="regEmail" maxlength="35" placeholder="E-mail" class="auth-input" required>
+                <input type="email" id="regEmail" maxlength="80" placeholder="E-mail" class="auth-input">
             </div>
 
             <div class="input-group">
-                <input type="text" id="regRGM" placeholder="RGM (Matrícula)" class="auth-input" required>
+                <input type="text" id="university" maxlength="160" placeholder="Faculdade" class="auth-input">
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <select id="semester" class="auth-input">
+                        <option value="">Semestre</option>
+                        <option value="1">1º semestre</option>
+                        <option value="2">2º semestre</option>
+                        <option value="3">3º semestre</option>
+                        <option value="4">4º semestre</option>
+                        <option value="5">5º semestre</option>
+                        <option value="6">6º semestre</option>
+                        <option value="7">7º semestre</option>
+                        <option value="8">8º semestre</option>
+                        <option value="9">9º semestre</option>
+                        <option value="10">10º semestre</option>
+                        <option value="11">11º semestre</option>
+                        <option value="12">12º semestre</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <select id="legalSpecialty" class="auth-input">
+                        <option value="">Área de interesse</option>
+                        <option value="Direito Civil">Direito Civil</option>
+                        <option value="Direito do Trabalho">Direito do Trabalho</option>
+                        <option value="Direito Penal">Direito Penal</option>
+                        <option value="Direito Empresarial">Direito Empresarial</option>
+                        <option value="Direito Tributario">Direito Tributário</option>
+                        <option value="Direito Constitucional">Direito Constitucional</option>
+                        <option value="Direito Administrativo">Direito Administrativo</option>
+                        <option value="Direito do Consumidor">Direito do Consumidor</option>
+                        <option value="Direito de Familia">Direito de Família</option>
+                        <option value="Direito Previdenciario">Direito Previdenciário</option>
+                        <option value="Direito Ambiental">Direito Ambiental</option>
+                        <option value="Direito Digital">Direito Digital</option>
+                    </select>
+                </div>
             </div>
 
             <div class="input-group">
-                <input type="text" id="regUniversity" placeholder="Instituição de Ensino" class="auth-input" required>
-            </div>
-
-            <div class="input-group">
-                <input type="number" id="regSemester" placeholder="Semestre Atual" class="auth-input" min="1" max="12" required>
-            </div>
-
-            <div class="input-group">
-                <input type="password" id="regPassword" maxlength="25" placeholder="Senha" class="auth-input" required>
+                <input type="password" id="regPassword" maxlength="25" placeholder="Senha" class="auth-input">
                 <div class="strength-meter">
                     <div id="strengthBar" class="bar"></div>
                 </div>
@@ -46,21 +77,22 @@
             </div>
 
             <div class="input-group">
-                <input type="password" id="confirmPassword" maxlength="25" placeholder="Confirme a senha" class="auth-input" required>
+                <input type="password" id="confirmPassword" maxlength="25" placeholder="Confirme a senha" class="auth-input">
             </div>
 
-            <div class="input-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
-                <input type="checkbox" id="lgpdConsent" required>
-                <label for="lgpdConsent" style="font-size: 12px; color: #666;">
-                    Consinto com o uso dos meus dados para fins acadêmicos e segurança.
-                </label>
-            </div>
+            <label class="consent-line">
+                <input type="checkbox" id="lgpdConsent">
+                <span>Aceito o uso dos meus dados para autenticação e segurança da conta.</span>
+            </label>
 
+            <div class="auth-card">
             <div class="button-group">
-                <button type="submit" class="btn-primary">Criar conta</button>
+                <button type="button" id="btnRegistrar" onclick="realizarRegistro(event)" class="btn-primary">
+                    Criar conta
+                </button>
             </div>
-        </form>
-        
+        </div>
+        </div>
     </div>
 
     <script src="../js/registrar.js"></script>

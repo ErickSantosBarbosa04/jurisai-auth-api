@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import Literal, Optional
-
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
-
+# --- ENUMS (Sincronizados exatamente com os <option> do seu HTML) ---
 ProfileType = Literal["estudante", "advogado", "outro"]
+
+# Removidos acentos onde o HTML não os possui para evitar Erro 400
 LegalSpecialty = Literal[
     "Direito Civil",
     "Direito do Trabalho",
@@ -20,12 +21,11 @@ LegalSpecialty = Literal[
     "Direito Digital",
 ]
 
-
 class UserProfileFields(BaseModel):
     full_name: Optional[str] = Field(default=None, min_length=3, max_length=120)
-    profile_type: Optional[ProfileType] = None
+    profile_type: Optional[ProfileType] = "estudante"
     university: Optional[str] = Field(default=None, min_length=2, max_length=160)
-    semester: Optional[int] = Field(default=None, ge=1, le=10)
+    semester: Optional[int] = Field(default=None, ge=1, le=12) # Ajustado para até 12 semestres como no seu HTML
     legal_specialty: Optional[LegalSpecialty] = None
 
     @field_validator("full_name", "university", mode="before")
@@ -36,51 +36,33 @@ class UserProfileFields(BaseModel):
         value = str(value).strip()
         return value or None
 
+# --- REQUISIÇÕES ---
 
-
-class RegisterRequest(UserProfileFields):
+class RegisterRequest(BaseModel):
+    # No registro, esses campos tornam-se obrigatórios para bater com o banco
     email: EmailStr
-    password: str
-    lgpd_consent: bool  
-    # --- NOVOS CAMPOS ACADÊMICOS ---
+    password: str = Field(..., min_length=6)
     full_name: str
-    rgm_matriz: str
     university: str
     semester: int
-
+    lgpd_consent: bool
+    profile_type: ProfileType = "estudante"
+    legal_specialty: LegalSpecialty
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
     totp_code: Optional[str] = None 
 
+# --- RESPOSTAS ---
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-
-class TOTPSetupResponse(BaseModel):
-    secret: str
-    qr_uri: str
-
-# Esquema para validar o código de 6 dígitos do Authenticator (Requisito 1.6)
-class TOTPVerifyRequest(BaseModel):
-    email: str  
-    code: str   
-
-
-class UserUpdateRequest(UserProfileFields):
-    @model_validator(mode="after")
-    def require_at_least_one_field(self):
-        if not self.model_fields_set:
-            raise ValueError("Envie pelo menos um campo para atualizar.")
-        return self
-
-
 class UserResponse(BaseModel):
-    id: str # Alterado para str devido ao uso de UUID
+    id: int # Alterado para int para bater com o novo models.py dos seus colegas
     email: str
-    full_name: str # Adicionado para retorno no dashboard
     is_2fa_enabled: bool
     full_name: Optional[str] = None
     profile_type: Optional[str] = None
@@ -92,14 +74,25 @@ class UserResponse(BaseModel):
     updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
-        
-class ResetPasswordRequest(BaseModel):
-    token: str
-    new_password: str
 
-class NovaSenhaFinalRequest(BaseModel):
-    email: EmailStr
-    new_password: str
+# --- SEGURANÇA E MFA ---
+
+class TOTPSetupResponse(BaseModel):
+    secret: str
+    qr_uri: str
+
+class TOTPVerifyRequest(BaseModel):
+    email: str  
+    code: str   
+
+# --- ATUALIZAÇÃO E SENHA ---
+
+class UserUpdateRequest(UserProfileFields):
+    @model_validator(mode="after")
+    def require_at_least_one_field(self) -> "UserUpdateRequest":
+        if not self.model_fields_set:
+            raise ValueError("Envie pelo menos um campo para atualizar.")
+        return self
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
@@ -107,10 +100,12 @@ class ForgotPasswordRequest(BaseModel):
 class ValidarRecuperacaoRequest(BaseModel):
     email: EmailStr
     code: str
-    
-# Altere de PasswordResetRequest para RecuperarSenhaRequest
-# Esquema para validar a troca de senha (Requisito 1.2)
+
+class NovaSenhaFinalRequest(BaseModel):
+    email: EmailStr
+    new_password: str
+
 class RecuperarSenhaRequest(BaseModel):
     email: EmailStr
-    code: str # Adicione o campo 'code' se a rota de recuperação exigir o 2FA
+    code: str 
     new_password: str
