@@ -9,7 +9,8 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from app.core.db.database import Base, engine, ensure_user_profile_columns
+# REMOVIDO: ensure_user_profile_columns (agora o MySQL cuida disso)
+from app.core.db.database import Base, engine
 from app.core.config import settings 
 from app.routers import auth, mfa, user, password_reset
 
@@ -21,7 +22,7 @@ logging.basicConfig(
 
 # Inicialização do Banco de Dados
 Base.metadata.create_all(bind=engine)
-ensure_user_profile_columns()
+# A execução do ensure_user_profile_columns foi apagada daqui.
 
 # Configuração do Rate Limit (Atende Requisito 1.11) 
 limiter = Limiter(key_func=get_remote_address)

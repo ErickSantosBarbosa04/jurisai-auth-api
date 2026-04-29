@@ -56,7 +56,7 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 class UserResponse(BaseModel):
-    id: int 
+    id: str 
     email: str
     is_2fa_enabled: bool
     full_name: Optional[str] = None

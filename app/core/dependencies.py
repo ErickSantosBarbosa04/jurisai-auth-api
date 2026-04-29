@@ -41,7 +41,8 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             detail="Payload do token inválido"
         )
         
-    user = db.query(models.User).filter(models.User.id == int(user_id)).first()
+    # CORREÇÃO: O user_id agora é um UUID (texto), então removemos a conversão int()
+    user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 

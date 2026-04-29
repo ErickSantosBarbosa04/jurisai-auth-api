@@ -13,7 +13,10 @@ Sistema de autenticação RESTful que implementa:
 - **Rate limiting** 5 tentativas/minuto no login
 
 ---
-
+---
+juri_db
+admin
+---
 ##  Tecnologias
 
 | Tecnologia | Finalidade |
@@ -57,13 +60,16 @@ text
 
 ```cmd
 # 1. Criar o .Env na raiz:
-DATABASE_URL=sqlite:///./jurisai.db
-SECRET_KEY=9a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p
+DATABASE_URL="mysql+pymysql://root:sua_senha_aqui@localhost:3306/jurisai_db"
+SECRET_KEY=(ele muda)
 FERNET_KEY= (ele muda)
 
 # 2. Para descobrir o fernet_key coloque no terminal:
 
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
+# Para descobrir o SECRET_KEY coloque no terminal:
+python -c "import secrets; print(secrets.token_hex(32))"
 
 # 3. Acesse a pasta do projeto
 cd juris-auth
@@ -80,7 +86,7 @@ venv\Scripts\Activate.ps1       # PowerShell
 pip install -r requirements.txt
 
 # 7. Execute o servidor
-uvicorn main:app --reload
+python -m uvicorn main:app --reload
 Acesse
 API: http://127.0.0.1:8000
 
