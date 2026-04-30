@@ -1,29 +1,64 @@
-/* Importando a fonte Inter para um ar mais moderno (opcional, mantive Segoe tbm) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Segoe+UI:wght@400;600&display=swap');
+/* --- Variáveis de Estilo: JurisAI Premium (Unificado) --- */
+:root {
+    --primary-gold: #c5a059;
+    --gold-hover: #e2c286;
+    --dark-bg: #1a1c1e;
+    --card-bg: #25282c;
+    
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    
+    --error: #fb7185;
+    --success: #34d399;
+    --border: #3f444d;
+    --gold-border: rgba(197, 160, 89, 0.4);
+    
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    --gold-gradient: linear-gradient(135deg, #c5a059 0%, #8e6d2f 100%);
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Inter', system-ui, sans-serif; 
+}
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
-    background-color: #f2f2f2;
+    background-color: var(--dark-bg);
+    background-image: radial-gradient(circle at center, #2c3036 0%, #1a1c1e 100%);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    color: var(--text-main);
+    padding: 24px;
 }
 
+/* --- Card de Autenticação (Padronizado) --- */
 .auth-card {
-    background: #ffffff;
-    padding: 44px;
-    width: 100%;
-    max-width: 360px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Sombra um pouco mais suave */
-    border-radius: 4px; /* Leve arredondado para modernizar */
-    position: relative; /* ESSENCIAL para o botão de voltar se fixar aqui */
-    padding-top: 60px; /* Espaço extra para o botão de voltar no topo */
+    background: var(--card-bg);
+    padding: 5rem 2.5rem 2.5rem; /* Padding superior maior para o botão voltar */
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    width: min(100%, 420px);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
 }
 
-/* --- Estilo do Botão Voltar (Ajustado para dentro do Card) --- */
+/* Linha decorativa superior */
+.auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gold-gradient);
+}
+
+/* --- Botão Voltar Padronizado --- */
 .back-link-container {
     position: absolute;
     top: 20px;
@@ -31,99 +66,130 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, transform 0.2s ease;
     z-index: 10;
 }
 
-.back-link-img {
-    width: 28px; /* Tamanho levemente menor para não brigar com o título */
-    height: 28px;
-    object-fit: contain;
-}
-
 .back-link-container:hover {
-    transform: scale(1.1); /* Efeito de zoom suave */
-    opacity: 0.7;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
 }
 
-.user-info {
-    margin-bottom: 5px;
+.back-link-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    /* Filtro para tornar a seta dourada */
+    filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(0.9) contrast(0.9);
 }
 
-h3 {
-    margin: 0;
-    font-size: 24px;
-    color: #1b1b1b;
-    font-weight: 600;
+h3 { 
+    color: var(--primary-gold); 
+    margin-bottom: 0.5rem; 
+    text-align: center; 
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .instruction-text {
-    font-size: 15px;
-    color: #323130;
-    margin: 10px 0 25px 0;
-    line-height: 1.4;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
 }
 
-/* --- Inputs estilo Microsoft --- */
+/* --- Input com Contorno Dourado --- */
 .auth-input {
     width: 100%;
-    border: none;
-    border-bottom: 1px solid #666;
-    padding: 8px 0;
-    font-size: 16px;
+    padding: 0.9rem 1.1rem;
+    background: #1e2124;
+    color: white;
+    font-size: 1rem;
     outline: none;
-    margin-bottom: 35px;
-    transition: border-bottom 0.2s ease;
-    background: transparent;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    
+    /* Borda dourada padronizada (Substituindo a borda inferior Microsoft) */
+    border: 1.5px solid var(--gold-border); 
+    border-radius: 6px;
 }
 
-.auth-input:focus {
-    border-bottom: 2px solid #0067b8;
+.auth-input:focus { 
+    border-color: var(--primary-gold); 
+    box-shadow: 0 0 8px rgba(197, 160, 89, 0.3);
+    background: #2b2f33;
 }
 
 /* --- Grupo de Botões --- */
 .button-group {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center; /* Centralizado para seguir o padrão de login */
 }
 
 .btn-primary {
-    background-color: #0067b8;
-    color: white;
+    width: 100%; /* Largura total para consistência visual */
+    padding: 1rem;
+    background: var(--gold-gradient);
+    color: #1a1c1e;
     border: none;
-    padding: 10px 32px;
-    font-size: 15px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 600;
-    min-width: 100px;
-    transition: all 0.2s;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(142, 109, 47, 0.3);
 }
 
-.btn-primary:hover {
-    background-color: #005da6;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.btn-primary:hover { 
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(142, 109, 47, 0.4);
 }
 
-/* Estilo para Mensagens de Erro (Dinâmico via JS) */
+/* --- Mensagens de Status --- */
 #mensagemStatus {
-    font-size: 14px;
-    padding: 8px;
-    border-radius: 4px;
-    margin-bottom: 15px;
+    font-size: 0.85rem;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
     text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
 }
 
 /* Responsividade */
 @media (max-width: 480px) {
-    body { background-color: #fff; }
+    body { padding: 0; }
     .auth-card {
-        padding: 40px 24px;
-        box-shadow: none;
-        height: 100vh;
-        max-width: none;
+        border-radius: 0;
+        min-height: 100vh;
+        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
-    .back-link-container { top: 40px; left: 24px; }
+}
+
+.auth-card .back-link-img {
+    /* CORREÇÃO DO TAMANHO: Tamanho de ícone fixo */
+    width: 45px; 
+    height: 45px; 
+    
+    /* CORREÇÃO DE COR: Transforma a imagem (seta preta) em dourado */
+    /* Isso usa filtros CSS para mudar a cor da imagem sem precisar de um novo arquivo. */
+    filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(0.9) contrast(0.9);
+    
+    /* Se a seta for branca no arquivo original, use este filtro abaixo no lugar do sepia:
+       filter: invert(72%) sepia(48%) saturate(319%) hue-rotate(357deg) brightness(91%) contrast(87%); 
+    */
+    
+    object-fit: contain; /* Garante que a seta não distorça */
+    display: block;
 }

@@ -2,27 +2,33 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificação de Identidade - JurisAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/recuperar-2fa.css">
 </head>
 <body>
     <div class="auth-card">
-        
+        <!-- Seção de Voltar e Identificação -->
         <div class="user-info">
-            <a href="esqueci.html" class="back-link">←</a>
-            <span id="displayEmail" style="font-weight: bold;">carregando...</span>
+            <a href="esqueci.html" class="back-link-container">
+                <img src="../assets/botao-voltar.png" alt="Voltar" class="back-link-img">
+            </a>
+            <span id="displayEmail">carregando...</span>
         </div>
 
         <h2>Aprovar solicitação</h2>
 
-        <div id="mensagemStatus" style="display:none; color: #d9534f; background: #f9f2f2; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 13px;"></div>
+        <!-- Container de mensagens (Erro/Aviso) -->
+        <div id="mensagemStatus" style="display:none;"></div>
 
         <div class="auth-instruction">
             <p>Abra o aplicativo <strong>Authenticator</strong> e insira o código de 6 dígitos.</p>
         </div>
 
+        <!-- Entrada do Código TOTP -->
         <div class="totp-container">
-            <input type="text" id="totpCode" maxlength="6" placeholder="000000" class="totp-input">
+            <input type="text" id="totpCode" maxlength="6" placeholder="000000" class="totp-input" autocomplete="one-time-code">
         </div>
 
         <div class="button-group">
@@ -31,6 +37,5 @@
     </div>
 
     <script src="../js/2faRecupera.js"></script>
-
 </body>
 </html>

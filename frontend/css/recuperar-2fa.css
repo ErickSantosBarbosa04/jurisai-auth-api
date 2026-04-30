@@ -1,90 +1,207 @@
-/* Importando a fonte padrão */
-@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap');
+/* --- Variáveis de Estilo: JurisAI Premium (Unificado) --- */
+:root {
+    --primary-gold: #c5a059;
+    --gold-hover: #e2c286;
+    --dark-bg: #1a1c1e;
+    --card-bg: #25282c;
+    
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    
+    --error: #fb7185;
+    --success: #34d399;
+    --border: #3f444d;
+    --gold-border: rgba(197, 160, 89, 0.4);
+    
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    --gold-gradient: linear-gradient(135deg, #c5a059 0%, #8e6d2f 100%);
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Inter', system-ui, sans-serif; 
+}
 
 body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f2f2f2;
+    background-color: var(--dark-bg);
+    background-image: radial-gradient(circle at center, #2c3036 0%, #1a1c1e 100%);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    color: var(--text-main);
+    padding: 24px;
 }
 
+/* --- Card de Autenticação (Padronizado) --- */
 .auth-card {
-    background: #fff;
-    padding: 44px;
-    width: 360px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: var(--card-bg);
+    padding: 5rem 2.5rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    width: min(100%, 420px);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Linha decorativa superior */
+.auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gold-gradient);
+}
+
+/* --- Botão Voltar --- */
+.back-link-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+    z-index: 10;
+}
+
+.back-link-container:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.back-link-img {
+    width: 24px; /* Tamanho padronizado conforme anterior */
+    height: 24px;
+    object-fit: contain;
+    filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(0.9) contrast(0.9);
 }
 
 .user-info {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 20px;
-    color: #1b1b1b;
-    font-size: 15px;
+    margin-bottom: 1.5rem;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    justify-content: center;
 }
 
-.back-link {
-    text-decoration: none;
-    color: #666;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-h2 {
-    font-size: 24px;
-    margin: 0 0 16px 0;
-    color: #1b1b1b;
-    font-weight: 600;
+h2 { 
+    color: var(--primary-gold); 
+    margin-bottom: 1rem; 
+    text-align: center; 
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .auth-instruction p {
-    font-size: 15px;
-    color: #1b1b1b;
-    line-height: 1.4;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
 }
-
-/* O Quadrado do código (Estilo imagem 2) */
+#userEmail {
+    display: block;      /* Garante que ocupe a largura disponível */
+    text-align: center;  /* Centraliza o texto */
+    margin: 10px auto;   /* Centraliza o bloco e dá um espaçamento vertical */
+    color: var(--text-muted); /* Usa a cor padronizada do seu sistema */
+    font-size: 0.9rem;
+    word-break: break-all; /* Evita que e-mails longos quebrem o layout em telas pequenas */
+}
+/* --- O Quadrado do Código (TOTP) Premium --- */
 .totp-container {
-    margin: 30px 0;
+    margin: 2rem 0;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 .totp-input {
     width: 100%;
-    max-width: 120px;
-    height: 60px;
-    font-size: 32px;
+    max-width: 200px;
+    height: 70px;
+    font-size: 36px;
     text-align: center;
-    border: 2px solid #333;
-    font-weight: 600;
+    background: #1e2124;
+    color: var(--primary-gold); /* Código em dourado para destaque */
+    border: 2px solid var(--gold-border);
+    border-radius: 8px;
+    font-weight: 700;
     outline: none;
+    letter-spacing: 4px;
+    transition: all 0.3s ease;
 }
 
 .totp-input:focus {
-    border-color: #0067b8;
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
+    background: #2b2f33;
 }
 
+/* --- Grupo de Botões --- */
 .button-group {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
+    justify-content: center;
+    margin-top: 1rem;
 }
 
 .btn-primary {
-    background-color: #0067b8;
-    color: white;
+    width: 100%;
+    padding: 1rem;
+    background: var(--gold-gradient);
+    color: #1a1c1e;
     border: none;
-    padding: 10px 24px;
-    font-size: 15px;
+    border-radius: 6px;
     cursor: pointer;
-    min-width: 100px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(142, 109, 47, 0.3);
 }
 
-.btn-primary:hover {
-    background-color: #005da6;
+.btn-primary:hover { 
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(142, 109, 47, 0.4);
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    body { padding: 0; }
+    .auth-card {
+        border-radius: 0;
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
+
+.auth-card .back-link-img {
+    /* CORREÇÃO DO TAMANHO: Tamanho de ícone fixo */
+    width: 50px; 
+    height: 50px; 
+    
+    /* CORREÇÃO DE COR: Transforma a imagem (seta preta) em dourado */
+    /* Isso usa filtros CSS para mudar a cor da imagem sem precisar de um novo arquivo. */
+    filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(0.9) contrast(0.9);
+    
+    /* Se a seta for branca no arquivo original, use este filtro abaixo no lugar do sepia:
+       filter: invert(72%) sepia(48%) saturate(319%) hue-rotate(357deg) brightness(91%) contrast(87%); 
+    */
+    
+    object-fit: contain; /* Garante que a seta não distorça */
+    display: block;
 }

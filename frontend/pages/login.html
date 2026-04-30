@@ -26,9 +26,14 @@
         </div>
 
         <div class="form-group">
-            <label for="password">Senha</label>
-            <input type="password" id="password" required placeholder="Sua senha" autocomplete="current-password">
-        </div>
+    <label for="password">Senha</label>
+    <div class="password-wrapper">
+        <input type="password" id="password" required placeholder="Sua senha" autocomplete="current-password">
+        <button type="button" id="togglePassword" class="toggle-password">
+            <img src="../assets/olhoOculto.png" id="eyeIcon" alt="Mostrar Senha">
+        </button>
+    </div>
+</div>
 
         <button type="button" id="btnEntrar" onclick="realizarLogin()">Entrar</button>
 

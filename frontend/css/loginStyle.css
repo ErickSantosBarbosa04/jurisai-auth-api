@@ -1,158 +1,268 @@
-/* --- Variáveis de Estilo --- */
+/* --- Variáveis de Estilo: JurisAI Premium (Unificado) --- */
 :root {
-    --primary: #1e3a8a;
-    --primary-hover: #1e40af;
-    --bg-body: #f8fafc;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --error: #ef4444;
-    --success: #10b981;
-    --white: #ffffff;
-    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --primary-gold: #c5a059;
+    --gold-hover: #e2c286;
+    --dark-bg: #1a1c1e;
+    --card-bg: #25282c;
+    
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    
+    --error: #fb7185;
+    --success: #34d399;
+    --border: #3f444d;
+    --gold-border: rgba(197, 160, 89, 0.4);
+    
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    --gold-gradient: linear-gradient(135deg, #c5a059 0%, #8e6d2f 100%);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Inter', system-ui, sans-serif; 
+}
 
 body {
-    background: var(--bg-body);
+    background-color: var(--dark-bg);
+    background-image: radial-gradient(circle at center, #2c3036 0%, #1a1c1e 100%);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     color: var(--text-main);
+    padding: 24px;
 }
 
 /* --- Card de Login --- */
 .login-container {
-    background: var(--white);
-    padding: 2.5rem;
-    border-radius: 8px;
+    background: var(--card-bg);
+    padding: 3.5rem 2.5rem 2.5rem;
+    border-radius: 12px;
     box-shadow: var(--shadow);
-    width: 90%;
-    max-width: 400px;
-    border: 1px solid #e2e8f0;
+    width: min(100%, 420px);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Linha decorativa superior */
+.login-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gold-gradient);
 }
 
 h2 { 
-    color: var(--primary); 
+    color: var(--primary-gold); 
     margin-bottom: 0.5rem; 
     text-align: center; 
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .subtitle {
     text-align: center;
     color: var(--text-muted);
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    margin-bottom: 2.5rem;
 }
 
-/* --- Formulário --- */
-.form-group { margin-bottom: 1.2rem; }
+/* --- Formulário e Inputs Dourados --- */
+.form-group { margin-bottom: 1.5rem; }
 
 label { 
     display: block; 
-    margin-bottom: 0.5rem; 
-    color: var(--text-main); 
-    font-weight: 500;
-    font-size: 0.85rem;
+    margin-bottom: 0.6rem; 
+    color: var(--primary-gold); 
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
 }
 
 input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    outline: none;
+    padding: 0.9rem 1.1rem;
+    background: #1e2124;
+    color: white;
     font-size: 1rem;
-    transition: all 0.2s ease;
-    background: #fdfdfd;
+    outline: none;
+    transition: all 0.3s ease;
+    
+    /* Borda dourada padronizada */
+    border: 1.5px solid var(--gold-border); 
+    border-radius: 6px;
 }
 
 input:focus { 
-    border-color: var(--primary); 
-    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
-    background: var(--white);
+    border-color: var(--primary-gold); 
+    box-shadow: 0 0 8px rgba(197, 160, 89, 0.3);
+    background: #2b2f33;
 }
 
+input::placeholder {
+    color: #4b5563;
+}
+
+/* --- Botão Premium --- */
 button {
     width: 100%;
-    padding: 0.8rem;
-    background: var(--primary);
-    color: white;
+    padding: 1rem;
+    background: var(--gold-gradient);
+    color: #1a1c1e;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1rem;
-    transition: background 0.2s ease, transform 0.1s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
     margin-top: 1rem;
+    box-shadow: 0 4px 15px rgba(142, 109, 47, 0.3);
 }
 
-button:hover { background: var(--primary-hover); }
-button:active { transform: scale(0.98); }
+button:hover { 
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(142, 109, 47, 0.4);
+}
 
-/* --- Links Extras --- */
+button:active { transform: translateY(0); }
+
+/* --- Links e Rodapé --- */
 .extra-links {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     text-align: center;
     font-size: 0.85rem;
 }
-
-.extra-links a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.extra-links a:hover { text-decoration: underline; }
-
-/* --- Toast Notification (Estilo Moderno) --- */
-#toast {
-    position: fixed;
-    bottom: -100px; /* Agora aparece de baixo, estilo mobile-first */
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 320px;
-    padding: 16px 24px;
-    border-radius: 8px;
-    color: white;
-    font-weight: 500;
+/* --- Toggle Password com Themis --- */
+.password-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 1000;
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
 }
 
-#toast.show { bottom: 40px; }
+.password-wrapper input {
+    padding-right: 3.5rem; /* Abre espaço para o ícone no final */
+}
 
-.toast-success { background-color: #059669; border-left: 5px solid #047857; }
-.toast-error { background-color: #dc2626; border-left: 5px solid #b91c1c; }
-
-.toast-timer {
+.toggle-password {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    background: rgba(255,255,255,0.4);
+    right: 12px;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    box-shadow: none; /* Remove a sombra do padrão de botões */
+    transform: none !important; /* Remove o pulo do padrão de botões */
+}
+
+.toggle-password:hover {
+    filter: brightness(1.2);
+}
+
+.toggle-password img {
+    width: 490%;
+    height: 490%;
+    object-fit: contain;
+    /* Caso a imagem não esteja dourada, o filtro abaixo ajuda: */
+    filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(0.9) contrast(0.9);
+}
+.extra-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.extra-links a:hover { 
+    color: var(--primary-gold);
+    text-decoration: underline; 
+}
+
+.register-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+/* --- Mensagem de Aviso e Toast --- */
+#mensagemAviso {
+    display: none; /* Escondido por padrão, ativado pelo JS */
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    
+    /* Cores JurisAI para Erro */
+    background: rgba(251, 113, 133, 0.1); /* Fundo avermelhado sutil */
+    color: var(--error);                  /* Texto rosa/vermelho do root */
+    border: 1px solid var(--error);       /* Borda definida no root */
+    
+    /* Garante que fique dentro do card e empurre o resto para baixo */
+    position: relative; 
+    box-sizing: border-box;
+}
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
     width: 100%;
 }
 
-/* --- Feedback de Erro --- */
-.input-error {
-    border: 1.5px solid var(--error) !important;
-    background-color: #fffafb;
+.password-wrapper .auth-input, 
+.password-wrapper input {
+    padding-right: 50px !important; /* Abre caminho para a Themis */
 }
 
-#mensagemAviso {
-    background: #fef9c3;
-    border: 1px solid #fde047;
-    color: #854d0e;
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
-    display: none;
+.toggle-password {
+    position: absolute;
+    right: 5px; /* Ajuste para não bater na borda */
+    top: 50%;
+    transform: translateY(-50%) !important; /* Centraliza verticalmente no input */
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.toggle-password img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+#mensagemAviso:not(:empty) {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+#toast {
+    background: var(--card-bg);
+    border: 1px solid var(--primary-gold);
+}
+
+.toast-success { border-left: 5px solid var(--success) !important; color: var(--success); }
+.toast-error { border-left: 5px solid var(--error) !important; color: var(--error); }

@@ -34,76 +34,123 @@ if (passwordInput) {
 
 function atualizarBarra(n) {
     if (!strengthBar) return;
+    
     strengthBar.className = 'bar'; 
     if (n > 0) strengthBar.classList.add(`lvl-${n}`);
-    strengthText.innerText = `Força da senha: ${n}/5`;
+    
+    if (strengthText) {
+        const labels = ["", "Muito Fraca", "Fraca", "Média", "Forte", "Excelente"];
+        strengthText.innerText = `Força da senha: ${labels[n]}`;
+        strengthText.style.color = n >= 4 ? "var(--success)" : "var(--primary-gold)";
+    }
 }
 
-// Função de Notificação
+function toggleVisibility(inputId, imgId) {
+    const input = document.getElementById(inputId);
+    const img = document.getElementById(imgId);
+    
+    if (input.type === "password") {
+        input.type = "text";
+        img.src = "../assets/olhoAber.png";
+    } else {
+        input.type = "password";
+        img.src = "../assets/olhoOculto.png";
+    }
+}
+
 function mostrarAviso(msg, tipo = "error") {
     let aviso = document.getElementById('mensagemStatus');
+    
+    // Se o elemento não existir no HTML, ele será criado agora
     if (!aviso) {
         aviso = document.createElement('div');
         aviso.id = 'mensagemStatus';
-        const card = document.querySelector('.auth-card') || document.querySelector('.login-container');
-        card.insertBefore(aviso, card.firstChild.nextSibling);
+        const card = document.querySelector('.auth-card');
+        // Insere logo abaixo do título
+        const titulo = card.querySelector('h2') || card.querySelector('h3');
+        titulo.insertAdjacentElement('afterend', aviso);
     }
     
     aviso.innerText = msg;
-    aviso.style.display = "block";
+    aviso.style.display = "block"; // Garante que saia do 'none'
     
+    // Aplica as classes que você já tem no seu CSS padronizado
     if (tipo === "success") {
-        aviso.style.background = "#d4edda";
-        aviso.style.color = "#155724";
-        aviso.style.border = "1px solid #c3e6cb";
+        aviso.className = "toast-success";
+        aviso.style.backgroundColor = "rgba(52, 211, 153, 0.1)";
+        aviso.style.color = "var(--success)";
+        aviso.style.border = "1px solid var(--success)";
     } else {
-        aviso.style.background = "#f8d7da";
-        aviso.style.color = "#721c24";
-        aviso.style.border = "1px solid #f5c6cb";
+        aviso.className = "toast-error";
+        aviso.style.backgroundColor = "rgba(251, 113, 133, 0.1)";
+        aviso.style.color = "var(--error)";
+        aviso.style.border = "1px solid var(--error)";
     }
-    aviso.style.padding = "10px";
-    aviso.style.borderRadius = "5px";
-    aviso.style.marginBottom = "15px";
+
+    // Estilos de layout para garantir visibilidade no tema escuro
+    aviso.style.padding = "12px";
+    aviso.style.margin = "15px 0";
+    aviso.style.borderRadius = "6px";
+    aviso.style.textAlign = "center";
+    aviso.style.fontSize = "0.9rem";
+    aviso.style.fontWeight = "500";
 }
 
 // --- FUNÇÃO PRINCIPAL DE REGISTRO ---
 async function realizarRegistro(event) {
-    console.log("1. Botão clicado. Iniciando script...");
-    
-    if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        console.log("2. Refresh padrão bloqueado.");
-    }
+    if (event) event.preventDefault();
 
     const btn = document.getElementById('btnRegistrar');
     
+    // 1. PRIMEIRO: Captura centralizada de todos os campos
+    const fields = {
+        email: document.getElementById('regEmail'),
+        password: document.getElementById('regPassword'),
+        confirm: document.getElementById('confirmPassword'),
+        fullName: document.getElementById('fullName'),
+        university: document.getElementById('university'),
+        semester: document.getElementById('semester'),
+        specialty: document.getElementById('legalSpecialty'),
+        lgpd: document.getElementById('lgpdConsent')
+    };
+
+    // 2. Validação: Todos os campos devem estar preenchidos
+    const allFilled = Object.values(fields).every(field => {
+        if (!field) return false; 
+        if (field.type === 'checkbox') return field.checked;
+        return field.value.trim() !== "";
+    });
+
+    if (!allFilled) {
+        mostrarAviso("Por favor, preencha todos os campos e aceite os termos de uso.");
+        return false;
+    }
+
+    // 3. Validação: Formato de E-mail (Regex)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(fields.email.value.trim())) {
+        mostrarAviso("Por favor, insira um formato de e-mail válido (ex: nome@exemplo.com).");
+        return false;
+    }
+
+    // 4. Validação: Comparação de senhas
+    if (fields.password.value !== fields.confirm.value) {
+        mostrarAviso("As senhas não coincidem. Verifique a digitação.");
+        return false;
+    }
+
     try {
-        const emailField = document.getElementById('regEmail');
-        const passwordField = document.getElementById('regPassword');
-        const fullNameField = document.getElementById('fullName');
-        const universityField = document.getElementById('university');
-        const semesterField = document.getElementById('semester');
-        const specialtyField = document.getElementById('legalSpecialty');
-        const lgpdCheck = document.getElementById('lgpdConsent');
-
-        if (!emailField || !passwordField) {
-            console.error("Erro: Campos não encontrados!");
-            return false;
-        }
-
         const payload = {
-            email: emailField.value.trim().toLowerCase(),
-            password: passwordField.value,
-            full_name: fullNameField.value.trim(),
-            university: universityField.value.trim(),
-            semester: Number(semesterField.value) || 1,
-            legal_specialty: specialtyField.value || "Direito Civil",
+            email: fields.email.value.trim().toLowerCase(),
+            password: fields.password.value,
+            full_name: fields.fullName.value.trim(),
+            university: fields.university.value.trim(),
+            semester: Number(fields.semester.value),
+            legal_specialty: fields.specialty.value,
             profile_type: "estudante", 
             lgpd_consent: true
         };
 
-        console.log("3. Enviando fetch...");
         btn.disabled = true;
         btn.innerText = "Processando...";
 
@@ -113,43 +160,33 @@ async function realizarRegistro(event) {
             body: JSON.stringify(payload)
         });
 
-        const responseText = await response.text();
-        let data = {};
-        try {
-            data = responseText ? JSON.parse(responseText) : {};
-        } catch (e) { console.error("Erro no parse do JSON"); }
+        const data = await response.json().catch(() => ({}));
 
         if (response.ok) {
-            console.log("4. Resposta do servidor: 201 OK!");
+            if (data.access_token) localStorage.setItem('access_token', data.access_token);
             
-            if (data.access_token) {
-                localStorage.setItem('access_token', data.access_token);
-            }
+            mostrarAviso("Conta criada com sucesso! Preparando acesso...", "success");
+            btn.innerText = "Sucesso!";
 
-            mostrarAviso("Conta criada com sucesso!", "success");
-            btn.innerText = "Redirecionando...";
+            setTimeout(() => { 
+                window.location.href = "telaQr.html"; 
+            }, 1500);
 
-            console.log("6. Redirecionando agora...");
-            // Usando location.href para garantir a troca de página imediata
-            window.location.href = "telaQr.html"; 
-            
-            return false; 
         } else {
-            console.log("5. Erro retornado pelo servidor.");
             const detail = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
-            mostrarAviso(detail || "Erro no cadastro.");
+            mostrarAviso(detail || "Não foi possível completar o cadastro.");
+            
             btn.disabled = false;
             btn.innerText = "Criar conta";
         }
 
     } catch (error) {
-        console.error("ERRO FATAL NO JS:", error); 
-        if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Criar conta";
-        }
+        console.error("ERRO DE REDE:", error); 
+        mostrarAviso("Falha na comunicação com o servidor. Tente novamente.");
+        
+        btn.disabled = false;
+        btn.innerText = "Criar conta";
     }
     
-    console.log("7. Fim da execução.");
     return false;
 }
