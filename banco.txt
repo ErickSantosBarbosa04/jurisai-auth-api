@@ -1,0 +1,57 @@
+-- 1. Garante que estamos na base certa
+CREATE DATABASE jurisai_db;
+USE jurisai_db;
+
+-- 2. Criamos a tabela de usuários COMPLETA
+CREATE TABLE users (
+    id CHAR(36) PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    hashed_password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(120),
+    profile_type VARCHAR(30) DEFAULT 'estudante',
+    university VARCHAR(160),
+    semester INT,
+    legal_specialty VARCHAR(80),
+    
+    -- GAVETAS DE SEGURANÇA
+    failed_login_attempts INT DEFAULT 0,
+    lockout_until DATETIME NULL,
+    
+    -- GAVETAS DE LGPD
+    lgpd_consent BOOLEAN DEFAULT FALSE,
+    consent_purpose VARCHAR(255) NULL,
+    consent_date DATETIME NULL,
+    terms_version VARCHAR(50) NULL,
+    
+    -- 2FA e Controle de Tempo
+    is_2fa_enabled BOOLEAN DEFAULT FALSE,
+    totp_secret VARCHAR(255) NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 3. Recriamos a tabela de tokens de recuperação
+CREATE TABLE password_reset_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 2. Recria a tabela com o nome exato que o Python está pedindo
+CREATE TABLE token_blacklist (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(512) NOT NULL UNIQUE, 
+    
+    -- O NOME CORRETO AQUI: invalidated_at
+    invalidated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+SELECT * FROM users;
+SELECT * FROM password_reset_tokens;
+SELECT * FROM token_blacklist;
