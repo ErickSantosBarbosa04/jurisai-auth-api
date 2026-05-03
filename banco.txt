@@ -1,8 +1,13 @@
--- 1. Garante que estamos na base certa
-CREATE DATABASE jurisai_db;
+-- 1. Garante que estamos na base de dados correta
+CREATE DATABASE IF NOT EXISTS jurisai_db;
 USE jurisai_db;
 
--- 2. Criamos a tabela de usuários COMPLETA
+-- Remove tabelas existentes caso precise limpar o banco
+DROP TABLE IF EXISTS token_blacklist;
+DROP TABLE IF EXISTS password_reset_tokens;
+DROP TABLE IF EXISTS users;
+
+-- 2. Criação da tabela de usuários completa
 CREATE TABLE users (
     id CHAR(36) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -13,24 +18,28 @@ CREATE TABLE users (
     semester INT,
     legal_specialty VARCHAR(80),
     
-    -- GAVETAS DE SEGURANÇA
+    -- Controle de tentativas de login (Segurança)
     failed_login_attempts INT DEFAULT 0,
     lockout_until DATETIME NULL,
+    last_failed_login DATETIME NULL,
     
-    -- GAVETAS DE LGPD
+    -- Conformidade com a LGPD
     lgpd_consent BOOLEAN DEFAULT FALSE,
     consent_purpose VARCHAR(255) NULL,
     consent_date DATETIME NULL,
     terms_version VARCHAR(50) NULL,
     
-    -- 2FA e Controle de Tempo
+    -- 2FA e Controle de Sessão
     is_2fa_enabled BOOLEAN DEFAULT FALSE,
     totp_secret VARCHAR(255) NULL,
+    tokens_valid_after DATETIME NULL,
+    
+    -- Timestamps
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- 3. Recriamos a tabela de tokens de recuperação
+-- 3. Criação da tabela de tokens de recuperação
 CREATE TABLE password_reset_tokens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id CHAR(36) NOT NULL,
@@ -42,16 +51,14 @@ CREATE TABLE password_reset_tokens (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 2. Recria a tabela com o nome exato que o Python está pedindo
+-- 4. Criação da tabela de tokens invalidados (Blacklist)
 CREATE TABLE token_blacklist (
     id INT AUTO_INCREMENT PRIMARY KEY,
     token VARCHAR(512) NOT NULL UNIQUE, 
-    
-    -- O NOME CORRETO AQUI: invalidated_at
     invalidated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-
+-- 5. Consulta para verificação
 SELECT * FROM users;
 SELECT * FROM password_reset_tokens;
 SELECT * FROM token_blacklist;
