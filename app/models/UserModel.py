@@ -12,6 +12,7 @@ class User(Base):
     is_2fa_enabled = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, nullable=True, onupdate=lambda: datetime.now(timezone.utc))
+    tokens_valid_after = Column(DateTime, nullable=True)
 
     # --- PERFIL EDITAVEL DO USUARIO ---
     full_name = Column(String(120), nullable=True)
@@ -21,6 +22,7 @@ class User(Base):
     legal_specialty = Column(String(80), nullable=True)
 
     # --- NOVOS CAMPOS PARA REQUISITO 1.11 ---
+    last_failed_login = Column(DateTime, nullable=True)
     failed_login_attempts = Column(Integer, default=0)
     lockout_until = Column(DateTime, nullable=True)
 

@@ -164,5 +164,19 @@ document.getElementById("deleteAccountBtn").addEventListener("click", async () =
         showToast("Erro ao excluir conta.");
     }
 });
+document.getElementById("logoutAllBtn").addEventListener("click", async () => {
+    const confirmed = confirm("Tem certeza que deseja desconectar de todos os outros dispositivos?");
+    if (!confirmed) return;
 
+    try {
+        const response = await fetchProtected("/auth/logout-all", { method: "POST" });
+        if (!response.ok) throw new Error("Erro ao desconectar aparelhos.");
+        
+        alert("Desconectado com sucesso. Faça login novamente.");
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html";
+    } catch (error) {
+        showToast("Erro ao processar solicitação.");
+    }
+});
 loadProfile();

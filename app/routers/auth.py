@@ -5,6 +5,7 @@ from app.core.db.database import get_db
 from app.core.dependencies import get_current_user
 from app.schema import schemas
 from app.services.auth_service import AuthService
+from datetime import datetime, timezone
 
 # IMPORTAÇÕES ADICIONAIS PARA OS NOVOS ENDPOINTS
 from app.models.UserModel import User
@@ -85,3 +86,10 @@ def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
 #Delega a invalidação do token ao AuthService.
 def logout(request: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     return AuthService.blacklist_token(db, request, current_user)
+
+@router.post("/logout-all", status_code=status.HTTP_200_OK)
+def logout_all_devices(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # Grava o momento exato do clique. Todos os tokens antigos morrem agora.
+    current_user.tokens_valid_after = datetime.now(timezone.utc)
+    db.commit()
+    return {"message": "Desconectado de todos os dispositivos com sucesso."}

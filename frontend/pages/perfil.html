@@ -83,8 +83,8 @@
                         <div class="input-group">
                             <label for="theme_mode">Aparência do Sistema</label>
                             <select id="theme_mode" name="theme_mode">
-                                <option value="light">☀️ Modo Claro (Padrão)</option>
-                                <option value="dark">🌙 Modo Escuro</option>
+                                <option value="light"> Modo Claro (Padrão)</option>
+                                <option value="dark"> Modo Escuro</option>
                             </select>
                         </div>
 
@@ -98,7 +98,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <button id="savePreferencesBtn" class="btn-secondary" type="button">Salvar preferências</button>
+                            <button id="savePreferencesBtn" class="btn-primary" type="button">Salvar preferências</button>
                         </div>
                     </form>
                 </section>
@@ -135,6 +135,16 @@
                         Você tem o direito de baixar uma cópia de todas as informações que armazenamos sobre você.
                     </p>
                     <button id="exportBtn" class="btn-secondary" type="button" style="width: 100%;">Baixar arquivo JSON</button>
+                </div>
+
+                <hr style="border:0; border-top: 1px solid var(--border); margin: 24px 0;">
+
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 14px; margin: 0 0 8px;">Sessões</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px;">
+                        Esqueceu o notebook aberto em outro lugar? Desconecte sua conta de todos os aparelhos.
+                    </p>
+                    <button id="logoutAllBtn" class="btn-secondary" type="button" style="width: 100%; border-color: var(--error); color: var(--danger);">Desconectar todos os aparelhos</button>
                 </div>
 
                 <div class="danger-zone">

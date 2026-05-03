@@ -44,9 +44,18 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     # CORREÇÃO: O user_id agora é um UUID (texto), então removemos a conversão int()
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail="Usuário não encontrado"
-        )
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    # NOVA TRAVA: Sessões Concorrentes
+    # O "iat" é o momento exato em que o token foi criado
+    token_criado_em = payload.get("iat") 
+    
+    if user.tokens_valid_after and token_criado_em:
+        # Se o token for mais velho que o momento em que o usuário clicou em "Desconectar todos"
+        if token_criado_em < user.tokens_valid_after.timestamp():
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, 
+                detail="Sua sessão foi encerrada em outro dispositivo."
+            )
 
     return user

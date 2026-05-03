@@ -1,3 +1,5 @@
+import re
+import html
 from datetime import datetime
 from typing import Literal, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
@@ -25,6 +27,9 @@ class UserProfileFields(BaseModel):
     def clean_optional_text(cls, value):
         if value is None: return value
         value = str(value).strip()
+        if value:
+            # Proteção XSS: Transforma tags HTML em texto seguro
+            value = html.escape(value)
         return value or None
 
 # --- REQUISIÇÕES DE ACESSO ---
@@ -32,13 +37,33 @@ class UserProfileFields(BaseModel):
 class RegisterRequest(BaseModel):
     # Requisito: Campos obrigatórios para criação no banco
     email: EmailStr
-    password: str = Field(..., min_length=6)
+    password: str = Field(..., min_length=8) # Tamanho mínimo ajustado para 8
     full_name: str
     university: str
     semester: int
     lgpd_consent: bool
     profile_type: ProfileType = "estudante"
     legal_specialty: LegalSpecialty
+
+    @field_validator("full_name", "university", mode="before")
+    @classmethod
+    def clean_required_text(cls, value):
+        if value is None: return value
+        value = str(value).strip()
+        # Proteção XSS no Registro
+        return html.escape(value) if value else value
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, senha):
+        # Fiscal de Senhas Fortes
+        if len(senha) < 8:
+            raise ValueError('A senha deve ter no mínimo 8 caracteres.')
+        if not re.search(r"\d", senha):
+            raise ValueError('A senha deve conter pelo menos um número.')
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", senha):
+            raise ValueError('A senha deve conter pelo menos um caractere especial (!, @, #, etc).')
+        return senha
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -90,7 +115,19 @@ class ValidarRecuperacaoRequest(BaseModel):
 class NovaSenhaFinalRequest(BaseModel):
     """Para salvar a nova senha após validações"""
     email: EmailStr
-    new_password: str = Field(..., min_length=6)
+    new_password: str = Field(..., min_length=8) # Tamanho mínimo ajustado para 8
+
+    @field_validator('new_password')
+    @classmethod
+    def validate_new_password(cls, senha):
+        # Fiscal de Senhas Fortes na Recuperação
+        if len(senha) < 8:
+            raise ValueError('A senha deve ter no mínimo 8 caracteres.')
+        if not re.search(r"\d", senha):
+            raise ValueError('A senha deve conter pelo menos um número.')
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", senha):
+            raise ValueError('A senha deve conter pelo menos um caractere especial (!, @, #, etc).')
+        return senha
 
 class UserUpdateRequest(UserProfileFields):
     @model_validator(mode="after")
