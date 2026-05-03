@@ -13,6 +13,10 @@
             <img src="../assets/botao-voltar.png" alt="Voltar para o Login" class="back-link-img">
         </a>
 
+        <div class="themis-badge-container">
+            <img src="../assets/olhoOculto.png" id="themisLogo" alt="Selo JurisAI" class="themis-badge">
+        </div>
+
         <h3>Criar conta</h3>
 
         <div id="mensagemStatus" style="display: none;"></div>
@@ -68,28 +72,28 @@
         </div>
 
         <div class="input-group">
-    <label for="regPassword">Senha</label>
-    <div class="password-wrapper">
-        <input type="password" id="regPassword" maxlength="25" placeholder="Crie uma senha" class="auth-input">
-        <button type="button" class="toggle-password" onclick="toggleVisibility('regPassword', 'eyeReg')">
-            <img src="../assets/olhoOculto.png" id="eyeReg" alt="Ver senha">
-        </button>
-    </div>
-    <div class="strength-meter">
-        <div id="strengthBar" class="bar"></div>
-    </div>
-    <small id="strengthText">Força da senha: 0/5</small>
-</div>
+            <label for="regPassword">Senha</label>
+            <div class="password-wrapper">
+                <input type="password" id="regPassword" maxlength="25" placeholder="Crie uma senha" class="auth-input">
+                <button type="button" class="toggle-password" onclick="toggleVisibility('regPassword', 'eyeReg')">
+                    <img src="../assets/olhosfechados.png" id="eyeReg" alt="Mostrar/Ocultar Senha">
+                </button>
+            </div>
+            <div class="strength-meter">
+                <div id="strengthBar" class="bar"></div>
+            </div>
+            <small id="strengthText">Força da senha: 0/5</small>
+        </div>
 
-<div class="input-group">
-    <label for="confirmPassword">Confirme a senha</label>
-    <div class="password-wrapper">
-        <input type="password" id="confirmPassword" maxlength="25" placeholder="Repita a senha" class="auth-input">
-        <button type="button" class="toggle-password" onclick="toggleVisibility('confirmPassword', 'eyeConfirm')">
-            <img src="../assets/olhoOculto.png" id="eyeConfirm" alt="Ver senha">
-        </button>
-    </div>
-</div>
+        <div class="input-group">
+            <label for="confirmPassword">Confirme a senha</label>
+            <div class="password-wrapper">
+                <input type="password" id="confirmPassword" maxlength="25" placeholder="Repita a senha" class="auth-input">
+                <button type="button" class="toggle-password" onclick="toggleVisibility('confirmPassword', 'eyeConfirm')">
+                    <img src="../assets/olhosfechados.png" id="eyeConfirm" alt="Mostrar/Ocultar Senha">
+                </button>
+            </div>
+        </div>
 
         <label class="consent-line">
             <input type="checkbox" id="lgpdConsent">

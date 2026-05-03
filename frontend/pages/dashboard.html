@@ -10,94 +10,59 @@
     <nav class="navbar">
         <div class="brand">JurisAI</div>
         <div class="nav-actions">
-            <span id="timerDisplay" class="session-timer">Sessao ativa</span>
-            <button id="logoutBtn" class="btn-secondary" type="button">Sair</button>
+            <span id="timerDisplay" class="session-timer">Sessão ativa</span>
+            
+            <div class="user-menu-container">
+                <button id="userAvatarBtn" class="avatar-btn" type="button">?</button>
+                
+                <div id="dropdownMenu" class="dropdown-content hidden">
+                    <div class="dropdown-header">
+                        <strong id="dropdownName">Carregando...</strong>
+                        <span id="dropdownEmail">...</span>
+                    </div>
+                    <hr>
+                    <a href="perfil.html" id="menuProfile">Configurações do Perfil</a>
+                    <hr>
+                    <a href="#" id="menuLogout">Sair</a>
+                </div>
+            </div>
         </div>
     </nav>
 
     <main class="page-shell">
         <header class="page-header">
             <div>
-                <p class="eyebrow">Area do usuario</p>
-                <h1 id="welcomeTitle">Meu perfil</h1>
+                <p class="eyebrow">Área de Trabalho</p>
+                <h1 id="welcomeTitle">Bem-vindo(a)</h1>
             </div>
-            <button id="exportBtn" class="btn-outline" type="button">Exportar dados</button>
+            <span id="specialtyBadge" class="status-pill success" style="font-size: 14px;">Carregando área...</span>
         </header>
 
-        <section class="content-grid">
-            <section class="panel">
-                <div class="panel-heading">
-                    <h2>Dados academicos</h2>
-                    <span id="saveStatus" class="status-pill">Nao salvo</span>
-                </div>
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <h3>Nova Petição Inicial</h3>
+                <p>Use a IA para estruturar peças jurídicas complexas.</p>
+                <button class="btn-primary" style="width: 100%; margin-top: 15px;">Criar Documento</button>
+            </div>
+            <div class="metric-card">
+                <h3>Análise de Jurisprudência</h3>
+                <p>Encontre decisões recentes nos tribunais superiores.</p>
+                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Buscar Casos</button>
+            </div>
+            <div class="metric-card">
+                <h3>Resumo de Processo</h3>
+                <p>Faça upload de um PDF longo e receba um resumo imediato.</p>
+                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Analisar PDF</button>
+            </div>
+        </section>
 
-                <form id="profileForm" class="profile-form">
-                    <label for="full_name">Nome completo</label>
-                    <input id="full_name" name="full_name" type="text" maxlength="120" placeholder="Seu nome completo">
-
-                    <label for="profile_type">Tipo de perfil</label>
-                    <select id="profile_type" name="profile_type">
-                        <option value="estudante">Estudante</option>
-                        <option value="advogado">Advogado</option>
-                        <option value="outro">Outro</option>
-                    </select>
-
-                    <label for="university">Faculdade</label>
-                    <input id="university" name="university" type="text" maxlength="160" placeholder="Nome da faculdade">
-
-                    <label for="semester">Semestre</label>
-                    <select id="semester" name="semester">
-                        <option value="">Selecione</option>
-                    </select>
-
-                    <label for="legal_specialty">Area de interesse</label>
-                    <select id="legal_specialty" name="legal_specialty">
-                        <option value="">Selecione</option>
-                        <option>Direito Civil</option>
-                        <option>Direito do Trabalho</option>
-                        <option>Direito Penal</option>
-                        <option>Direito Empresarial</option>
-                        <option>Direito Tributario</option>
-                        <option>Direito Constitucional</option>
-                        <option>Direito Administrativo</option>
-                        <option>Direito do Consumidor</option>
-                        <option>Direito de Familia</option>
-                        <option>Direito Previdenciario</option>
-                        <option>Direito Ambiental</option>
-                        <option>Direito Digital</option>
-                    </select>
-
-                    <button class="btn-primary" type="submit">Salvar perfil</button>
-                </form>
-            </section>
-
-            <section class="panel">
-                <div class="panel-heading">
-                    <h2>Conta</h2>
-                    <span id="twoFactorStatus" class="status-pill">Verificando</span>
-                </div>
-
-                <dl class="account-list">
-                    <div>
-                        <dt>E-mail</dt>
-                        <dd id="userEmail">Carregando...</dd>
-                    </div>
-                    <div>
-                        <dt>Cadastro</dt>
-                        <dd id="createdAt">-</dd>
-                    </div>
-                    <div>
-                        <dt>Ultima atualizacao</dt>
-                        <dd id="updatedAt">-</dd>
-                    </div>
-                </dl>
-
-                <button id="deleteAccountBtn" class="btn-danger" type="button">Excluir minha conta</button>
-            </section>
+        <section class="panel" style="margin-top: 24px;">
+            <h2>Notícias e Atualizações: <span id="dynamicTopic">Sua Área</span></h2>
+            <p id="dynamicContent" style="color: var(--text-muted); margin-top: 10px; line-height: 1.6;">
+                Buscando as últimas movimentações do STF e STJ referentes à sua especialidade...
+            </p>
         </section>
     </main>
-
-    <div id="toast" role="status" aria-live="polite"></div>
 
     <script src="../js/dashboard.js"></script>
 </body>

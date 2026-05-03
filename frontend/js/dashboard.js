@@ -1,205 +1,95 @@
+const API_BASE_URL = "http://127.0.0.1:8000";
 const token = localStorage.getItem("access_token");
-const profileForm = document.getElementById("profileForm");
-const saveStatus = document.getElementById("saveStatus");
-const toast = document.getElementById("toast");
 const timerDisplay = document.getElementById("timerDisplay");
 
-const specialtyOptions = [
-    "Direito Civil",
-    "Direito do Trabalho",
-    "Direito Penal",
-    "Direito Empresarial",
-    "Direito Tributario",
-    "Direito Constitucional",
-    "Direito Administrativo",
-    "Direito do Consumidor",
-    "Direito de Familia",
-    "Direito Previdenciario",
-    "Direito Ambiental",
-    "Direito Digital"
-];
-
-if (!token) {
-    window.location.href = "login.html";
+// Aplica o tema imediatamente
+if (localStorage.getItem("theme_mode") === "dark") {
+    document.body.classList.add("dark-mode");
 }
 
-for (let i = 1; i <= 10; i += 1) {
-    const option = document.createElement("option");
-    option.value = String(i);
-    option.textContent = `${i} semestre`;
-    document.getElementById("semester").appendChild(option);
-}
+if (!token) window.location.href = "login.html";
 
-function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 3200);
-}
+const avatarBtn = document.getElementById("userAvatarBtn");
+const dropdownMenu = document.getElementById("dropdownMenu");
 
-function formatDate(value) {
-    if (!value) return "-";
-    return new Intl.DateTimeFormat("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short"
-    }).format(new Date(value));
-}
+avatarBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdownMenu.classList.toggle("hidden");
+});
 
-function setField(id, value) {
-    const field = document.getElementById(id);
-    if (field) field.value = value ?? "";
-}
-
-function fillProfile(user) {
-    document.getElementById("welcomeTitle").textContent = user.full_name
-        ? `Ola, ${user.full_name.split(" ")[0]}`
-        : "Meu perfil";
-    document.getElementById("userEmail").textContent = user.email;
-    document.getElementById("createdAt").textContent = formatDate(user.created_at);
-    document.getElementById("updatedAt").textContent = formatDate(user.updated_at);
-
-    const twoFactor = document.getElementById("twoFactorStatus");
-    twoFactor.textContent = user.is_2fa_enabled ? "2FA ativo" : "2FA pendente";
-    twoFactor.className = `status-pill ${user.is_2fa_enabled ? "success" : "warning"}`;
-
-    setField("full_name", user.full_name);
-    setField("profile_type", user.profile_type || "estudante");
-    setField("university", user.university);
-    setField("semester", user.semester);
-    setField("legal_specialty", user.legal_specialty);
-
-    saveStatus.textContent = "Sincronizado";
-    saveStatus.className = "status-pill success";
-}
-
-async function fetchProtected(url, options = {}) {
-    const response = await fetch(url, {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-            ...(options.headers || {})
-        }
-    });
-
-    if (response.status === 401) {
-        localStorage.removeItem("access_token");
-        window.location.href = "login.html?motivo=inatividade";
-        throw new Error("Sessao expirada");
-    }
-
-    return response;
-}
-
-async function loadProfile() {
-    try {
-        const response = await fetchProtected("/auth/me");
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.detail || "Nao foi possivel carregar o perfil.");
-        }
-
-        fillProfile(data);
-    } catch (error) {
-        showToast(error.message);
-    }
-}
-
-profileForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    saveStatus.textContent = "Salvando";
-    saveStatus.className = "status-pill";
-
-    const formData = new FormData(profileForm);
-    const payload = {
-        full_name: formData.get("full_name") || null,
-        profile_type: formData.get("profile_type") || "estudante",
-        university: formData.get("university") || null,
-        semester: formData.get("semester") ? Number(formData.get("semester")) : null,
-        legal_specialty: formData.get("legal_specialty") || null
-    };
-
-    try {
-        const response = await fetchProtected("/auth/me", {
-            method: "PATCH",
-            body: JSON.stringify(payload)
-        });
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(Array.isArray(data.detail) ? data.detail[0].msg : data.detail);
-        }
-
-        fillProfile(data);
-        showToast("Perfil atualizado.");
-    } catch (error) {
-        saveStatus.textContent = "Erro";
-        saveStatus.className = "status-pill warning";
-        showToast(error.message || "Erro ao salvar perfil.");
+document.addEventListener("click", (e) => {
+    if (!dropdownMenu.contains(e.target) && e.target !== avatarBtn) {
+        dropdownMenu.classList.add("hidden");
     }
 });
 
-document.getElementById("logoutBtn").addEventListener("click", async () => {
+// --- SISTEMA DE CONTEÚDO DINÂMICO (IA SIMULADA) ---
+const knowledgeBase = {
+    "Direito Penal": "O STJ consolidou entendimento recente sobre a aplicação do princípio da insignificância em crimes de furto qualificado. Nossa IA está preparada para redigir Habeas Corpus com base nesta nova tese.",
+    "Direito Civil": "Atualizações no Código Civil: Novas diretrizes sobre responsabilidade civil em contratos digitais. Utilize a ferramenta de Petição Inicial para adaptar seus contratos aos novos precedentes.",
+    "Direito do Trabalho": "Reforma Trabalhista em foco: O TST emitiu novas súmulas referentes ao regime de teletrabalho e controle de jornada por aplicativos. Explore a nossa base de jurisprudência.",
+    "Direito Tributário": "Reforma Tributária: A transição para o novo IVA dual (IBS e CBS) já começou. A JurisAI possui modelos de planejamento fiscal atualizados para o ano corrente.",
+    "Direito Empresarial": "A nova lei de Falências e Recuperação Judicial trouxe mudanças rigorosas para o plano de credores. Acesse os resumos de PDFs para analisar balanços de empresas em crise.",
+    "Direito Digital": "A LGPD sofreu novas regulamentações da ANPD quanto à coleta de cookies e multas aplicáveis. Nossa IA pode gerar Termos de Uso e Políticas de Privacidade de forma automatizada."
+};
+
+async function loadBasicProfile() {
     try {
-        await fetchProtected("/auth/logout", { method: "POST" });
+        const response = await fetch(`${API_BASE_URL}/user/me`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("Sessão inválida");
+        
+        const user = await response.json();
+        const primeironome = user.full_name ? user.full_name.split(" ")[0] : "Usuário";
+        
+        // Dados Padrão
+        document.getElementById("welcomeTitle").textContent = `Bem-vindo(a), ${primeironome}`;
+        document.getElementById("dropdownName").textContent = primeironome;
+        document.getElementById("dropdownEmail").textContent = user.email;
+        avatarBtn.textContent = primeironome.charAt(0).toUpperCase();
+
+        // A Mágica do Conteúdo Dinâmico!
+        const especialidade = user.legal_specialty || "Geral";
+        document.getElementById("specialtyBadge").textContent = especialidade;
+        document.getElementById("dynamicTopic").textContent = especialidade;
+        
+        if (knowledgeBase[especialidade]) {
+            document.getElementById("dynamicContent").textContent = knowledgeBase[especialidade];
+        } else {
+            document.getElementById("dynamicContent").textContent = "Selecione uma especialidade específica no seu perfil para receber atualizações jurídicas filtradas.";
+        }
+
+    } catch (error) {
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html";
+    }
+}
+
+document.getElementById("menuLogout").addEventListener("click", async (e) => {
+    e.preventDefault();
+    try { 
+        await fetch(`${API_BASE_URL}/auth/logout`, { 
+            method: "POST", 
+            headers: { "Authorization": `Bearer ${token}` } 
+        }); 
     } finally {
         localStorage.removeItem("access_token");
         window.location.href = "login.html";
     }
 });
 
-document.getElementById("exportBtn").addEventListener("click", async () => {
-    try {
-        const response = await fetchProtected("/auth/export-data");
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.detail || "Erro ao exportar dados.");
-        }
-
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "jurisai-dados-usuario.json";
-        link.click();
-        URL.revokeObjectURL(link.href);
-    } catch (error) {
-        showToast(error.message);
-    }
-});
-
-document.getElementById("deleteAccountBtn").addEventListener("click", async () => {
-    const confirmed = confirm("Isso remove sua conta e seus dados. Deseja continuar?");
-    if (!confirmed) return;
-
-    try {
-        const response = await fetchProtected("/auth/delete-account", { method: "DELETE" });
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.detail || "Erro ao excluir conta.");
-        }
-        localStorage.removeItem("access_token");
-        window.location.href = "register.html";
-    } catch (error) {
-        showToast(error.message);
-    }
-});
-
+// --- O TIMER DE VOLTA À ATIVA ---
 const SESSION_LIMIT_MS = 10 * 60 * 1000;
 let remainingMs = SESSION_LIMIT_MS;
 let countdownTimer;
 let inactivityTimer;
 
-function logoutByInactivity() {
-    localStorage.removeItem("access_token");
-    window.location.href = "login.html?motivo=inatividade";
-}
-
 function updateTimer() {
     remainingMs -= 1000;
     const min = Math.max(0, Math.floor(remainingMs / 60000));
     const sec = Math.max(0, Math.floor((remainingMs % 60000) / 1000));
-    timerDisplay.textContent = `Sessao: ${min}:${sec < 10 ? "0" : ""}${sec}`;
+    if(timerDisplay) timerDisplay.textContent = `Sessão: ${min}:${sec < 10 ? "0" : ""}${sec}`;
 }
 
 function resetSessionTimer() {
@@ -208,12 +98,15 @@ function resetSessionTimer() {
     remainingMs = SESSION_LIMIT_MS;
     updateTimer();
     countdownTimer = setInterval(updateTimer, 1000);
-    inactivityTimer = setTimeout(logoutByInactivity, SESSION_LIMIT_MS);
+    inactivityTimer = setTimeout(() => {
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html?motivo=inatividade";
+    }, SESSION_LIMIT_MS);
 }
 
 ["click", "keydown", "mousemove"].forEach((eventName) => {
     window.addEventListener(eventName, resetSessionTimer, { passive: true });
 });
 
-loadProfile();
+loadBasicProfile();
 resetSessionTimer();

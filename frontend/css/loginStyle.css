@@ -180,7 +180,6 @@ button:active { transform: translateY(0); }
     height: 490%;
     object-fit: contain;
     /* Caso a imagem não esteja dourada, o filtro abaixo ajuda: */
-    filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(0.9) contrast(0.9);
 }
 .extra-links a {
     color: var(--text-muted);

@@ -1,5 +1,5 @@
 /* ============================================================
-   JURISAIS PREMIUM - GLOBAL SETTINGS
+   JURISAI PREMIUM - GLOBAL SETTINGS
    ============================================================ */
 :root {
     /* Paleta Jurídica */
@@ -23,12 +23,7 @@
     --gold-gradient: linear-gradient(135deg, #c5a059 0%, #8e6d2f 100%);
 }
 
-* { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
-    font-family: 'Inter', system-ui, sans-serif; 
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
 
 body {
     background-color: var(--dark-bg);
@@ -42,29 +37,40 @@ body {
 }
 
 /* ============================================================
-   CONTAINERS (CARDS)
+   CONTAINERS (CARDS) E DECORAÇÃO
    ============================================================ */
 .auth-card, .login-container {
     background: var(--card-bg);
-    padding: 3.5rem 2.5rem 2.5rem;
+    padding: 2.5rem;
     border-radius: 12px;
     box-shadow: var(--shadow);
     width: min(100%, 520px);
     border: 1px solid var(--border);
     position: relative;
     overflow: hidden;
-    padding-top: 5rem; /* Espaço para o botão de voltar absoluto */
 }
 
 /* Linha decorativa de prestígio no topo */
 .auth-card::before, .login-container::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
     background: var(--gold-gradient);
+}
+
+/* Apenas decorativo: Logo central da Themis (isolado no topo) */
+.themis-badge-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0rem;
+}
+.themis-badge {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 3px rgba(197, 160, 89, 0.3);
 }
 
 h2, h3 { 
@@ -80,24 +86,14 @@ h2, h3 {
 /* ============================================================
    FORMS & INPUTS
    ============================================================ */
-.input-group, .form-group {
-    margin-bottom: 1.2rem;
-}
+.input-group, .form-group { margin-bottom: 1.2rem; }
 
 label { 
-    display: block; 
-    margin-bottom: 0.6rem; 
-    color: var(--primary-gold); 
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
+    display: block; margin-bottom: 0.6rem; color: var(--primary-gold); 
+    font-weight: 600; font-size: 0.8rem; text-transform: uppercase;
 }
 
-.auth-input, 
-input[type="email"], 
-input[type="password"], 
-input[type="text"],
-select.auth-input {
+.auth-input, input[type="email"], input[type="password"], input[type="text"], select.auth-input {
     width: 100%;
     padding: 0.9rem 1.1rem;
     background: #1e2124;
@@ -115,8 +111,12 @@ select.auth-input {
     background: #2b2f33;
 }
 
+/* Ajustes no select do formulário duplo */
+.form-row { display: flex; gap: 1rem; }
+.form-row .input-group { flex: 1; }
+
 /* ============================================================
-   PASSWORD TOGGLE (THEMIS ICON)
+   PASSWORD TOGGLE (Ícones do olho aumentados)
    ============================================================ */
 .password-wrapper {
     position: relative;
@@ -125,70 +125,56 @@ select.auth-input {
 }
 
 .password-wrapper .auth-input {
-    padding-right: 45px; /* Espaço para o ícone */
+    /* AUMENTADO: Espaço interno direito aumentado para acomodar o ícone maior 
+       sem que o texto digitado passe por baixo dele. */
+    padding-right: 60px; 
 }
 
+/* Botão invisível do olho */
 .toggle-password {
     position: absolute;
-    right: -50px;
+    right: 12px;
     background: none;
     border: none;
     cursor: pointer;
-    width: 130px;
-    height: 130px;
+    /* AUMENTADO: Tamanho do container do botão aumentado para 32px */
+    width: 46px;
+    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
-    box-shadow: none !important;
-    transform: none !important;
+    z-index: 5;
+    padding: 0;
 }
 
 .toggle-password img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    /* Removemos o filtro aqui para não "apagar" a imagem circular escura */
-    display: block;
+    opacity: 0.7; /* Sutil por padrão */
+    transition: opacity 0.2s ease;
+}
+
+.toggle-password:hover img {
+    opacity: 1; /* Acende ao passar o mouse */
 }
 
 /* ============================================================
    STRENGTH METER & STATUS
    ============================================================ */
-.strength-meter {
-    background: #3f444d;
-    height: 6px;
-    border-radius: 3px;
-    margin: 10px 0;
-    overflow: hidden;
-}
+.strength-meter { background: #3f444d; height: 6px; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+.bar { height: 100%; width: 0%; transition: width 0.3s ease, background-color 0.3s ease; }
 
-.bar {
-    height: 100%;
-    width: 0%;
-    transition: width 0.3s ease, background-color 0.3s ease;
-}
-
-/* Níveis de força */
 .lvl-1 { width: 20%; background: var(--error); }
 .lvl-2 { width: 40%; background: #fb923c; }
 .lvl-3 { width: 60%; background: #facc15; }
 .lvl-4 { width: 80%; background: #60a5fa; }
 .lvl-5 { width: 100%; background: var(--success); }
 
-#strengthText {
-    display: block;
-    margin-top: 8px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
+#strengthText { display: block; margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); }
 
 #mensagemStatus, .toast-success, .toast-error { 
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    font-size: 0.9rem;
+    padding: 12px; border-radius: 6px; margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem;
 }
 
 .toast-success { color: var(--success); border: 1px solid var(--success); background: rgba(52, 211, 153, 0.1); }
@@ -213,43 +199,29 @@ select.auth-input {
 }
 
 .btn-primary:hover, button:hover:not(.toggle-password) { 
-    transform: translateY(-2px);
-    filter: brightness(1.1);
-    box-shadow: 0 6px 20px rgba(142, 109, 47, 0.4);
+    transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 20px rgba(142, 109, 47, 0.4);
 }
+
+.consent-line { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 1.5rem; margin-top: 1rem; color: var(--text-muted); }
+.consent-line input { margin-top: 3px; }
+.consent-line span { font-size: 0.8rem; font-weight: normal; text-transform: none; color: inherit; }
 
 .back-link-container {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 10;
-    display: inline-flex;
-    padding: 8px;
-    border-radius: 50%;
+    position: absolute; top: 15px; left: 15px; z-index: 10;
+    display: inline-flex; padding: 8px; border-radius: 50%;
     transition: background-color 0.3s ease;
 }
-
 .back-link-container:hover { background-color: rgba(255, 255, 255, 0.1); }
 
-.back-link-img {
-    width: 50px; /* Ajustado para não quebrar o layout */
-    height: 50px;
-    object-fit: contain;
-    /* Filtro para converter a seta preta em dourado */
-    filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(0.9) contrast(0.9);
+.back-link-img { 
+    /* AUMENTADO: Tamanho da seta de voltar aumentado para 48px */
+    width: 60px; 
+    height: 60px; 
+    object-fit: contain; 
+    filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(0.9) contrast(0.9); 
 }
 
-/* ============================================================
-   RESPONSIVIDADE
-   ============================================================ */
 @media (max-width: 560px) {
     body { padding: 0; }
-    .auth-card, .login-container {
-        border-radius: 0;
-        min-height: 100vh;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
+    .auth-card, .login-container { border-radius: 0; min-height: 100vh; width: 100%; display: flex; flex-direction: column; justify-content: center; }
 }

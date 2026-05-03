@@ -45,16 +45,33 @@ function atualizarBarra(n) {
     }
 }
 
-function toggleVisibility(inputId, imgId) {
+function toggleVisibility(inputId, iconId) {
     const input = document.getElementById(inputId);
-    const img = document.getElementById(imgId);
+    const icon = document.getElementById(iconId);
     
+    // Captura o logo grande lá do topo
+    const themisLogo = document.getElementById("themisLogo");
+
     if (input.type === "password") {
         input.type = "text";
-        img.src = "../assets/olhoAber.png";
+        // Muda o ícone pequeno do campo
+        icon.src = "../assets/olhoaberto.png";
+        icon.alt = "Ocultar senha";
+        
+        // Muda o logo gigante do topo para o olho aberto
+        if (themisLogo) {
+            themisLogo.src = "../assets/olhoAber.png";
+        }
     } else {
         input.type = "password";
-        img.src = "../assets/olhoOculto.png";
+        // Muda o ícone pequeno do campo
+        icon.src = "../assets/olhosfechados.png";
+        icon.alt = "Ver senha";
+        
+        // Muda o logo gigante do topo de volta para o olho oculto
+        if (themisLogo) {
+            themisLogo.src = "../assets/olhoOculto.png";
+        }
     }
 }
 

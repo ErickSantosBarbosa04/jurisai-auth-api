@@ -17,9 +17,9 @@ if (togglePassword) {
         
         // Alterna a imagem da Themis (Venda vs Olhar)
         if (type === 'password') {
-            eyeIcon.src = '../assets/olhoOculto.png'; // Com venda
+            eyeIcon.src = '../assets/olhosfechados.png'; // Com venda
         } else {
-            eyeIcon.src = '../assets/olhoAber.png';   // Sem venda
+            eyeIcon.src = '../assets/olhoaberto.png';   // Sem venda
         }
     });
 }
