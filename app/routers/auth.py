@@ -88,7 +88,7 @@ def logout(request: Request, db: Session = Depends(get_db), current_user=Depends
     return AuthService.blacklist_token(db, request, current_user)
 
 @router.post("/logout-all", status_code=status.HTTP_200_OK)
-def logout_all_devices(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+def logout_all_devices(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # Grava o momento exato do clique. Todos os tokens antigos morrem agora.
     current_user.tokens_valid_after = datetime.now(timezone.utc)
     db.commit()

@@ -1,7 +1,7 @@
 // js/redefinir.js
 
 // CONFIGURAÇÃO: URL do servidor Backend (Porta 8000 para o Python)
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = window.location.origin;
 
 window.onload = () => {
     console.log("Página de redefinição carregada com sucesso.");

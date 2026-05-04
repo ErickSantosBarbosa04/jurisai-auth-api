@@ -6,7 +6,7 @@ if (emailDoUrl && document.getElementById('userEmail')) {
 }
 
 // Configuração da URL do Backend
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = window.location.origin;
 
 async function confirmarLogin2FA() {
     const codeInput = document.getElementById('totpCode');
