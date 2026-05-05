@@ -1,5 +1,3 @@
-// js/loginJs.js
-
 // 1. CAPTURA DOS ELEMENTOS
 const btnEntrar = document.getElementById('btnEntrar');
 const toast = document.getElementById('toast');
@@ -11,35 +9,25 @@ const eyeIcon = document.querySelector('#eyeIcon');
 
 if (togglePassword) {
     togglePassword.addEventListener('click', function () {
-        // Alterna o tipo do input
         const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
         password.setAttribute('type', type);
         
-        // Alterna a imagem da Themis (Venda vs Olhar)
         if (type === 'password') {
-            eyeIcon.src = '../assets/olhosfechados.png'; // Com venda
+            eyeIcon.src = '../assets/olhosfechados.png';
         } else {
-            eyeIcon.src = '../assets/olhoaberto.png';   // Sem venda
+            eyeIcon.src = '../assets/olhoaberto.png';
         }
     });
 }
+
 function mostrarAviso(msg, tipo = "error") {
     const aviso = document.getElementById('mensagemAviso');
     if (!aviso) return;
 
     aviso.innerText = msg;
-    
-    // Aplica a cor baseada no tipo (sucesso ou erro)
-    if (tipo === "success") {
-        aviso.style.color = "var(--success)";
-        aviso.style.borderColor = "var(--success)";
-        aviso.style.background = "rgba(52, 211, 153, 0.1)";
-    } else {
-        aviso.style.color = "var(--error)";
-        aviso.style.borderColor = "var(--error)";
-        aviso.style.background = "rgba(251, 113, 133, 0.1)";
-    }
+    aviso.className = tipo; 
 }
+
 // --- FUNÇÕES DE UTILIDADE (Tentativas e Toast) ---
 
 function obterTentativas() {
@@ -52,7 +40,7 @@ function salvarTentativas(n) {
 
 function showToast(message, type = 'error') {
     if (!toast || !toastMsg) {
-        alert(message); // Fallback caso o HTML do toast suma
+        alert(message);
         return;
     }
 
@@ -75,9 +63,28 @@ function showToast(message, type = 'error') {
 
 // --- LÓGICA DE BLOQUEIO LOCAL ---
 
+function calcularTempoBloqueio(detail) {
+    if (!detail) return 15 * 60; // Padrão: 15 minutos em segundos
+    
+    // Expressões regulares para ler o tempo em minutos ou segundos
+    const minuteMatch = detail.match(/(\d+)\s+minuto/);
+    const secondMatch = detail.match(/(\d+)\s+segundo/);
+
+    let totalSeconds = 0;
+    if (minuteMatch) {
+        totalSeconds += parseInt(minuteMatch[1], 10) * 60;
+    }
+    if (secondMatch) {
+        totalSeconds += parseInt(secondMatch[1], 10);
+    }
+    
+    return totalSeconds > 0 ? totalSeconds : 15 * 60;
+}
+
 function verificarBloqueioLocal() {
     const btn = document.getElementById('btnEntrar');
     const tempoBloqueio = localStorage.getItem('lockout_time');
+    
     if (tempoBloqueio) {
         const agora = Date.now();
         if (agora < tempoBloqueio) {
@@ -105,9 +112,9 @@ function iniciarTimerBloqueio(segundos) {
             btn.innerText = "Entrar";
             localStorage.removeItem('lockout_time');
             salvarTentativas(0);
-            showToast("Acesso liberado. Tente novamente.", "success");
+            mostrarAviso("Acesso liberado. Tente novamente.", "success");
         } else {
-            btn.innerText = `Bloqueado (${segundos}s)`;
+            btn.innerText = `BLOQUEADO (${segundos}s)`;
         }
     }, 1000);
 }
@@ -118,14 +125,12 @@ async function realizarLogin() {
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const btn = document.getElementById('btnEntrar');
-    const aviso = document.getElementById('mensagemAviso'); // Captura a div correta
 
-    // Limpa avisos anteriores ao clicar
-    if (aviso) aviso.innerText = "";
+    // Oculta/limpa avisos
+    mostrarAviso("", "error");
 
     const emailValue = emailInput.value.trim();
     
-    // Validação de E-mail (Frontend)
     if (!emailValue.includes('@')) {
         mostrarAviso("Por favor, insira um e-mail válido com '@'.");
         return; 
@@ -169,19 +174,20 @@ async function realizarLogin() {
             const detail = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
             const message = detail || "Erro ao realizar login.";
 
-            // Padronização: Todas as respostas usam mostrarAviso
             if (message.toLowerCase().includes("2fa") || message.toLowerCase().includes("código")) {
                 mostrarAviso("Segunda etapa: Autenticação 2FA.", "success");
                 setTimeout(() => {
                     window.location.replace(`duasEtapa.html?email=${encodeURIComponent(emailValue.toLowerCase())}`);
                 }, 1000);
             } else if (response.status === 403 || erros >= 5) {
-                const tempoExpiracao = Date.now() + (60 * 1000);
+                // Calcula os segundos exatos lendo o texto de aviso da API
+                const tempoSegundos = calcularTempoBloqueio(message);
+                const tempoExpiracao = Date.now() + (tempoSegundos * 1000);
+                
                 localStorage.setItem('lockout_time', tempoExpiracao);
                 mostrarAviso(message);
-                iniciarTimerBloqueio(60);
+                iniciarTimerBloqueio(tempoSegundos);
             } else {
-                // Aqui era onde aparecia o erro na esquerda
                 mostrarAviso(`${message} (Tentativa ${erros}/5)`);
                 btn.disabled = false;
                 btn.innerText = "Entrar";
@@ -204,7 +210,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// CARREGAMENTO INICIAL
+// Verificação no carregamento
 window.onload = () => {
     verificarBloqueioLocal();
 };

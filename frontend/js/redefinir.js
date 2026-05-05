@@ -1,6 +1,3 @@
-// js/redefinir.js
-
-// CONFIGURAÇÃO: URL do servidor Backend (Porta 8000 para o Python)
 const API_BASE_URL = "http://127.0.0.1:8000";
 
 window.onload = () => {
@@ -9,44 +6,100 @@ window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
     
-    const displayEmail = document.getElementById('userEmail');
+    const displayEmail = document.getElementById('userEmailDisplay');
     if (email && displayEmail) {
         displayEmail.innerText = email;
+        // Armazena o e-mail para caso o usuário atualize a tela
+        localStorage.setItem('reset_email', email);
+    } else if (localStorage.getItem('reset_email')) {
+        const storedEmail = localStorage.getItem('reset_email');
+        if (displayEmail) displayEmail.innerText = storedEmail;
     }
 
     // --- Medidor de Força ---
-    const pInput = document.getElementById('newPassword');
-    const sBar = document.getElementById('strengthBar');
-    const sText = document.getElementById('strengthText');
+const pInput = document.getElementById('password');
+const sBar = document.getElementById('strengthBar');
+const sText = document.getElementById('strengthText');
 
-    if (pInput) {
-        pInput.addEventListener('input', () => {
-            const senha = pInput.value;
-            let forca = 0;
-            if (senha.length > 0) {
-                forca += 1; 
-                if (senha.length >= 3) forca += 1;
-                if (senha.length >= 10) forca += 1;
-                if (/[A-Z]/.test(senha)) forca += 1;
-                if (/[!@#$%^&*]/.test(senha)) forca += 1;
-            }
+if (pInput) {
+    pInput.addEventListener('input', () => {
+        const senha = pInput.value;
+
+        // Se o campo estiver vazio, zera o indicador
+        if (senha.length === 0) {
             if (sBar) {
-                sBar.className = 'bar';
-                if (forca > 0) sBar.classList.add(`lvl-${forca}`);
+                sBar.style.width = '0%';
+                sBar.style.backgroundColor = 'transparent';
             }
-            if (sText) sText.innerText = `Força: ${forca}/5`;
-        });
-    }
+            if (sText) {
+                sText.innerText = 'Força: 0/5';
+            }
+            return;
+        }
+        
+        let score = 0;
+        if (senha.length >= 8) score++;
+        if (/\d/.test(senha)) score++;
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(senha)) score++;
+        if (/[A-Z]/.test(senha)) score++;
+        if (senha.length >= 12) score++;
+
+        if (sBar) {
+            if (score <= 1) {
+                sBar.style.width = '20%';
+                sBar.style.backgroundColor = 'var(--error)';
+            } else if (score === 2 || score === 3) {
+                sBar.style.width = '60%';
+                sBar.style.backgroundColor = '#f59e0b';
+            } else {
+                sBar.style.width = '100%';
+                sBar.style.backgroundColor = 'var(--success)';
+            }
+        }
+        
+        if (sText) {
+            sText.innerText = `Força: ${score}/5`;
+        }
+    });
+}
 
     // --- VÍNCULO DO BOTÃO ---
-    const botao = document.getElementById('btnSalvarSenha');
+    const botao = document.getElementById('btnRedefinir');
     if (botao) {
         botao.addEventListener('click', salvarNovaSenha);
-        console.log("Botão 'btnSalvarSenha' ativado.");
+        console.log("Botão 'btnRedefinir' ativado.");
     } else {
-        console.error("ERRO: O botão com ID 'btnSalvarSenha' não foi encontrado!");
+        console.error("ERRO: O botão com ID 'btnRedefinir' não foi encontrado!");
     }
 };
+
+// --- ALTERNÂNCIA DE SENHAS ---
+const passwordInput = document.getElementById('password');
+const confirmPasswordInput = document.getElementById('confirm_password');
+const eyeIcon = document.getElementById('eyeIcon');
+const eyeIconConfirm = document.getElementById('eyeIconConfirm');
+
+const togglePassword = document.getElementById('togglePassword');
+if (togglePassword) {
+    togglePassword.addEventListener('click', () => {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        if (eyeIcon) {
+            eyeIcon.src = isPassword ? '../assets/olhoaberto.png' : '../assets/olhosfechados.png';
+        }
+    });
+}
+
+const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+if (toggleConfirmPassword) {
+    toggleConfirmPassword.addEventListener('click', () => {
+        const isPassword = confirmPasswordInput.getAttribute('type') === 'password';
+        confirmPasswordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        if (eyeIconConfirm) {
+            eyeIconConfirm.src = isPassword ? '../assets/olhoaberto.png' : '../assets/olhosfechados.png';
+        }
+    });
+}
 
 async function salvarNovaSenha(e) {
     if (e) {
@@ -56,20 +109,20 @@ async function salvarNovaSenha(e) {
 
     console.log("Função salvarNovaSenha disparada!");
 
-    const passwordInput = document.getElementById('newPassword');
-    const confirmInput = document.getElementById('confirmNewPassword');
-    const btn = document.getElementById('btnSalvarSenha');
+    const pInput = document.getElementById('password');
+    const cInput = document.getElementById('confirm_password');
+    const btn = document.getElementById('btnRedefinir');
     
     const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email');
+    const email = urlParams.get('email') || localStorage.getItem('reset_email');
 
-    if (!passwordInput || !confirmInput) {
+    if (!pInput || !cInput) {
         mostrarAviso("Erro: Campos de senha não localizados.");
         return false;
     }
 
-    const newPass = passwordInput.value; 
-    const confirmPass = confirmInput.value;
+    const newPass = pInput.value; 
+    const confirmPass = cInput.value;
 
     if (!email) {
         mostrarAviso("Erro: E-mail não identificado.");
@@ -81,8 +134,17 @@ async function salvarNovaSenha(e) {
         return false;
     }
 
-    if (newPass.length < 6) {
-        mostrarAviso("A senha deve ter no mínimo 6 caracteres.");
+    // Regras de validação da senha
+    if (newPass.length < 8) {
+        mostrarAviso("A senha deve ter no mínimo 8 caracteres.");
+        return false;
+    }
+    if (!/\d/.test(newPass)) {
+        mostrarAviso("A senha deve conter pelo menos um número.");
+        return false;
+    }
+    if (!/[!@#$%^&*(),.?\":{}|<>]/.test(newPass)) {
+        mostrarAviso("A senha deve conter pelo menos um caractere especial (!, @, #, etc).");
         return false;
     }
 
@@ -115,11 +177,13 @@ async function salvarNovaSenha(e) {
         }
 
         if (response.ok) {
-            console.log("Sucesso no servidor! Fuga relâmpago antes do Live Server recarregar...");
+            console.log("Sucesso no servidor!");
+            mostrarAviso("Senha atualizada com sucesso! Redirecionando...", "success");
             
-            // REDIRECIONAMENTO INSTANTÂNEO - SEM DELAY
-            // Ele muda a página antes do VS Code mandar o sinal de refresh
-            window.location.href = "login.html";
+            setTimeout(() => {
+                localStorage.removeItem('reset_email');
+                window.location.href = "login.html";
+            }, 1500);
             
             return false;
         } else {
@@ -129,7 +193,7 @@ async function salvarNovaSenha(e) {
             
             if (btn) {
                 btn.disabled = false;
-                btn.innerText = "Redefinir senha";
+                btn.innerText = "Redefinir Senha";
             }
         }
     } catch (error) {
@@ -137,24 +201,31 @@ async function salvarNovaSenha(e) {
         mostrarAviso("Não foi possível conectar ao servidor JurisAI.");
         if (btn) {
             btn.disabled = false;
-            btn.innerText = "Redefinir senha";
+            btn.innerText = "Redefinir Senha";
         }
     }
     return false;
 }
 
 function mostrarAviso(msg, tipo = "error") {
-    const aviso = document.getElementById('mensagemStatus');
+    const aviso = document.getElementById('mensagemAviso');
     if (!aviso) {
         alert(msg);
         return;
     }
+    
     aviso.innerText = msg;
     aviso.style.display = "block";
-    aviso.style.background = tipo === "success" ? "#d4edda" : "#f8d7da";
-    aviso.style.color = tipo === "success" ? "#155724" : "#721c24";
-    aviso.style.padding = "10px";
-    aviso.style.marginBottom = "15px";
-    aviso.style.textAlign = "center";
-    aviso.style.borderRadius = "4px";
+    
+    if (tipo === "success") {
+        aviso.className = "success";
+        aviso.style.color = "var(--success)";
+        aviso.style.borderColor = "var(--success)";
+        aviso.style.background = "rgba(52, 211, 153, 0.1)";
+    } else {
+        aviso.className = "error";
+        aviso.style.color = "var(--error)";
+        aviso.style.borderColor = "var(--error)";
+        aviso.style.background = "rgba(251, 113, 133, 0.1)";
+    }
 }

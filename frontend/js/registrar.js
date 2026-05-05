@@ -44,7 +44,14 @@ function atualizarBarra(n) {
         strengthText.style.color = n >= 4 ? "var(--success)" : "var(--primary-gold)";
     }
 }
+const universityInput = document.getElementById('university');
 
+if (universityInput) {
+    universityInput.addEventListener('input', (e) => {
+        // Remove qualquer número ou caractere especial, mantendo apenas letras e espaços
+        e.target.value = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+    });
+}
 function toggleVisibility(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
@@ -74,7 +81,38 @@ function toggleVisibility(inputId, iconId) {
         }
     }
 }
+function validarNomeCompleto(nome) {
+    // Expressão regular que aceita apenas letras, acentos e espaços
+    const regexValida = /^[a-zA-ZÀ-ÿ\s]+$/;
 
+    if (!nome || nome.trim() === "") {
+        return "O campo de nome completo não pode ficar vazio.";
+    }
+
+    // Remove espaços extras nas pontas
+    const nomeLimpo = nome.trim();
+
+    if (!regexValida.test(nomeLimpo)) {
+        return "O nome completo não deve conter números ou caracteres especiais.";
+    }
+
+    // Verifica se o usuário colocou pelo menos um sobrenome
+    if (nomeLimpo.split(" ").length < 2) {
+        return "Por favor, insira o seu nome e sobrenome.";
+    }
+
+    return null; // Tudo certo
+}
+function formatarNomeInstituicao(nome) {
+    if (!nome) return "";
+    
+    // Remove espaços extras no começo e no final
+    // E garante que apenas as primeiras letras fiquem em maiúsculo
+    return nome
+        .trim()
+        .toLowerCase()
+        .replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+}
 function mostrarAviso(msg, tipo = "error") {
     let aviso = document.getElementById('mensagemStatus');
     
@@ -114,12 +152,44 @@ function mostrarAviso(msg, tipo = "error") {
 }
 
 // --- FUNÇÃO PRINCIPAL DE REGISTRO ---
+// 1. VALIDAÇÃO DE SEGURANÇA: NOME COMPLETO
+function validarNomeCompleto(nome) {
+    const regexValida = /^[a-zA-ZÀ-ÿ\s]+$/;
+
+    if (!nome || nome.trim() === "") {
+        return "O campo de nome completo não pode ficar vazio.";
+    }
+
+    const nomeLimpo = nome.trim();
+
+    if (!regexValida.test(nomeLimpo)) {
+        return "O nome completo não deve conter números ou caracteres especiais.";
+    }
+
+    if (nomeLimpo.split(/\s+/).length < 2) {
+        return "Por favor, insira o seu nome e sobrenome.";
+    }
+
+    return null;
+}
+
+// 2. FUNÇÃO PRINCIPAL DE REGISTRO
+// 1. FUNÇÃO DE FORMATAÇÃO DA INSTITUIÇÃO
+function formatarNomeInstituicao(nome) {
+    if (!nome) return "";
+    return nome
+        .trim()
+        .toLowerCase()
+        .replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+}
+
+// 2. FUNÇÃO PRINCIPAL DE REGISTRO
 async function realizarRegistro(event) {
     if (event) event.preventDefault();
 
     const btn = document.getElementById('btnRegistrar');
     
-    // 1. PRIMEIRO: Captura centralizada de todos os campos
+    // Captura centralizada de todos os campos
     const fields = {
         email: document.getElementById('regEmail'),
         password: document.getElementById('regPassword'),
@@ -131,7 +201,7 @@ async function realizarRegistro(event) {
         lgpd: document.getElementById('lgpdConsent')
     };
 
-    // 2. Validação: Todos os campos devem estar preenchidos
+    // Validação: Todos os campos devem estar preenchidos
     const allFilled = Object.values(fields).every(field => {
         if (!field) return false; 
         if (field.type === 'checkbox') return field.checked;
@@ -143,16 +213,27 @@ async function realizarRegistro(event) {
         return false;
     }
 
-    // 3. Validação: Formato de E-mail (Regex)
+    // Validação: Formato de E-mail (Regex)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(fields.email.value.trim())) {
         mostrarAviso("Por favor, insira um formato de e-mail válido (ex: nome@exemplo.com).");
         return false;
     }
 
-    // 4. Validação: Comparação de senhas
+    // Validação: Comparação de senhas
     if (fields.password.value !== fields.confirm.value) {
         mostrarAviso("As senhas não coincidem. Verifique a digitação.");
+        return false;
+    }
+
+    // Validação: Segurança do Nome Completo
+    const erroNome = validarNomeCompleto(fields.fullName.value);
+    if (erroNome) {
+        mostrarAviso(erroNome);
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Criar conta";
+        }
         return false;
     }
 
@@ -161,15 +242,17 @@ async function realizarRegistro(event) {
             email: fields.email.value.trim().toLowerCase(),
             password: fields.password.value,
             full_name: fields.fullName.value.trim(),
-            university: fields.university.value.trim(),
+            university: formatarNomeInstituicao(fields.university.value), // <-- Formatando a instituição
             semester: Number(fields.semester.value),
             legal_specialty: fields.specialty.value,
             profile_type: "estudante", 
             lgpd_consent: true
         };
 
-        btn.disabled = true;
-        btn.innerText = "Processando...";
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "Processando...";
+        }
 
         const response = await fetch('http://127.0.0.1:8000/auth/register', {
             method: 'POST',
@@ -183,7 +266,7 @@ async function realizarRegistro(event) {
             if (data.access_token) localStorage.setItem('access_token', data.access_token);
             
             mostrarAviso("Conta criada com sucesso! Preparando acesso...", "success");
-            btn.innerText = "Sucesso!";
+            if (btn) btn.innerText = "Sucesso!";
 
             setTimeout(() => { 
                 window.location.href = "telaQr.html"; 
@@ -193,16 +276,20 @@ async function realizarRegistro(event) {
             const detail = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
             mostrarAviso(detail || "Não foi possível completar o cadastro.");
             
-            btn.disabled = false;
-            btn.innerText = "Criar conta";
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Criar conta";
+            }
         }
 
     } catch (error) {
         console.error("ERRO DE REDE:", error); 
         mostrarAviso("Falha na comunicação com o servidor. Tente novamente.");
         
-        btn.disabled = false;
-        btn.innerText = "Criar conta";
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Criar conta";
+        }
     }
     
     return false;

@@ -34,9 +34,14 @@ const knowledgeBase = {
 
 async function loadBasicProfile() {
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
         const response = await fetch(`${API_BASE_URL}/user/me`, {
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: { "Authorization": `Bearer ${token}` },
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
         
         if (response.status === 401) {
             localStorage.removeItem("access_token");
@@ -56,7 +61,7 @@ async function loadBasicProfile() {
 
         const especialidade = user.legal_specialty || "Geral";
         const badge = document.getElementById("specialtyBadge");
-        if(badge) badge.textContent = especialidade;
+        if (badge) badge.textContent = especialidade;
         
         document.getElementById("dynamicTopic").textContent = especialidade;
         
@@ -67,6 +72,9 @@ async function loadBasicProfile() {
         }
 
     } catch (error) {
+        if (error.name === 'AbortError') {
+            console.error("Tempo de conexão excedido com a API.");
+        }
         localStorage.removeItem("access_token");
         window.location.href = "login.html";
     }
@@ -85,15 +93,28 @@ async function handleLogout(e) {
     }
 }
 
-document.getElementById("menuLogout").addEventListener("click", handleLogout);
-document.getElementById("navbarLogoutBtn").addEventListener("click", handleLogout);
+// --- Tratamento seguro dos botões de logout ---
+const menuLogoutBtn = document.getElementById("menuLogout");
+if (menuLogoutBtn) {
+    menuLogoutBtn.addEventListener("click", handleLogout);
+}
 
-// --- SISTEMA DE SESSÃO SINCRONIZADA ---
+const navbarLogoutBtn = document.getElementById("navbarLogoutBtn");
+if (navbarLogoutBtn) {
+    navbarLogoutBtn.addEventListener("click", handleLogout);
+}
+
+// --- SISTEMA DE SESSÃO OTIMIZADO E CORRIGIDO ---
 const SESSION_LIMIT_MS = 10 * 60 * 1000; // 10 Minutos
 
+// Inicializa a expiração caso não exista
+if (!localStorage.getItem("session_expiration")) {
+    localStorage.setItem("session_expiration", Date.now() + SESSION_LIMIT_MS);
+}
+
 function updateTimer() {
-    const lastActive = parseInt(localStorage.getItem("session_last_active") || Date.now(), 10);
-    const remainingMs = Math.max(0, SESSION_LIMIT_MS - (Date.now() - lastActive));
+    const expiration = parseInt(localStorage.getItem("session_expiration") || Date.now(), 10);
+    const remainingMs = Math.max(0, expiration - Date.now());
     
     const min = Math.floor(remainingMs / 60000);
     const sec = Math.floor((remainingMs % 60000) / 1000);
@@ -102,22 +123,31 @@ function updateTimer() {
         timerDisplay.textContent = `Sessão: ${min}:${sec < 10 ? "0" : ""}${sec}`;
     }
 
+    // Ao zerar, limpa a sessão e envia para o login
     if (remainingMs <= 0) {
         localStorage.removeItem("access_token");
+        localStorage.removeItem("session_expiration");
         window.location.href = "login.html?motivo=inatividade";
     }
 }
 
+// Controle para evitar excesso de requisições no localStorage
+let lastActivityTime = 0;
+
 function resetSessionTimer() {
-    localStorage.setItem("session_last_active", Date.now());
+    const now = Date.now();
+    // Atualiza apenas se o intervalo for maior que 2 segundos
+    if (now - lastActivityTime > 2000) {
+        lastActivityTime = now;
+        localStorage.setItem("session_expiration", now + SESSION_LIMIT_MS);
+    }
 }
 
+// Escuta os eventos de atividade do usuário
 ["click", "keydown", "mousemove"].forEach((eventName) => {
     window.addEventListener(eventName, resetSessionTimer, { passive: true });
 });
 
-// Executa a checagem do timer a cada 1 segundo
 setInterval(updateTimer, 1000);
-
 loadBasicProfile();
 resetSessionTimer();

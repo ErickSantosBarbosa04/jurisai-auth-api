@@ -1,32 +1,54 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Redefinir Senha - JurisAI</title>
-    <link rel="stylesheet" href="../css/registrar.css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Nova Senha | JurisAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/loginStyle.css">
+    <link rel="icon" href="../assets/—Pngtree—elegant golden business logo capital_20563813.png" type="image/png">
 </head>
 <body>
-    <div class="auth-card">
-        <h3>Criar nova senha</h3>
-        <p id="userEmail" style="font-size: 14px; color: #666; margin-bottom: 20px;"></p>
+    <div id="toast">
+        <span id="toast-message"></span>
+        <div id="toast-timer" class="toast-timer"></div>
+    </div>
 
-        <div id="mensagemStatus" style="display:none;"></div>
+    <div class="login-container">
+        <h2>CRIAR NOVA SENHA</h2>
+        <p class="subtitle" id="userEmailDisplay">Carregando e-mail...</p>
 
-        <div class="input-group">
-            <input type="password" id="newPassword" maxlength="25" placeholder="Nova senha" class="auth-input">
-            <div class="strength-meter">
-                <div id="strengthBar" class="bar"></div>
+        <div id="mensagemAviso" style="display: none;"></div>
+        
+        <form id="resetForm" class="login-form">
+            <div class="form-group">
+                <label for="password">Nova senha</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" required placeholder="Sua senha" autocomplete="new-password">
+                    <button type="button" id="togglePassword" class="toggle-password">
+                        <img src="../assets/olhosfechados.png" id="eyeIcon" alt="Mostrar Senha">
+                    </button>
+                </div>
+                
+                <div class="strength-meter" style="margin-top: 8px;">
+                    <div id="strengthBar" class="strength-bar" style="width: 0%;"></div>
+                </div>
+                <small id="strengthText" style="color: var(--text-muted); font-size: 11px;">Força: 0/5</small>
             </div>
-            <small id="strengthText">Força: 0/5</small>
-        </div>
 
-        <div class="input-group">
-            <input type="password" id="confirmNewPassword" maxlength="25" placeholder="Confirme a nova senha" class="auth-input">
-        </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirmar senha</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirm_password" required placeholder="Confirme sua senha" autocomplete="new-password">
+                    <button type="button" id="toggleConfirmPassword" class="toggle-password">
+                        <img src="../assets/olhosfechados.png" id="eyeIconConfirm" alt="Mostrar Senha">
+                    </button>
+                </div>
+            </div>
 
-        <div class="button-group">
-            <button type="button" id="btnSalvarSenha" class="btn-primary">Redefinir senha</button>
-        </div>
+            <button type="button" id="btnRedefinir" onclick="redefinirSenha()">Redefinir Senha</button>
+            
+        </form>
     </div>
 
     <script src="../js/redefinir.js"></script>

@@ -33,18 +33,72 @@ admin
 
 ##  Estrutura do Projeto
 
-juris-auth/
+JURISAI-AUTH-API/
 ├── app/
-│ ├── init.py
-│ ├── main.py # Rotas FastAPI
-│ ├── auth.py # bcrypt + JWT + TOTP
-│ ├── database.py # Conexão PostgreSQL
-│ ├── models.py # User + TokenBlacklist
-│ ├── schemas.py # Validação Pydantic
-│ └── dependencies.py # get_db, get_current_user
-├── requirements.txt
+│   ├── core/
+│   │   ├── db/
+│   │   │   └── database.py
+│   │   ├── config.py
+│   │   ├── crypto.py
+│   │   ├── dependencies.py
+│   │   └── security.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── PasswordResetToken.py
+│   │   ├── TokenBlacklistModel.py
+│   │   └── UserModel.py
+│   ├── routers/
+│   │   ├── auth.py
+│   │   ├── mfa.py
+│   │   ├── password_reset.py
+│   │   └── user.py
+│   ├── schema/
+│   │   └── schemas.py
+│   └── services/
+│       ├── auth_service.py
+│       ├── mfa_service.py
+│       ├── password_service.py
+│       └── user_service.py
+├── frontend/
+│   ├── assets/
+│   ├── css/
+│   │   ├── dashboardStyle.css
+│   │   ├── esqueci.css
+│   │   ├── loginStyle.css
+│   │   ├── recuperar-2fa.css
+│   │   └── registrar.css
+│   ├── js/
+│   │   ├── 2faRecupera.js
+│   │   ├── ativar-2fa.js
+│   │   ├── authGuard.js
+│   │   ├── dashboard.js
+│   │   ├── duasEtapa.js
+│   │   ├── esqueci.js
+│   │   ├── loginJs.js
+│   │   ├── perfil.js
+│   │   ├── redefinir.js
+│   │   └── registrar.js
+│   └── pages/
+│       ├── dashboard.html
+│       ├── duasEtapa.html
+│       ├── esqueci.html
+│       ├── login.html
+│       ├── perfil.html
+│       ├── recuperar-2fa.html
+│       ├── redefinir.html
+│       ├── register.html
+│       └── telaQr.html
+├── .pytest_cache/
+├── .vscode/
+├── venv/
+├── .env
+├── .gitignore
+├── banco.txt
+├── body.json
+├── main.py
 ├── README.md
-└── venv/
+├── ReadmeBiel.md
+└── requirements.txt
 
 text
 
@@ -59,7 +113,7 @@ text
 ### Instalação
 
 ```cmd
-# 1. Criar o .Env na raiz:
+# 1. Criar o .Env na raiz:  (cuiado com a senha do db)
 DATABASE_URL="mysql+pymysql://root:sua_senha_aqui@localhost:3306/jurisai_db"
 SECRET_KEY=(ele muda)
 FERNET_KEY= (ele muda)
@@ -71,22 +125,21 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 # Para descobrir o SECRET_KEY coloque no terminal:
 python -c "import secrets; print(secrets.token_hex(32))"
 
-# 3. Acesse a pasta do projeto
-cd juris-auth
-
-# 4. Crie o ambiente virtual
+# 3. Crie o ambiente virtual
 python -m venv venv
 
-# 5. Ative o ambiente virtual
+# 4. Ative o ambiente virtual
 venv\Scripts\activate.bat       # CMD Windows
 # ou
 venv\Scripts\Activate.ps1       # PowerShell
 
-# 6. Instale as dependências
+# 5. Instale as dependências
 pip install -r requirements.txt
 
-# 7. Execute o servidor
+# 6. Execute o servidor
 python -m uvicorn main:app --reload
+
+
 Acesse
 API: http://127.0.0.1:8000
 

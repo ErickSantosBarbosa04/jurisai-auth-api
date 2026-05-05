@@ -14,6 +14,8 @@ function applyTheme() {
 }
 applyTheme();
 
+let currentUserData = null; // Armazena os dados originais do usuário
+
 const profileForm = document.getElementById("profileForm");
 const saveStatus = document.getElementById("saveStatus");
 const toast = document.getElementById("toast");
@@ -37,6 +39,7 @@ function setField(id, value) {
 }
 
 function fillProfile(user) {
+    currentUserData = user; // Salva o estado atual do usuário
     document.getElementById("userEmailCard").textContent = user.email;
     if (user.created_at) {
         document.getElementById("createdAt").textContent = new Intl.DateTimeFormat("pt-BR").format(new Date(user.created_at));
@@ -50,10 +53,36 @@ function fillProfile(user) {
     setField("profile_type", user.profile_type || "estudante");
     setField("university", user.university);
     setField("semester", user.semester);
-    setField("legal_specialty", user.legal_specialty);
+    setField("legal_specialty", user.legal_specialty); 
 
     saveStatus.textContent = "Sincronizado";
     saveStatus.className = "status-pill success";
+}
+
+// Função de formatação da instituição
+function formatarNomeInstituicao(nome) {
+    if (!nome) return "";
+    return nome
+        .trim()
+        .toLowerCase()
+        .replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+}
+
+// 1. VALIDAÇÃO DE SEGURANÇA: TEXTO SIMPLES (NOME E INSTITUIÇÃO)
+function validarTextoSimples(valor, campoNome) {
+    const regexValida = /^[a-zA-ZÀ-ÿ\s]+$/;
+
+    if (!valor || valor.trim() === "") {
+        return `O campo ${campoNome} não pode ficar vazio.`;
+    }
+
+    const valorLimpo = valor.trim();
+
+    if (!regexValida.test(valorLimpo)) {
+        return `O campo ${campoNome} não deve conter números ou caracteres especiais.`;
+    }
+
+    return null;
 }
 
 async function fetchProtected(endpoint, options = {}) {
@@ -88,18 +117,59 @@ async function loadProfile() {
     }
 }
 
+// Trava de segurança no evento de digitação (Instituição)
+const universityInput = document.getElementById("university");
+if (universityInput) {
+    universityInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+    });
+}
+
 profileForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    const fullNameInput = document.getElementById("full_name").value;
+    const universityInput = document.getElementById("university").value;
+
+    // Validação do Nome
+    const erroNome = validarTextoSimples(fullNameInput, "Nome Completo");
+    if (erroNome) {
+        showToast(erroNome);
+        return;
+    }
+
+    // Validação da Instituição
+    const erroUniv = validarTextoSimples(universityInput, "Instituição");
+    if (erroUniv) {
+        showToast(erroUniv);
+        return;
+    }
+
     saveStatus.textContent = "Salvando...";
     saveStatus.className = "status-pill";
 
     const formData = new FormData(profileForm);
+
+    // Tratamento seguro da área de interesse
+    let selectedSpecialty = formData.get("legal_specialty");
+    if (!selectedSpecialty || selectedSpecialty.trim() === "" || selectedSpecialty === "Selecione") {
+        selectedSpecialty = currentUserData ? currentUserData.legal_specialty : null;
+    }
+
+    // Tratamento seguro do semestre
+    let semesterValue = formData.get("semester");
+    if (!semesterValue || semesterValue === "") {
+        semesterValue = null;
+    } else {
+        semesterValue = Number(semesterValue);
+    }
+
     const payload = {
         full_name: formData.get("full_name") || null,
         profile_type: formData.get("profile_type") || "estudante",
-        university: formData.get("university") || null,
-        semester: formData.get("semester") ? Number(formData.get("semester")) : null,
-        legal_specialty: formData.get("legal_specialty") || null
+        university: formatarNomeInstituicao(formData.get("university")) || null,
+        semester: semesterValue,
+        legal_specialty: selectedSpecialty
     };
 
     try {
@@ -107,8 +177,13 @@ profileForm.addEventListener("submit", async (event) => {
             method: "PATCH",
             body: JSON.stringify(payload)
         });
+        
         const data = await response.json();
-        if (!response.ok) throw new Error(data.detail);
+        if (!response.ok) {
+            console.error("Erro de validação (422):", data);
+            throw new Error(data.detail || "Erro ao atualizar dados.");
+        }
+
         fillProfile(data);
         showToast("Perfil atualizado com sucesso!");
     } catch (error) {
@@ -118,11 +193,34 @@ profileForm.addEventListener("submit", async (event) => {
     }
 });
 
-// --- SISTEMA DE SESSÃO NO PERFIL ---
-function resetSessionTimer() {
-    localStorage.setItem("session_last_active", Date.now());
+// --- SISTEMA DE SESSÃO SINCRONIZADO ---
+const SESSION_LIMIT_MS = 10 * 60 * 1000; // 10 Minutos
+
+function updateTimer() {
+    const expiration = parseInt(localStorage.getItem("session_expiration") || Date.now(), 10);
+    const remainingMs = Math.max(0, expiration - Date.now());
+    
+    if (remainingMs <= 0) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("session_expiration");
+        window.location.href = "login.html?motivo=inatividade";
+    }
 }
 
+let lastActivityTime = 0;
+
+function resetSessionTimer() {
+    const now = Date.now();
+    if (now - lastActivityTime > 2000) {
+        lastActivityTime = now;
+        localStorage.setItem("session_expiration", now + SESSION_LIMIT_MS);
+    }
+}
+
+// Inicia o cronômetro visual/interno (Apenas uma vez)
+setInterval(updateTimer, 1000);
+
+// Adiciona os eventos para detectar que o usuário está ativo (Apenas uma vez)
 ["click", "keydown", "mousemove"].forEach((eventName) => {
     window.addEventListener(eventName, resetSessionTimer, { passive: true });
 });
@@ -135,7 +233,6 @@ document.getElementById("savePreferencesBtn").addEventListener("click", () => {
     localStorage.setItem("theme_mode", theme);
     localStorage.setItem("ai_tone", tone);
 
-    // Atualiza o CSS na hora
     if (theme === "dark") {
         document.body.classList.add("dark-mode");
     } else {
@@ -178,7 +275,7 @@ document.getElementById("logoutAllBtn").addEventListener("click", async () => {
     if (!confirmed) return;
 
     try {
-        const response = await fetchProtected("/user/logout-all", { method: "POST" });
+        const response = await fetchProtected("/auth/logout-all", { method: "POST" });
         if (!response.ok) throw new Error("Erro ao desconectar aparelhos.");
         
         alert("Desconectado com sucesso. Faça login novamente.");
@@ -189,5 +286,6 @@ document.getElementById("logoutAllBtn").addEventListener("click", async () => {
     }
 });
 
+// Inicializações
 loadProfile();
 resetSessionTimer();
