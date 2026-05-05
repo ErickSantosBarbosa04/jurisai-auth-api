@@ -23,7 +23,6 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// --- SISTEMA DE CONTEÚDO DINÂMICO (IA SIMULADA) ---
 const knowledgeBase = {
     "Direito Penal": "O STJ consolidou entendimento recente sobre a aplicação do princípio da insignificância em crimes de furto qualificado. Nossa IA está preparada para redigir Habeas Corpus com base nesta nova tese.",
     "Direito Civil": "Atualizações no Código Civil: Novas diretrizes sobre responsabilidade civil em contratos digitais. Utilize a ferramenta de Petição Inicial para adaptar seus contratos aos novos precedentes.",
@@ -38,20 +37,27 @@ async function loadBasicProfile() {
         const response = await fetch(`${API_BASE_URL}/user/me`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
+        
+        if (response.status === 401) {
+            localStorage.removeItem("access_token");
+            window.location.href = "login.html?motivo=inatividade";
+            return;
+        }
+
         if (!response.ok) throw new Error("Sessão inválida");
         
         const user = await response.json();
         const primeironome = user.full_name ? user.full_name.split(" ")[0] : "Usuário";
         
-        // Dados Padrão
         document.getElementById("welcomeTitle").textContent = `Bem-vindo(a), ${primeironome}`;
         document.getElementById("dropdownName").textContent = primeironome;
         document.getElementById("dropdownEmail").textContent = user.email;
         avatarBtn.textContent = primeironome.charAt(0).toUpperCase();
 
-        // A Mágica do Conteúdo Dinâmico!
         const especialidade = user.legal_specialty || "Geral";
-        document.getElementById("specialtyBadge").textContent = especialidade;
+        const badge = document.getElementById("specialtyBadge");
+        if(badge) badge.textContent = especialidade;
+        
         document.getElementById("dynamicTopic").textContent = especialidade;
         
         if (knowledgeBase[especialidade]) {
@@ -66,8 +72,8 @@ async function loadBasicProfile() {
     }
 }
 
-document.getElementById("menuLogout").addEventListener("click", async (e) => {
-    e.preventDefault();
+async function handleLogout(e) {
+    if (e) e.preventDefault();
     try { 
         await fetch(`${API_BASE_URL}/auth/logout`, { 
             method: "POST", 
@@ -77,36 +83,41 @@ document.getElementById("menuLogout").addEventListener("click", async (e) => {
         localStorage.removeItem("access_token");
         window.location.href = "login.html";
     }
-});
+}
 
-// --- O TIMER DE VOLTA À ATIVA ---
-const SESSION_LIMIT_MS = 10 * 60 * 1000;
-let remainingMs = SESSION_LIMIT_MS;
-let countdownTimer;
-let inactivityTimer;
+document.getElementById("menuLogout").addEventListener("click", handleLogout);
+document.getElementById("navbarLogoutBtn").addEventListener("click", handleLogout);
+
+// --- SISTEMA DE SESSÃO SINCRONIZADA ---
+const SESSION_LIMIT_MS = 10 * 60 * 1000; // 10 Minutos
 
 function updateTimer() {
-    remainingMs -= 1000;
-    const min = Math.max(0, Math.floor(remainingMs / 60000));
-    const sec = Math.max(0, Math.floor((remainingMs % 60000) / 1000));
-    if(timerDisplay) timerDisplay.textContent = `Sessão: ${min}:${sec < 10 ? "0" : ""}${sec}`;
+    const lastActive = parseInt(localStorage.getItem("session_last_active") || Date.now(), 10);
+    const remainingMs = Math.max(0, SESSION_LIMIT_MS - (Date.now() - lastActive));
+    
+    const min = Math.floor(remainingMs / 60000);
+    const sec = Math.floor((remainingMs % 60000) / 1000);
+    
+    if (timerDisplay) {
+        timerDisplay.textContent = `Sessão: ${min}:${sec < 10 ? "0" : ""}${sec}`;
+    }
+
+    if (remainingMs <= 0) {
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html?motivo=inatividade";
+    }
 }
 
 function resetSessionTimer() {
-    clearTimeout(inactivityTimer);
-    clearInterval(countdownTimer);
-    remainingMs = SESSION_LIMIT_MS;
-    updateTimer();
-    countdownTimer = setInterval(updateTimer, 1000);
-    inactivityTimer = setTimeout(() => {
-        localStorage.removeItem("access_token");
-        window.location.href = "login.html?motivo=inatividade";
-    }, SESSION_LIMIT_MS);
+    localStorage.setItem("session_last_active", Date.now());
 }
 
 ["click", "keydown", "mousemove"].forEach((eventName) => {
     window.addEventListener(eventName, resetSessionTimer, { passive: true });
 });
+
+// Executa a checagem do timer a cada 1 segundo
+setInterval(updateTimer, 1000);
 
 loadBasicProfile();
 resetSessionTimer();

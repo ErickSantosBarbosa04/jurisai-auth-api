@@ -5,6 +5,7 @@ from app.core.db.database import SessionLocal
 from app import models
 from app.core.security import verify_token
 from app.models.UserModel import User
+from datetime import datetime, timezone 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -41,18 +42,21 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             detail="Payload do token inválido"
         )
         
-    # CORREÇÃO: O user_id agora é um UUID (texto), então removemos a conversão int()
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-    # NOVA TRAVA: Sessões Concorrentes
     # O "iat" é o momento exato em que o token foi criado
     token_criado_em = payload.get("iat") 
     
     if user.tokens_valid_after and token_criado_em:
+        # Garante que a data do banco seja UTC para comparar com o timestamp
+        valid_after = user.tokens_valid_after
+        if valid_after.tzinfo is None:
+            valid_after = valid_after.replace(tzinfo=timezone.utc)
+            
         # Se o token for mais velho que o momento em que o usuário clicou em "Desconectar todos"
-        if token_criado_em < user.tokens_valid_after.timestamp():
+        if token_criado_em < valid_after.timestamp():
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, 
                 detail="Sua sessão foi encerrada em outro dispositivo."

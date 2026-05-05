@@ -16,7 +16,6 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 logger = logging.getLogger(__name__)
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-
 #Delega o registro ao AuthService
 def register(data: schemas.RegisterRequest, db: Session = Depends(get_db)):
     return AuthService.register_user(db, data)
@@ -44,7 +43,6 @@ def recuperar_confirmar(data: schemas.ValidarRecuperacaoRequest, db: Session = D
         raise HTTPException(status_code=404, detail="Usuário ou 2FA não encontrado")
 
     # Descriptografa e valida o TOTP
-    from app.core.crypto import decrypt
     raw_secret = decrypt(user.totp_secret)
     
     if not verify_totp(raw_secret, data.code):
@@ -63,7 +61,6 @@ def redefinir_senha(data: schemas.NovaSenhaFinalRequest, db: Session = Depends(g
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
     # Aqui você faz o hash da nova senha e salva
-    from app.core.security import get_password_hash
     user.hashed_password = get_password_hash(data.new_password)
     
     db.commit()
@@ -88,8 +85,8 @@ def logout(request: Request, db: Session = Depends(get_db), current_user=Depends
     return AuthService.blacklist_token(db, request, current_user)
 
 @router.post("/logout-all", status_code=status.HTTP_200_OK)
-def logout_all_devices(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    # Grava o momento exato do clique. Todos os tokens antigos morrem agora.
+#Desconecta o usuário de todas as sessões ativas
+def logout_all_devices(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     current_user.tokens_valid_after = datetime.now(timezone.utc)
     db.commit()
     return {"message": "Desconectado de todos os dispositivos com sucesso."}

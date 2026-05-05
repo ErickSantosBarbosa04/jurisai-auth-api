@@ -5,7 +5,6 @@ from app.core.db.database import get_db
 from app.core.dependencies import get_current_user
 from app.schema import schemas
 from app.services.user_service import UserService
-# IMPORTANTE: Importar o modelo User para que o Depends(get_current_user) funcione
 from app.models.UserModel import User 
 
 # O prefixo aqui é /user, então o endpoint completo será /user/me

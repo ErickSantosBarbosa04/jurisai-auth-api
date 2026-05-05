@@ -3,8 +3,7 @@ const token = localStorage.getItem("access_token");
 
 if (!token) window.location.href = "login.html";
 
-// --- SISTEMA DE TEMA GLOBAL ---
-// Aplica o tema na hora que a página abre
+// Aplica o tema
 function applyTheme() {
     const savedTheme = localStorage.getItem("theme_mode");
     if (savedTheme === "dark") {
@@ -13,9 +12,8 @@ function applyTheme() {
         document.body.classList.remove("dark-mode");
     }
 }
-applyTheme(); // Executa imediatamente
+applyTheme();
 
-// Elementos da UI
 const profileForm = document.getElementById("profileForm");
 const saveStatus = document.getElementById("saveStatus");
 const toast = document.getElementById("toast");
@@ -70,13 +68,12 @@ async function fetchProtected(endpoint, options = {}) {
 
     if (response.status === 401) {
         localStorage.removeItem("access_token");
-        window.location.href = "login.html";
+        window.location.href = "login.html?motivo=inatividade";
         throw new Error("Sessão expirada");
     }
     return response;
 }
 
-// Carregar Dados e Preferências do Navegador
 async function loadProfile() {
     try {
         const response = await fetchProtected("/user/me");
@@ -84,16 +81,13 @@ async function loadProfile() {
         if (!response.ok) throw new Error(data.detail);
         fillProfile(data);
 
-        // Carrega as preferências locais (Tema e IA) para os Selects
         setField("theme_mode", localStorage.getItem("theme_mode") || "light");
         setField("ai_tone", localStorage.getItem("ai_tone") || "tecnico");
-
     } catch (error) {
         showToast(error.message);
     }
 }
 
-// Salvar Perfil Principal (Backend)
 profileForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     saveStatus.textContent = "Salvando...";
@@ -124,7 +118,16 @@ profileForm.addEventListener("submit", async (event) => {
     }
 });
 
-// --- SALVAR PREFERÊNCIAS DE SISTEMA (Frontend) ---
+// --- SISTEMA DE SESSÃO NO PERFIL ---
+function resetSessionTimer() {
+    localStorage.setItem("session_last_active", Date.now());
+}
+
+["click", "keydown", "mousemove"].forEach((eventName) => {
+    window.addEventListener(eventName, resetSessionTimer, { passive: true });
+});
+
+// Botão de Preferências
 document.getElementById("savePreferencesBtn").addEventListener("click", () => {
     const theme = document.getElementById("theme_mode").value;
     const tone = document.getElementById("ai_tone").value;
@@ -132,11 +135,16 @@ document.getElementById("savePreferencesBtn").addEventListener("click", () => {
     localStorage.setItem("theme_mode", theme);
     localStorage.setItem("ai_tone", tone);
 
-    applyTheme(); // Muda a cor na hora!
+    // Atualiza o CSS na hora
+    if (theme === "dark") {
+        document.body.classList.add("dark-mode");
+    } else {
+        document.body.classList.remove("dark-mode");
+    }
     showToast("Preferências do sistema salvas!");
 });
 
-// Ações de LGPD e Exclusão
+// Ações
 document.getElementById("exportBtn").addEventListener("click", async () => {
     try {
         const response = await fetchProtected("/user/export-data");
@@ -164,12 +172,13 @@ document.getElementById("deleteAccountBtn").addEventListener("click", async () =
         showToast("Erro ao excluir conta.");
     }
 });
+
 document.getElementById("logoutAllBtn").addEventListener("click", async () => {
     const confirmed = confirm("Tem certeza que deseja desconectar de todos os outros dispositivos?");
     if (!confirmed) return;
 
     try {
-        const response = await fetchProtected("/auth/logout-all", { method: "POST" });
+        const response = await fetchProtected("/user/logout-all", { method: "POST" });
         if (!response.ok) throw new Error("Erro ao desconectar aparelhos.");
         
         alert("Desconectado com sucesso. Faça login novamente.");
@@ -179,4 +188,6 @@ document.getElementById("logoutAllBtn").addEventListener("click", async () => {
         showToast("Erro ao processar solicitação.");
     }
 });
+
 loadProfile();
+resetSessionTimer();
