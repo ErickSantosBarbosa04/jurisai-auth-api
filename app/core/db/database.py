@@ -19,11 +19,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 def get_db():
-    """
-    Injeção de Dependência: Cria uma sessão de banco de dados para cada 
-    requisição e garante que ela seja fechada ao final.
-    Atende ao Requisito 6.4 (Gestão de Recursos).
-    """
     db = SessionLocal()
     try:
         yield db
