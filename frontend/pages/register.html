@@ -94,17 +94,41 @@
             </div>
         </div>
 
-        <label class="consent-line">
+        <label class="consent-line term-consent">
             <input type="checkbox" id="lgpdConsent">
-            <span>Aceito o uso dos meus dados para autenticação e segurança da conta.</span>
+            <span class="consent-text">
+                Aceito o uso dos meus dados para autenticação e segurança da conta, e concordo com os 
+                <span class="term-link" onclick="abrirTermos(event)">Termos de Uso e Privacidade</span>.
+            </span>
         </label>
 
-        <div class="button-group">
+        <div class="button-group btn-create-margin">
             <button type="button" id="btnRegistrar" onclick="realizarRegistro(event)" class="btn-primary">
                 Criar conta
             </button>
         </div>
+    </div>
 
+    <div id="modalTermos" class="modal-overlay" onclick="fecharTermosClickFora(event)">
+        <div class="modal-content">
+            <h2>Termos de Uso e Privacidade</h2>
+            <div class="modal-body">
+                <p>Bem-vindo(a) ao <strong>JurisAI</strong>! Estes Termos de Uso regulam o seu acesso e uso da nossa plataforma. Ao criar uma conta e utilizar nossos serviços, você concorda com as regras descritas abaixo.</p>
+                
+                <h3>1. O que é o JurisAI?</h3>
+                <p>O JurisAI é uma plataforma de assistência baseada em inteligência artificial. <strong>Importante:</strong> As respostas geradas pela IA não substituem a consultoria jurídica oficial. O usuário é o único responsável por revisar qualquer informação antes de usá-la.</p>
+                
+                <h3>2. Segurança da Conta e Cookies</h3>
+                <p>Para manter sua conta segura, usamos o armazenamento local do seu navegador (uma tecnologia semelhante aos cookies) para guardar sua chave de acesso e lembrar suas preferências de tela. Não usamos cookies para rastreamento ou propagandas.</p>
+                
+                <h3>3. Proteção de Dados (LGPD)</h3>
+                <p>Levamos sua privacidade a sério. Consentindo com este termo, você permite o tratamento dos seus dados essenciais para o funcionamento da conta. Você pode exportar (baixar) ou excluir seus dados permanentemente no painel de perfil a qualquer momento.</p>
+                
+                <h3>4. Regras de Conduta</h3>
+                <p>Você concorda em não tentar burlar os sistemas de segurança, não sobrecarregar o sistema com bots e não usar a plataforma para gerar conteúdos ilícitos ou de desinformação.</p>
+            </div>
+            <button type="button" class="btn-primary" onclick="aceitarTermos()">Li tudo</button>
+        </div>
     </div>
 
     <script src="../js/registrar.js"></script>

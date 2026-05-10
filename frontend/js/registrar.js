@@ -31,7 +31,26 @@ if (passwordInput) {
         atualizarBarra(forca);
     });
 }
+// Funções de controle do Modal
+const modal = document.getElementById('modalTermos');
+const checkboxTermos = document.getElementById('lgpdConsent');
 
+function abrirTermos(event) {
+    event.preventDefault();
+    modal.classList.add('show');
+}
+
+function aceitarTermos() {
+    modal.classList.remove('show');
+    checkboxTermos.checked = true; // Marca a caixinha automaticamente
+}
+
+// Fecha o modal se o usuário clicar na parte escura fora da caixa
+    function fecharTermosClickFora(event) {
+        if (event.target === modal) {
+            modal.classList.remove('show');
+        }
+    }
 function atualizarBarra(n) {
     if (!strengthBar) return;
     
