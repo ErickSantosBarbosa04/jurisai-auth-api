@@ -21,6 +21,9 @@ class User(Base):
     semester = Column(Integer, nullable=True)
     legal_specialty = Column(String(80), nullable=True)
 
+    # --- CONTROLE DE ACESSO ---
+    is_admin = Column(Boolean, default=False) 
+
     # --- NOVOS CAMPOS PARA REQUISITO 1.11 ---
     last_failed_login = Column(DateTime, nullable=True)
     failed_login_attempts = Column(Integer, default=0)
