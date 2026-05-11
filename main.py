@@ -8,12 +8,14 @@ from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from app.models.UserModel import User
 
 # REMOVIDO: ensure_user_profile_columns (agora o MySQL cuida disso)
 from app.core.db.database import Base, engine
 from app.core.config import settings 
 from app.routers import auth, mfa, user, password_reset
 
+Base.metadata.create_all(bind=engine)
 # Configuração de Logs (Atende Requisito 5.1 e 5.2) 
 logging.basicConfig(
     level=logging.INFO,
