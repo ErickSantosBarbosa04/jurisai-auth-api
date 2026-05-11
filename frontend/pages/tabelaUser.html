@@ -21,8 +21,15 @@
                 <p class="eyebrow">Administração > Usuários</p>
                 <h1>Controle de Acessos</h1>
             </div>
-            <div class="search-container">
-                <input type="text" id="userSearch" placeholder="Buscar por nome ou e-mail..." class="auth-input" style="max-width: 300px;">
+            
+            <div style="display: flex; gap: 12px; align-items: center; margin-top: 15px; flex-wrap: wrap;">
+                <input type="text" id="userSearch" placeholder="🔍 Buscar por nome ou e-mail..." class="auth-input" style="max-width: 350px; flex: 1; margin: 0;">
+                
+                <select id="userSort" class="auth-input" style="max-width: 180px; margin: 0; cursor: pointer;">
+                    <option value="recente">Mais Recentes</option>
+                    <option value="az">Ordem: A - Z</option>
+                    <option value="za">Ordem: Z - A</option>
+                </select>
             </div>
         </header>
 
