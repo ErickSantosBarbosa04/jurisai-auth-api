@@ -24,10 +24,14 @@ for (let i = 1; i <= 10; i++) {
     const option = document.createElement("option");
     option.value = String(i);
     option.textContent = `${i}º semestre`;
-    document.getElementById("semester").appendChild(option);
+    const semesterSelect = document.getElementById("semester");
+    if (semesterSelect) {
+        semesterSelect.appendChild(option);
+    }
 }
 
 function showToast(message) {
+    if (!toast) return;
     toast.textContent = message;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 3200);
@@ -40,14 +44,20 @@ function setField(id, value) {
 
 function fillProfile(user) {
     currentUserData = user; // Salva o estado atual do usuário
-    document.getElementById("userEmailCard").textContent = user.email;
-    if (user.created_at) {
-        document.getElementById("createdAt").textContent = new Intl.DateTimeFormat("pt-BR").format(new Date(user.created_at));
+    
+    const emailCard = document.getElementById("userEmailCard");
+    if (emailCard) emailCard.textContent = user.email;
+    
+    const createdAtCard = document.getElementById("createdAt");
+    if (createdAtCard && user.created_at) {
+        createdAtCard.textContent = new Intl.DateTimeFormat("pt-BR").format(new Date(user.created_at));
     }
 
     const twoFactor = document.getElementById("twoFactorStatus");
-    twoFactor.textContent = user.is_2fa_enabled ? "2FA Ativo" : "2FA Pendente";
-    twoFactor.className = `status-pill ${user.is_2fa_enabled ? "success" : "warning"}`;
+    if (twoFactor) {
+        twoFactor.textContent = user.is_2fa_enabled ? "2FA Ativo" : "2FA Pendente";
+        twoFactor.className = `status-pill ${user.is_2fa_enabled ? "success" : "warning"}`;
+    }
 
     setField("full_name", user.full_name);
     setField("profile_type", user.profile_type || "estudante");
@@ -55,8 +65,10 @@ function fillProfile(user) {
     setField("semester", user.semester);
     setField("legal_specialty", user.legal_specialty); 
 
-    saveStatus.textContent = "Sincronizado";
-    saveStatus.className = "status-pill success";
+    if (saveStatus) {
+        saveStatus.textContent = "Sincronizado";
+        saveStatus.className = "status-pill success";
+    }
 }
 
 // Função de formatação da instituição
@@ -125,73 +137,79 @@ if (universityInput) {
     });
 }
 
-profileForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+if (profileForm) {
+    profileForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-    const fullNameInput = document.getElementById("full_name").value;
-    const universityInput = document.getElementById("university").value;
+        const fullNameInput = document.getElementById("full_name").value;
+        const universityInput = document.getElementById("university").value;
 
-    // Validação do Nome
-    const erroNome = validarTextoSimples(fullNameInput, "Nome Completo");
-    if (erroNome) {
-        showToast(erroNome);
-        return;
-    }
-
-    // Validação da Instituição
-    const erroUniv = validarTextoSimples(universityInput, "Instituição");
-    if (erroUniv) {
-        showToast(erroUniv);
-        return;
-    }
-
-    saveStatus.textContent = "Salvando...";
-    saveStatus.className = "status-pill";
-
-    const formData = new FormData(profileForm);
-
-    // Tratamento seguro da área de interesse
-    let selectedSpecialty = formData.get("legal_specialty");
-    if (!selectedSpecialty || selectedSpecialty.trim() === "" || selectedSpecialty === "Selecione") {
-        selectedSpecialty = currentUserData ? currentUserData.legal_specialty : null;
-    }
-
-    // Tratamento seguro do semestre
-    let semesterValue = formData.get("semester");
-    if (!semesterValue || semesterValue === "") {
-        semesterValue = null;
-    } else {
-        semesterValue = Number(semesterValue);
-    }
-
-    const payload = {
-        full_name: formData.get("full_name") || null,
-        profile_type: formData.get("profile_type") || "estudante",
-        university: formatarNomeInstituicao(formData.get("university")) || null,
-        semester: semesterValue,
-        legal_specialty: selectedSpecialty
-    };
-
-    try {
-        const response = await fetchProtected("/user/me", {
-            method: "PATCH",
-            body: JSON.stringify(payload)
-        });
-        
-        const data = await response.json();
-        if (!response.ok) {
-            console.error("Erro de validação (422):", data);
-            throw new Error(data.detail || "Erro ao atualizar dados.");
+        // Validação do Nome
+        const erroNome = validarTextoSimples(fullNameInput, "Nome Completo");
+        if (erroNome) {
+            showToast(erroNome);
+            return;
         }
 
-        fillProfile(data);
-        showToast("Perfil atualizado com sucesso!");
-    } catch (error) {
-        saveStatus.textContent = "Erro";
-        saveStatus.className = "status-pill warning";
-        showToast("Erro ao salvar perfil.");
-    }
-});
+        // Validação da Instituição
+        const erroUniv = validarTextoSimples(universityInput, "Instituição");
+        if (erroUniv) {
+            showToast(erroUniv);
+            return;
+        }
+
+        if (saveStatus) {
+            saveStatus.textContent = "Salvando...";
+            saveStatus.className = "status-pill";
+        }
+
+        const formData = new FormData(profileForm);
+
+        // Tratamento seguro da área de interesse
+        let selectedSpecialty = formData.get("legal_specialty");
+        if (!selectedSpecialty || selectedSpecialty.trim() === "" || selectedSpecialty === "Selecione") {
+            selectedSpecialty = currentUserData ? currentUserData.legal_specialty : null;
+        }
+
+        // Tratamento seguro do semestre
+        let semesterValue = formData.get("semester");
+        if (!semesterValue || semesterValue === "") {
+            semesterValue = null;
+        } else {
+            semesterValue = Number(semesterValue);
+        }
+
+        const payload = {
+            full_name: formData.get("full_name") || null,
+            profile_type: formData.get("profile_type") || "estudante",
+            university: formatarNomeInstituicao(formData.get("university")) || null,
+            semester: semesterValue,
+            legal_specialty: selectedSpecialty
+        };
+
+        try {
+            const response = await fetchProtected("/user/me", {
+                method: "PATCH",
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await response.json();
+            if (!response.ok) {
+                console.error("Erro de validação (422):", data);
+                throw new Error(data.detail || "Erro ao atualizar dados.");
+            }
+
+            fillProfile(data);
+            showToast("Perfil atualizado com sucesso!");
+        } catch (error) {
+            if (saveStatus) {
+                saveStatus.textContent = "Erro";
+                saveStatus.className = "status-pill warning";
+            }
+            showToast("Erro ao salvar perfil.");
+        }
+    });
+}
 
 // --- SISTEMA DE SESSÃO SINCRONIZADO ---
 const SESSION_LIMIT_MS = 10 * 60 * 1000; // 10 Minutos
@@ -226,65 +244,80 @@ setInterval(updateTimer, 1000);
 });
 
 // Botão de Preferências
-document.getElementById("savePreferencesBtn").addEventListener("click", () => {
-    const theme = document.getElementById("theme_mode").value;
-    const tone = document.getElementById("ai_tone").value;
+const savePrefsBtn = document.getElementById("savePreferencesBtn");
+if (savePrefsBtn) {
+    savePrefsBtn.addEventListener("click", () => {
+        const theme = document.getElementById("theme_mode").value;
+        const tone = document.getElementById("ai_tone").value;
 
-    localStorage.setItem("theme_mode", theme);
-    localStorage.setItem("ai_tone", tone);
+        localStorage.setItem("theme_mode", theme);
+        localStorage.setItem("ai_tone", tone);
 
-    if (theme === "dark") {
-        document.body.classList.add("dark-mode");
-    } else {
-        document.body.classList.remove("dark-mode");
-    }
-    showToast("Preferências do sistema salvas!");
-});
+        if (theme === "dark") {
+            document.body.classList.add("dark-mode");
+        } else {
+            document.body.classList.remove("dark-mode");
+        }
+        showToast("Preferências do sistema salvas!");
+    });
+}
 
-// Ações
-document.getElementById("exportBtn").addEventListener("click", async () => {
-    try {
-        const response = await fetchProtected("/user/export-data");
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.detail);
+// ==========================================
+// AÇÕES (Protegidas contra elementos não encontrados)
+// ==========================================
 
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "jurisai-dados.json";
-        link.click();
-    } catch (error) {
-        showToast("Erro ao exportar.");
-    }
-});
+const exportBtn = document.getElementById("exportBtn");
+if (exportBtn) {
+    exportBtn.addEventListener("click", async () => {
+        try {
+            const response = await fetchProtected("/user/export-data");
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.detail);
 
-document.getElementById("deleteAccountBtn").addEventListener("click", async () => {
-    if (!confirm("Atenção: Isso remove sua conta permanentemente!")) return;
-    try {
-        const response = await fetchProtected("/user/delete-account", { method: "DELETE" });
-        if (!response.ok) throw new Error("Erro");
-        localStorage.removeItem("access_token");
-        window.location.href = "register.html";
-    } catch (error) {
-        showToast("Erro ao excluir conta.");
-    }
-});
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "jurisai-dados.json";
+            link.click();
+        } catch (error) {
+            showToast("Erro ao exportar.");
+        }
+    });
+}
 
-document.getElementById("logoutAllBtn").addEventListener("click", async () => {
-    const confirmed = confirm("Tem certeza que deseja desconectar de todos os outros dispositivos?");
-    if (!confirmed) return;
+const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener("click", async () => {
+        if (!confirm("Atenção: Isso remove sua conta permanentemente!")) return;
+        try {
+            const response = await fetchProtected("/user/delete-account", { method: "DELETE" });
+            if (!response.ok) throw new Error("Erro");
+            localStorage.removeItem("access_token");
+            window.location.href = "register.html";
+        } catch (error) {
+            showToast("Erro ao excluir conta.");
+        }
+    });
+}
 
-    try {
-        const response = await fetchProtected("/auth/logout-all", { method: "POST" });
-        if (!response.ok) throw new Error("Erro ao desconectar aparelhos.");
-        
-        alert("Desconectado com sucesso. Faça login novamente.");
-        localStorage.removeItem("access_token");
-        window.location.href = "login.html";
-    } catch (error) {
-        showToast("Erro ao processar solicitação.");
-    }
-});
+const logoutAllBtn = document.getElementById("logoutAllBtn");
+if (logoutAllBtn) {
+    logoutAllBtn.addEventListener("click", async () => {
+        const confirmed = confirm("Tem certeza que deseja desconectar de todos os outros dispositivos?");
+        if (!confirmed) return;
+
+        try {
+            const response = await fetchProtected("/auth/logout-all", { method: "POST" });
+            if (!response.ok) throw new Error("Erro ao desconectar aparelhos.");
+            
+            alert("Desconectado com sucesso. Faça login novamente.");
+            localStorage.removeItem("access_token");
+            window.location.href = "login.html";
+        } catch (error) {
+            showToast("Erro ao processar solicitação.");
+        }
+    });
+}
 
 // Inicializações
 loadProfile();
