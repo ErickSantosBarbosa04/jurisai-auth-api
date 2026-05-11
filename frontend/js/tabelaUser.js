@@ -69,6 +69,9 @@ function aplicarFiltrosEOrdenacao() {
 // ==========================================
 // RENDERIZAR TABELA
 // ==========================================
+// ==========================================
+// RENDERIZAR TABELA
+// ==========================================
 function renderizarTabela(users) {
     const tableBody = document.getElementById("fullUsersTable");
     tableBody.innerHTML = "";
@@ -80,21 +83,41 @@ function renderizarTabela(users) {
 
     users.forEach(user => {
         const tr = document.createElement("tr");
-        const statusClass = user.lockout_until ? "warning" : "success";
-        const statusText = user.lockout_until ? "Suspenso" : "Ativo";
+        
+        // --- LÓGICA DE STATUS CORRIGIDA E MELHORADA ---
+        let statusClass = "success";
+        let statusText = "Ativo";
+        let corBg = "#d4edda"; // Fundo verde clarinho
+        let corTexto = "#155724"; // Texto verde escuro
+
+        if (user.lockout_until) {
+            const dataBloqueio = new Date(user.lockout_until);
+            const agora = new Date();
+            
+            // Se a data de bloqueio for maior que hoje (Ex: Ano 2999)
+            if (dataBloqueio > agora) {
+                statusClass = "error";
+                statusText = "Suspenso";
+                corBg = "#f8d7da"; // Fundo vermelho clarinho
+                corTexto = "#721c24"; // Texto vermelho escuro
+            }
+        }
 
         tr.innerHTML = `
             <td>
                 <div style="font-weight: 600;">${user.full_name || 'Sem nome'}</div>
                 <div style="font-size: 11px; color: var(--text-muted);">${user.email}</div>
             </td>
-            <td><span class="status-pill ${statusClass}">${statusText}</span></td>
+            <td>
+                <span class="status-pill ${statusClass}" style="background-color: ${corBg}; color: ${corTexto}; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 12px;">
+                    ${statusText}
+                </span>
+            </td>
             <td>${user.profile_type || 'N/A'}</td>
             <td>${user.legal_specialty || 'N/A'}</td>
             <td>
                 <div style="display: flex; gap: 8px;">
                     <button class="btn-action" title="Editar E-mail (Anti-Hacker)" onclick="editarUsuario('${user.id}', '${user.email}')">✏️</button>
-                    
                     <button class="btn-action" title="Resetar Senha" onclick="forçarResetSenha('${user.email}')">🔑</button>
                     <button class="btn-action" title="Suspender/Ativar" onclick="alternarStatus('${user.id}')">🚫</button>
                     <button class="btn-action" title="Ver Dados LGPD" onclick="verDetalhesLGPD('${user.id}')">📄</button>
