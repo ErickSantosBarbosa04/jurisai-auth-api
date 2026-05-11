@@ -9,6 +9,7 @@ from app.core.dependencies import get_current_user
 from app.schema import schemas
 from app.models.UserModel import User
 from app.services.user_service import UserService
+from app.services.email_service import EmailService
 
 # Aqui definimos o prefixo isolado para o Admin!
 router = APIRouter(prefix="/admin", tags=["Admin Control"])
@@ -75,11 +76,16 @@ def forcar_reset_senha(email_data: dict, db: Session = Depends(get_db), current_
     if not alvo:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
         
-    # Aqui, no futuro, você conectará com uma biblioteca de envio de e-mail (como o FastAPI-Mail).
-    # O e-mail enviado terá um botão HTML com o link: 
-    # href="https://seusite.com/esqueci.html?email={email_alvo}"
+    # Gera o link apontando para a sua tela de recuperação com o e-mail já preenchido!
+    link_real = f"https://jurisai-auth-api-production.up.railway.app/frontend/pages/esqueci.html?email={email_alvo}"
     
-    return {"message": f"E-mail de recuperação enviado para {email_alvo} com sucesso!"}
+    # Chama o carteiro para entregar a mensagem
+    sucesso = EmailService.send_recovery_email(email_alvo, link_real)
+    
+    if sucesso:
+        return {"message": f"E-mail enviado para {email_alvo} com sucesso!"}
+    else:
+        raise HTTPException(status_code=500, detail="Falha ao enviar e-mail. Verifique as credenciais.")
 
 @router.get("/user-lgpd/{user_id}")
 def ver_dados_lgpd_usuario(user_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

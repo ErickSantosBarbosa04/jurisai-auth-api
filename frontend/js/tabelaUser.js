@@ -15,14 +15,22 @@ async function carregarTodosUsuarios() {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
+        // Se o token for velho ou inválido, desloga na hora!
+        if (response.status === 401) {
+            console.warn("Token antigo detectado. Redirecionando para login...");
+            localStorage.removeItem("access_token");
+            window.location.href = "login.html?motivo=sessao_expirada";
+            return;
+        }
+
         if (!response.ok) throw new Error("Erro ao buscar lista de usuários.");
 
         listaDeUsuarios = await response.json();
-        aplicarFiltrosEOrdenacao(); // Chama a função que desenha a tabela
+        aplicarFiltrosEOrdenacao(); 
 
     } catch (error) {
         console.error(error);
-        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--error);">Erro de conexão.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--error);">Erro de conexão ou rota não encontrada.</td></tr>`;
     }
 }
 
