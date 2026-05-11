@@ -104,6 +104,14 @@ function iniciarTimerBloqueio(segundos) {
     if (!btn) return;
     btn.disabled = true;
 
+    if (segundos > 86400) {
+        btn.innerText = "CONTA SUSPENSA";
+        mostrarAviso("Esta conta foi suspensa pelo Administrador do sistema.", "error");
+        // Não iniciamos o setInterval, pois ele nunca vai acabar mesmo!
+        return; 
+    }
+
+    // Se for um bloqueio comum de senha (15 min), segue a contagem normal:
     const intervalo = setInterval(() => {
         segundos--;
         if (segundos <= 0) {
