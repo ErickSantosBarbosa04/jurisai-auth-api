@@ -96,7 +96,13 @@ class MFAService:
             # CÓDIGO OK! Agora sim geramos o token de acesso definitivo
             token = create_access_token({"sub": str(user.id)})
             logger.info(f"SERVICE: Login 2FA realizado com sucesso para: {email}")
-            return {"access_token": token, "token_type": "bearer"}
+            
+            # Retorno atualizado com a etiqueta is_admin
+            return {
+                "access_token": token, 
+                "token_type": "bearer",
+                "is_admin": user.is_admin
+            }
         else:
             logger.warning(f"SERVICE: Código 2FA inválido no login para: {email}")
             raise HTTPException(status_code=401, detail="Código 2FA inválido")

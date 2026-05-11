@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil Admin | JurisAI</title>
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
+    <link rel="icon" href="../assets/—Pngtree—elegant golden business logo capital_20563813.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">JurisAI <span style="font-size: 12px; color: white; background: var(--error); padding: 2px 6px; border-radius: 4px; vertical-align: middle;">ADMIN</span></div>
+        <div class="nav-actions">
+            <a href="dashboardADM.html" style="color: white; text-decoration: none; font-weight: 600; font-size: 14px; margin-right: 15px;">&larr; Voltar ao Painel Admin</a>
+        </div>
+    </nav>
+
+    <main class="page-shell">
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">Configurações > Meu perfil</p>
+                <h1 id="welcomeTitle">Meu perfil (Administrador)</h1>
+            </div>
+        </header>
+
+        <section class="content-grid">
+            <div class="main-column">
+                <section class="panel" id="perfil">
+                    <div class="panel-heading">
+                        <h2>Dados Acadêmicos e Profissionais</h2>
+                        <span id="saveStatus" class="status-pill">Não salvo</span>
+                    </div>
+
+                    <form id="profileForm" class="profile-form">
+                        <div class="input-group">
+                            <label for="full_name">Nome completo</label>
+                            <input id="full_name" name="full_name" type="text" maxlength="120" placeholder="Seu nome completo">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="profile_type">Tipo de perfil</label>
+                            <select id="profile_type" name="profile_type">
+                                <option value="estudante">Estudante</option>
+                                <option value="advogado">Advogado</option>
+                                <option value="outro">Admin/Outro</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="university">Instituição</label>
+                            <input id="university" name="university" type="text" maxlength="160" placeholder="Nome da faculdade">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="semester">Semestre</label>
+                            <select id="semester" name="semester">
+                                <option value="">Selecione</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="legal_specialty">Área de interesse</label>
+                            <select id="legal_specialty" name="legal_specialty">
+                                <option value="">Selecione</option>
+                                <option value="Direito Civil">Direito Civil</option>
+                                <option value="Direito Penal">Direito Penal</option>
+                                <option value="Direito Tributário">Direito Tributário</option>
+                                <option value="Direito do Trabalho">Direito do Trabalho</option>
+                                <option value="Direito Empresarial">Direito Empresarial</option>
+                                <option value="Direito Digital">Direito Digital</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-primary" type="submit">Salvar alterações</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="panel" style="margin-top: 24px;">
+                    <div class="panel-heading">
+                        <h2>Preferências do Sistema</h2>
+                    </div>
+                    <form id="preferencesForm" class="profile-form">
+                        <div class="input-group">
+                            <label for="theme_mode">Aparência do Sistema</label>
+                            <select id="theme_mode" name="theme_mode">
+                                <option value="light"> Modo Claro (Padrão)</option>
+                                <option value="dark"> Modo Escuro</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="ai_tone">Tom de Voz da IA</label>
+                            <select id="ai_tone" name="ai_tone">
+                                <option value="tecnico">Técnico e Formal</option>
+                                <option value="didatico">Didático e Simples</option>
+                                <option value="direto">Direto e Objetivo</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button id="savePreferencesBtn" class="btn-primary" type="button">Salvar preferências</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <section class="panel side-panel">
+                <div class="panel-heading">
+                    <h2>Segurança da Conta</h2>
+                </div>
+
+                <dl class="account-list">
+                    <div>
+                        <dt>E-mail cadastrado</dt>
+                        <dd id="userEmailCard">Carregando...</dd>
+                    </div>
+                    <div>
+                        <dt>Membro desde</dt>
+                        <dd id="createdAt">-</dd>
+                    </div>
+                    <div>
+                        <dt>Autenticação em Dois Fatores (2FA)</dt>
+                        <dd style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                            <span id="twoFactorStatus" class="status-pill">Verificando</span>
+                            <button id="manage2faBtn" class="btn-secondary" type="button" style="height: 32px; padding: 0 12px; font-size: 12px;">Gerenciar</button>
+                        </dd>
+                    </div>
+                </dl>
+                
+                <hr style="border:0; border-top: 1px solid var(--border); margin: 24px 0;">
+                
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 14px; margin: 0 0 8px;">Meus Dados (LGPD)</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px;">
+                        Você tem o direito de baixar uma cópia de todas as informações que armazenamos sobre você.
+                    </p>
+                    <button id="exportBtn" class="btn-secondary" type="button" style="width: 100%;">Baixar arquivo JSON</button>
+                </div>
+
+                <hr style="border:0; border-top: 1px solid var(--border); margin: 24px 0;">
+
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 14px; margin: 0 0 8px;">Sessões</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px;">
+                        Desconecte sua conta de todos os aparelhos por segurança.
+                    </p>
+                    <button id="logoutAllBtn" class="btn-secondary" type="button" style="width: 100%; border-color: var(--error); color: var(--danger);">Desconectar todos os aparelhos</button>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script src="../js/authGuard.js"></script>
+    <script src="../js/perfil.js"></script>
+</body>
+</html>

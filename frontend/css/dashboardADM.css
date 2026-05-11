@@ -1,0 +1,142 @@
+/* =========================================
+   ESTILOS EXCLUSIVOS DO PAINEL ADMIN
+   ========================================= */
+
+/* --- Badges e Avatares --- */
+.admin-badge {
+    font-size: 12px;
+    color: white;
+    background: var(--error, #fb7185);
+    padding: 2px 6px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+.admin-avatar {
+    border-color: var(--primary-gold, #d4af37) !important;
+    color: var(--primary-gold, #d4af37);
+}
+
+/* --- Métricas (Cards no Topo) --- */
+.metric-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-main, #e2e8f0);
+    margin-top: 10px;
+}
+
+.metric-subtitle {
+    font-size: 0.8rem;
+}
+
+.metric-subtitle.success { color: var(--success, #34d399); }
+
+.metric-status {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.metric-status.success { color: var(--success, #34d399); }
+
+.status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--success, #34d399);
+    border-radius: 50%;
+}
+
+.btn-full-width {
+    width: 100%;
+    margin-top: 15px;
+    font-size: 0.8rem;
+}
+
+/* --- Estrutura dos Painéis --- */
+.panel-spacing {
+    margin-top: 24px;
+}
+
+.panel-description {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+/* --- Tabela Administrativa --- */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.admin-table th, .admin-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border, #3f444d);
+}
+
+.admin-table th {
+    color: var(--primary-gold, #d4af37);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.admin-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.btn-action {
+    background: var(--card-bg, #25282c);
+    color: var(--text-main, #e2e8f0);
+    border: 1px solid var(--border, #3f444d);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Caixa de Logs --- */
+.log-box {
+    background: #1e2124;
+    padding: 15px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #34d399; /* Verde estilo terminal */
+    height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border, #3f444d);
+}
+
+.log-entry {
+    margin-bottom: 8px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+}
+
+.log-time {
+    color: var(--text-muted, #94a3b8);
+    margin-right: 10px;
+}
+
+/* Estilo da barra de rolagem da caixa de log */
+.log-box::-webkit-scrollbar { width: 6px; }
+.log-box::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
+.log-box::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }

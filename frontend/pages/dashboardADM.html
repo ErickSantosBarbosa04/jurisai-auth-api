@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Painel | JurisAI</title>
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
+    <link rel="stylesheet" href="../css/dashboardADM.css?v=1.0">
+    <link rel="icon" href="../assets/—Pngtree—elegant golden business logo capital_20563813.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand" style="color: var(--primary-gold);">JurisAI <span class="admin-badge">ADMIN</span></div>
+        <div class="nav-actions">
+            <span id="timerDisplay" class="session-timer">Sessão: 10:00</span>
+            
+            <div class="user-menu-container">
+                <button id="userAvatarBtn" class="avatar-btn admin-avatar" type="button">A</button>
+                
+                <div id="dropdownMenu" class="dropdown-content hidden">
+                    <div class="dropdown-header">
+                        <strong id="dropdownName">Admin Geral</strong>
+                        <span id="dropdownEmail">...</span>
+                    </div>
+                    <hr>
+                    <a href="perfilAdm.html" id="menuProfile">Configurações do Perfil</a>
+                    <hr>
+                    <a href="#" id="menuLogout">Sair do Sistema</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-shell">
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">Painel de Controle Administrativo</p>
+                <h1 id="welcomeTitle">Visão Geral do Sistema</h1>
+            </div>
+            <span id="specialtyBadge" class="status-pill success" style="font-size: 14px;">Acesso Nível Máximo</span>
+        </header>
+
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <h3>Usuários Ativos</h3>
+                <p class="metric-number">124</p>
+                <p class="metric-subtitle success">+12 esta semana</p>
+            </div>
+            <div class="metric-card">
+                <h3>Requisições IA (Hoje)</h3>
+                <p class="metric-number">845</p>
+                <p class="metric-subtitle success">Sistema operando normalmente</p>
+            </div>
+            <div class="metric-card">
+                <h3>Status do Servidor</h3>
+                <p class="metric-status success">
+                    <span class="status-dot"></span> ONLINE
+                </p>
+                <button class="btn-secondary btn-full-width">Reiniciar Serviços</button>
+            </div>
+        </section>
+
+        <section class="panel panel-spacing" style="text-align: center; padding: 40px 20px;">
+            <h2>Central de Gerenciamento</h2>
+            <p class="panel-description" style="margin-bottom: 24px;">Acesse a tabela completa para gerenciar permissões, suspensões, ver detalhes de LGPD e consultar logs individuais dos usuários.</p>
+            <button class="btn-primary" onclick="window.location.href='tabelaUser.html'" style="max-width: 300px; margin: 0 auto;">
+                Acessar Tabela de Usuários
+            </button>
+        </section>
+
+        <section class="panel panel-spacing">
+            <h2>Logs Globais de Segurança</h2>
+            <div class="log-box" id="systemLogs">
+                <div class="log-entry"><span class="log-time">[15:42:01]</span> INFO: Novo usuário registrado (maria.adv@email.com)</div>
+                <div class="log-entry"><span class="log-time">[15:38:12]</span> WARNING: Falha de login para IP 192.168.1.5</div>
+                <div class="log-entry"><span class="log-time">[15:30:00]</span> INFO: Backup do banco de dados concluído com sucesso.</div>
+                <div class="log-entry"><span class="log-time">[15:15:22]</span> INFO: Admin gabriel.fernandez.a8 acessou o painel.</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/authGuard.js"></script>
+    <script src="../js/dashboardADM.js"></script>
+</body>
+</html>

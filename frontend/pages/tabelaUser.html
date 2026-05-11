@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários | JurisAI Admin</title>
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
+    <link rel="stylesheet" href="../css/dashboardADM.css?v=1.1">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand" style="color: var(--primary-gold);">JurisAI <span class="admin-badge">ADMIN</span></div>
+        <div class="nav-actions">
+            <a href="dashboardADM.html" style="color: white; text-decoration: none; font-weight: 600; font-size: 14px; margin-right: 15px;">&larr; Voltar ao Painel</a>
+        </div>
+    </nav>
+
+    <main class="page-shell">
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">Administração > Usuários</p>
+                <h1>Controle de Acessos</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" id="userSearch" placeholder="Buscar por nome ou e-mail..." class="auth-input" style="max-width: 300px;">
+            </div>
+        </header>
+
+        <section class="panel">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Status</th>
+                            <th>Perfil</th>
+                            <th>Especialidade</th>
+                            <th>Ações Rápidas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fullUsersTable">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <script src="../js/authGuard.js"></script>
+    <script src="../js/tabelaUser.js?v=1.2"></script>
+</body>
+</html>
