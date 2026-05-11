@@ -66,29 +66,30 @@ function showToast(message, type = 'error') {
 function calcularTempoBloqueio(detail) {
     if (!detail) return 15 * 60; // Padrão: 15 minutos em segundos
     
-    // Expressões regulares para ler o tempo em minutos ou segundos
     const minuteMatch = detail.match(/(\d+)\s+minuto/);
     const secondMatch = detail.match(/(\d+)\s+segundo/);
 
     let totalSeconds = 0;
-    if (minuteMatch) {
-        totalSeconds += parseInt(minuteMatch[1], 10) * 60;
-    }
-    if (secondMatch) {
-        totalSeconds += parseInt(secondMatch[1], 10);
-    }
+    if (minuteMatch) totalSeconds += parseInt(minuteMatch[1], 10) * 60;
+    if (secondMatch) totalSeconds += parseInt(secondMatch[1], 10);
     
     return totalSeconds > 0 ? totalSeconds : 15 * 60;
 }
 
 function verificarBloqueioLocal() {
-    const btn = document.getElementById('btnEntrar');
     const tempoBloqueio = localStorage.getItem('lockout_time');
     
     if (tempoBloqueio) {
         const agora = Date.now();
+        const segundosRestantes = Math.ceil((tempoBloqueio - agora) / 1000);
+
+        // 🛡️ FAXINA AUTOMÁTICA: Se o navegador estiver preso com um bloqueio eterno, ele apaga agora!
+        if (segundosRestantes > 86400) {
+            localStorage.removeItem('lockout_time');
+            return false; // Libera a tela
+        }
+
         if (agora < tempoBloqueio) {
-            const segundosRestantes = Math.ceil((tempoBloqueio - agora) / 1000);
             iniciarTimerBloqueio(segundosRestantes);
             return true;
         } else {
@@ -104,14 +105,6 @@ function iniciarTimerBloqueio(segundos) {
     if (!btn) return;
     btn.disabled = true;
 
-    if (segundos > 86400) {
-        btn.innerText = "CONTA SUSPENSA";
-        mostrarAviso("Esta conta foi suspensa pelo Administrador do sistema.", "error");
-        // Não iniciamos o setInterval, pois ele nunca vai acabar mesmo!
-        return; 
-    }
-
-    // Se for um bloqueio comum de senha (15 min), segue a contagem normal:
     const intervalo = setInterval(() => {
         segundos--;
         if (segundos <= 0) {
@@ -134,7 +127,6 @@ async function realizarLogin() {
     const passwordInput = document.getElementById('password');
     const btn = document.getElementById('btnEntrar');
 
-    // Oculta/limpa avisos
     mostrarAviso("", "error");
 
     const emailValue = emailInput.value.trim();
@@ -188,13 +180,22 @@ async function realizarLogin() {
                     window.location.replace(`duasEtapa.html?email=${encodeURIComponent(emailValue.toLowerCase())}`);
                 }, 1000);
             } else if (response.status === 403 || erros >= 5) {
-                // Calcula os segundos exatos lendo o texto de aviso da API
-                const tempoSegundos = calcularTempoBloqueio(message);
-                const tempoExpiracao = Date.now() + (tempoSegundos * 1000);
                 
-                localStorage.setItem('lockout_time', tempoExpiracao);
-                mostrarAviso(message);
-                iniciarTimerBloqueio(tempoSegundos);
+                const tempoSegundos = calcularTempoBloqueio(message);
+                
+                if (tempoSegundos > 86400) {
+                    // É um banimento do Admin! Só trava a tela, NÃO salva na memória do PC.
+                    mostrarAviso("Esta conta foi suspensa pelo Administrador do sistema.", "error");
+                    btn.innerText = "CONTA SUSPENSA";
+                    btn.disabled = true;
+                } else {
+                    // É um bloqueio comum de 15 min. Salva no PC e inicia o relógio.
+                    const tempoExpiracao = Date.now() + (tempoSegundos * 1000);
+                    localStorage.setItem('lockout_time', tempoExpiracao);
+                    mostrarAviso(message);
+                    iniciarTimerBloqueio(tempoSegundos);
+                }
+
             } else {
                 mostrarAviso(`${message} (Tentativa ${erros}/5)`);
                 btn.disabled = false;
