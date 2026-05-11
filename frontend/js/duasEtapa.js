@@ -33,9 +33,8 @@ async function confirmarLogin2FA() {
             btn.innerText = "Verificando...";
         }
 
-        console.log("Enviando código para o servidor Python (8000)...");
+        console.log("Enviando código para o servidor...");
         
-        // CORREÇÃO: URL completa e rota /login-verify (conforme definido no seu Python)
         const response = await fetch(`${API_BASE_URL}/auth/2fa/login-verify`, { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -62,9 +61,15 @@ async function confirmarLogin2FA() {
                 localStorage.setItem('access_token', data.access_token);
                 mostrarAviso("Sucesso! Entrando no JurisAI...", "success");
                 
-                // Redirecionamento para o Dashboard
+                // Redirecionamento Inteligente (A MÁGICA ESTÁ AQUI)
                 setTimeout(() => {
-                    window.location.href = "dashboard.html";
+                    if (data.is_admin === true || data.is_admin === 1) {
+                        // Se a etiqueta de chefe veio no JSON, manda pro painel Admin
+                        window.location.href = "dashboardADM.html";
+                    } else {
+                        // Se não, manda pro painel comum
+                        window.location.href = "dashboard.html";
+                    }
                 }, 1000);
             } else {
                 mostrarAviso("Erro: Sessão não recebida corretamente.");
@@ -81,7 +86,7 @@ async function confirmarLogin2FA() {
         }
     } catch (error) {
         console.error("Erro de rede:", error);
-        mostrarAviso("Sem conexão com o servidor Python.");
+        mostrarAviso("Sem conexão com o servidor.");
         if (btn) {
             btn.disabled = false;
             btn.innerText = "Confirmar Login";
