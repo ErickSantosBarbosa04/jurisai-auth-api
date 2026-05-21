@@ -10,18 +10,18 @@
     <nav class="navbar">
         <div class="brand">JurisAI</div>
         <div class="nav-actions">
-            <span id="timerDisplay" class="session-timer">Sessão: 10:00</span>
-            
+            <span id="timerDisplay" class="session-timer">Sessao: 10:00</span>
+
             <div class="user-menu-container">
                 <button id="userAvatarBtn" class="avatar-btn" type="button">?</button>
-                
+
                 <div id="dropdownMenu" class="dropdown-content hidden">
                     <div class="dropdown-header">
                         <strong id="dropdownName">Carregando...</strong>
                         <span id="dropdownEmail">...</span>
                     </div>
                     <hr>
-                    <a href="perfil.html" id="menuProfile">Configurações do Perfil</a>
+                    <a href="perfil.html" id="menuProfile">Configuracoes do Perfil</a>
                     <hr>
                     <a href="#" id="menuLogout">Sair</a>
                 </div>
@@ -32,34 +32,37 @@
     <main class="page-shell">
         <header class="page-header">
             <div>
-                <p class="eyebrow">Área de Trabalho</p>
+                <p class="eyebrow">Area de Trabalho</p>
                 <h1 id="welcomeTitle">Bem-vindo(a)</h1>
             </div>
-            <span id="specialtyBadge" class="status-pill success" style="font-size: 14px;">Carregando área...</span>
+            <div class="header-badges">
+                <span id="specialtyBadge" class="status-pill success" style="font-size: 14px;">Carregando area...</span>
+                <span id="difficultyBadge" class="status-pill warning" style="font-size: 14px;">Nivel IA...</span>
+            </div>
         </header>
 
         <section class="metrics-grid">
             <div class="metric-card">
-                <h3>Nova Petição Inicial</h3>
-                <p>Use a IA para estruturar peças jurídicas complexas.</p>
-                <button class="btn-primary" style="width: 100%; margin-top: 15px;">Criar Documento</button>
+                <h3>Debate de Caso</h3>
+                <p>Treine raciocinio juridico com perguntas, contrapontos e fontes.</p>
+                <button class="btn-primary" data-chat-mode="debate" style="width: 100%; margin-top: 15px;">Iniciar Debate</button>
             </div>
             <div class="metric-card">
-                <h3>Análise de Jurisprudência</h3>
-                <p>Encontre decisões recentes nos tribunais superiores.</p>
-                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Buscar Casos</button>
+                <h3>Estudo Guiado</h3>
+                <p>Receba explicacoes didaticas com base juridica selecionada.</p>
+                <button class="btn-secondary" data-chat-mode="estudo" style="width: 100%; margin-top: 15px;">Estudar Tema</button>
             </div>
             <div class="metric-card">
-                <h3>Resumo de Processo</h3>
-                <p>Faça upload de um PDF longo e receba um resumo imediato.</p>
-                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Analisar PDF</button>
+                <h3>Estrutura de Peticao</h3>
+                <p>Organize fatos, fundamentos, pedidos e provas para exercicio academico.</p>
+                <button class="btn-secondary" data-chat-mode="peticao" style="width: 100%; margin-top: 15px;">Montar Estrutura</button>
             </div>
         </section>
 
         <section class="panel" style="margin-top: 24px;">
-            <h2>Notícias e Atualizações: <span id="dynamicTopic">Sua Área</span></h2>
+            <h2>Plano de estudo: <span id="dynamicTopic">Sua Area</span></h2>
             <p id="dynamicContent" style="color: var(--text-muted); margin-top: 10px; line-height: 1.6;">
-                Buscando as últimas movimentações do STF e STJ referentes à sua especialidade...
+                Use o modo debate para apresentar um caso, defender seu enquadramento juridico e receber perguntas orientadoras.
             </p>
         </section>
     </main>

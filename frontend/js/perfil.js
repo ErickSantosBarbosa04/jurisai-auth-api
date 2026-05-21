@@ -212,7 +212,7 @@ if (profileForm) {
 }
 
 // --- SISTEMA DE SESSÃO SINCRONIZADO ---
-const SESSION_LIMIT_MS = 10 * 60 * 1000; // 10 Minutos
+const SESSION_LIMIT_MS = 30 * 60 * 1000; // 30 minutos
 
 function updateTimer() {
     const expiration = parseInt(localStorage.getItem("session_expiration") || Date.now(), 10);

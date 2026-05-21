@@ -15,6 +15,8 @@ async function confirmarLogin2FA() {
     // Captura o email novamente para garantir que temos o valor atualizado
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email');
+    const pendingEmail = sessionStorage.getItem("pending_2fa_email");
+    const challengeToken = sessionStorage.getItem("pending_2fa_challenge");
 
     // 1. Validação básica de interface
     if (!codeInput.value || codeInput.value.length !== 6) {
@@ -24,6 +26,14 @@ async function confirmarLogin2FA() {
 
     if (!email) {
         mostrarAviso("Erro: E-mail não identificado na URL.");
+        return;
+    }
+
+    if (!challengeToken || pendingEmail !== email.toLowerCase()) {
+        mostrarAviso("Sessão de 2FA expirada. Informe sua senha novamente.");
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500);
         return;
     }
 
@@ -40,7 +50,8 @@ async function confirmarLogin2FA() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 email: email,
-                code: codeInput.value 
+                code: codeInput.value,
+                challenge_token: challengeToken
             })
         });
 
@@ -59,6 +70,8 @@ async function confirmarLogin2FA() {
             // 3. Salva o token de acesso final para entrar no sistema
             if (data.access_token) {
                 localStorage.setItem('access_token', data.access_token);
+                sessionStorage.removeItem("pending_2fa_email");
+                sessionStorage.removeItem("pending_2fa_challenge");
                 mostrarAviso("Sucesso! Entrando no JurisAI...", "success");
                 
                 // Redirecionamento Inteligente (A MÁGICA ESTÁ AQUI)

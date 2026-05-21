@@ -3,7 +3,7 @@ from fastapi import HTTPException, status, Request
 from sqlalchemy.orm import Session
 from app import models
 from app.schema import schemas
-from app.core.security import hash_password, verify_password, create_access_token, verify_totp
+from app.core.security import hash_password, verify_password, create_access_token, create_login_challenge_token, verify_totp
 from app.core.crypto import decrypt
 from app.models.TokenBlacklistModel import TokenBlacklist
 from datetime import datetime, timedelta, timezone
@@ -100,7 +100,15 @@ class AuthService:
         if user.is_2fa_enabled:
             if not totp_code or totp_code in ["", "null"]:
                 logger.info(f"SERVICE: Senha correta, solicitando 2FA para: {email}")
-                raise HTTPException(status_code=401, detail="Código 2FA obrigatório")
+                challenge_token = create_login_challenge_token(str(user.id))
+                raise HTTPException(
+                    status_code=401,
+                    detail={
+                        "code": "2fa_required",
+                        "message": "Codigo 2FA obrigatorio",
+                        "challenge_token": challenge_token,
+                    },
+                )
             
             try:
                 raw_secret = decrypt(user.totp_secret)
@@ -118,7 +126,7 @@ class AuthService:
         db.commit()
 
         token = create_access_token({"sub": str(user.id)})
-        return {"access_token": token, "token_type": "bearer"}
+        return {"access_token": token, "token_type": "bearer", "is_admin": user.is_admin}
     
     @staticmethod
     def _registrar_falha(db: Session, user: models.User):

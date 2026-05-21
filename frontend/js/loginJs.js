@@ -165,20 +165,32 @@ async function realizarLogin() {
             localStorage.setItem("access_token", data.access_token);
             mostrarAviso("Login realizado com sucesso! Redirecionando...", "success");
             setTimeout(() => { 
-                window.location.replace("duasEtapa.html"); 
+                if (data.is_admin === true || data.is_admin === 1) {
+                    window.location.replace("dashboardADM.html");
+                } else {
+                    window.location.replace("dashboard.html");
+                }
             }, 800);
         } else {
             let erros = obterTentativas() + 1;
             salvarTentativas(erros);
             
             const detail = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
-            const message = detail || "Erro ao realizar login.";
+            const message = typeof detail === "object"
+                ? (detail.message || "Erro ao realizar login.")
+                : (detail || "Erro ao realizar login.");
 
-            if (message.toLowerCase().includes("2fa") || message.toLowerCase().includes("código")) {
+            if (detail && typeof detail === "object" && detail.code === "2fa_required" && detail.challenge_token) {
+                sessionStorage.setItem("pending_2fa_email", emailValue.toLowerCase());
+                sessionStorage.setItem("pending_2fa_challenge", detail.challenge_token);
                 mostrarAviso("Segunda etapa: Autenticação 2FA.", "success");
                 setTimeout(() => {
                     window.location.replace(`duasEtapa.html?email=${encodeURIComponent(emailValue.toLowerCase())}`);
                 }, 1000);
+            } else if (message.toLowerCase().includes("2fa") || message.toLowerCase().includes("código")) {
+                mostrarAviso("Refaça o login para iniciar a segunda etapa de segurança.", "error");
+                btn.disabled = false;
+                btn.innerText = "Entrar";
             } else if (response.status === 403 || erros >= 5) {
                 
                 const tempoSegundos = calcularTempoBloqueio(message);

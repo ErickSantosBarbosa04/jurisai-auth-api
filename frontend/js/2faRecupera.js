@@ -60,6 +60,12 @@ async function validarEVoltar() {
         }
 
         if (response.ok) {
+            if (!data.reset_token) {
+                alert("Erro: token seguro de redefinição não foi recebido.");
+                return;
+            }
+
+            sessionStorage.setItem('password_reset_token', data.reset_token);
             alert("Sucesso! 2FA validado.");
             // Redireciona para a tela de redefinir a senha passando o email
             window.location.href = `redefinir.html?email=${encodeURIComponent(email)}`;

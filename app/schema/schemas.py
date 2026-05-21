@@ -107,6 +107,7 @@ class TOTPSetupResponse(BaseModel):
 class TOTPVerifyRequest(BaseModel):
     email: str  
     code: str   
+    challenge_token: Optional[str] = None
 
 # --- RECUPERAÇÃO E ATUALIZAÇÃO ---
 
@@ -118,6 +119,7 @@ class ValidarRecuperacaoRequest(BaseModel):
 class NovaSenhaFinalRequest(BaseModel):
     """Para salvar a nova senha após validações"""
     email: EmailStr
+    reset_token: str = Field(..., min_length=20, max_length=255)
     new_password: str = Field(..., min_length=8) # Tamanho mínimo ajustado para 8
 
     @field_validator('new_password')
@@ -132,9 +134,71 @@ class NovaSenhaFinalRequest(BaseModel):
             raise ValueError('A senha deve conter pelo menos um caractere especial (!, @, #, etc).')
         return senha
 
+class PasswordResetRequest(BaseModel):
+    """Para redefinir senha por token de recuperacao."""
+    token: str = Field(..., min_length=20, max_length=255)
+    new_password: str = Field(..., min_length=8)
+
+    @field_validator('new_password')
+    @classmethod
+    def validate_new_password(cls, senha):
+        if len(senha) < 8:
+            raise ValueError('A senha deve ter no minimo 8 caracteres.')
+        if not re.search(r"\d", senha):
+            raise ValueError('A senha deve conter pelo menos um numero.')
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", senha):
+            raise ValueError('A senha deve conter pelo menos um caractere especial (!, @, #, etc).')
+        return senha
+
 class UserUpdateRequest(UserProfileFields):
     @model_validator(mode="after")
     def require_at_least_one_field(self) -> "UserUpdateRequest":
         if not self.model_fields_set:
             raise ValueError("Envie pelo menos um campo para atualizar.")
         return self
+
+
+# --- JURISAI CHAT / IA ---
+
+ChatMode = Literal["debate", "estudo", "peticao"]
+ChatRole = Literal["user", "assistant"]
+
+
+class ChatHistoryMessage(BaseModel):
+    role: ChatRole
+    content: str = Field(..., min_length=1, max_length=4000)
+
+
+class ChatRequest(BaseModel):
+    question: str = Field(..., min_length=3, max_length=6000)
+    mode: ChatMode = "debate"
+    history: list[ChatHistoryMessage] = Field(default_factory=list, max_length=12)
+
+    @field_validator("question", mode="before")
+    @classmethod
+    def clean_question(cls, value):
+        value = str(value or "").strip()
+        return value
+
+
+class ChatSource(BaseModel):
+    title: str
+    file: str
+    excerpt: str
+    score: float
+
+
+class DebateScore(BaseModel):
+    percent: int
+    label: str
+    reason: str
+
+
+class ChatResponse(BaseModel):
+    answer: str
+    mode: ChatMode
+    sources: list[ChatSource]
+    provider: str
+    model: str
+    debate_score: Optional[DebateScore] = None
+    disclaimer: str = "Uso academico. A resposta nao substitui orientacao de advogado ou professor."

@@ -13,6 +13,6 @@ def forgot_password(data: schemas.EmailRequest, db: Session = Depends(get_db)):
     return PasswordService.create_reset_token(db, data.email)
 
 @router.post("/reset-password")
-# Finaliza o reset de senha usando o esquema NovaSenhaFinalRequest (Requisito 2.7)
-def reset_password(data: schemas.NovaSenhaFinalRequest, db: Session = Depends(get_db)):
+# Finaliza o reset de senha usando token seguro (Requisito 2.7)
+def reset_password(data: schemas.PasswordResetRequest, db: Session = Depends(get_db)):
     return PasswordService.reset_password(db, data)

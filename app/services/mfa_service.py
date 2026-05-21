@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.UserModel import User
 from app.schema import schemas
-from app.core.security import generate_totp_secret, verify_totp, get_totp_uri
+from app.core.security import generate_totp_secret, verify_totp, get_totp_uri, verify_login_challenge_token
 from app.core.crypto import encrypt, decrypt
 
 logger = logging.getLogger(__name__)
@@ -74,13 +74,18 @@ class MFAService:
         return {"message": "2FA ativado com sucesso"}
 
     @staticmethod
-    def verify_login_2fa(db: Session, email: str, code: str):
+    def verify_login_2fa(db: Session, email: str, code: str, challenge_token: str | None = None):
         # 1. Busca o usuário pelo e-mail (já que ele não está logado ainda)
-        user = db.query(User).filter(User.email == email).first()
+        user = db.query(User).filter(User.email == email.lower().strip()).first()
         
         if not user or not user.totp_secret:
             logger.warning(f"SERVICE: Tentativa de 2FA para usuário inexistente ou sem 2FA: {email}")
             raise HTTPException(status_code=401, detail="Usuário não encontrado ou 2FA não configurado")
+
+        challenge_user_id = verify_login_challenge_token(challenge_token or "")
+        if not challenge_user_id or str(user.id) != str(challenge_user_id):
+            logger.warning(f"SERVICE: Desafio 2FA ausente, expirado ou divergente para: {email}")
+            raise HTTPException(status_code=401, detail="Sessao de 2FA expirada. Informe a senha novamente.")
 
         # 2. Descriptografa o segredo do banco
         try:
@@ -95,6 +100,10 @@ class MFAService:
         if verify_totp(raw_secret, code):
             # CÓDIGO OK! Agora sim geramos o token de acesso definitivo
             token = create_access_token({"sub": str(user.id)})
+            user.failed_login_attempts = 0
+            user.lockout_until = None
+            user.last_failed_login = None
+            db.commit()
             logger.info(f"SERVICE: Login 2FA realizado com sucesso para: {email}")
             
             # Retorno atualizado com a etiqueta is_admin
@@ -104,5 +113,7 @@ class MFAService:
                 "is_admin": user.is_admin
             }
         else:
+            from app.services.auth_service import AuthService
+            AuthService._registrar_falha(db, user)
             logger.warning(f"SERVICE: Código 2FA inválido no login para: {email}")
             raise HTTPException(status_code=401, detail="Código 2FA inválido")

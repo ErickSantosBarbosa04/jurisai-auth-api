@@ -1,173 +1,140 @@
-#  JurisAI Auth API
-API de autenticação segura desenvolvida com FastAPI, PostgreSQL e 2FA via TOTP.
+# JurisAI
 
----
+Plataforma academica para estudantes de Direito, com autenticacao segura, 2FA, LGPD, painel do estudante e chat juridico com IA.
 
-##  Sobre o Projeto
+O objetivo do projeto final e permitir que o estudante apresente um caso concreto e debata com a IA em modo orientador/professor, usando uma base juridica local com RAG simples.
 
-Sistema de autenticação RESTful que implementa:
-- Hash de senhas com **bcrypt** (custo 12)
-- Sessões com **JWT** (expiração 30 minutos)
-- **Blacklist de tokens** no logout
-- **2FA TOTP** compatível com Google Authenticator
-- **Rate limiting** 5 tentativas/minuto no login
+## Funcionalidades
 
----
----
-juri_db
-admin
----
-##  Tecnologias
+- Cadastro e login com JWT.
+- 2FA TOTP compativel com Google Authenticator.
+- Blacklist de token no logout.
+- Logout de todos os dispositivos.
+- Perfil academico do estudante.
+- Exportacao e exclusao de dados para LGPD.
+- Painel do estudante.
+- Chat juridico autenticado em `/ai/chat`.
+- Modo Debate, Estudo e Peticao.
+- Entrada por voz e leitura da resposta no navegador.
+- Texto de carregamento "JurisAI esta pensando" enquanto a IA prepara a resposta.
+- Guardrails contra prompt injection e perguntas fora do escopo juridico.
+- Nivel de dificuldade da IA por semestre: quanto maior o semestre do perfil, mais rigorosa a cobranca no debate.
+- RAG simples com arquivos Markdown em `data/legal`, cobrindo temas iniciais de Civil, Consumidor, Trabalho, Penal, Constitucional, Administrativo, Digital, Familia, Previdenciario, Ambiental e Tributario.
+- Integracao com Groq opcional; modo `mock` para testes locais sem custo.
+- Login com 2FA protegido por desafio temporario de pre-autenticacao.
+- Recuperacao de senha protegida por 2FA e token de redefinicao de curta duracao.
 
-| Tecnologia | Finalidade |
-|------------|------------|
-| FastAPI | Framework web async |
-| PostgreSQL | Banco de dados |
+## Stack
+
+| Tecnologia | Uso |
+| --- | --- |
+| FastAPI | Backend e API REST |
+| MySQL | Banco de dados |
 | SQLAlchemy | ORM |
-| bcrypt / passlib | Hash de senhas |
-| python-jose | JWT HS256 |
+| bcrypt | Hash de senha |
+| python-jose | JWT |
 | pyotp | 2FA TOTP |
-| SlowAPI | Rate limiting |
+| Fernet | Criptografia do segredo 2FA |
+| HTML/CSS/JS | Frontend simples |
+| Groq/Llama | IA opcional via API |
 
----
+## Estrutura Principal
 
-##  Estrutura do Projeto
+```txt
+app/
+  core/
+  models/
+  routers/
+    auth.py
+    chat.py
+    mfa.py
+    user.py
+  schema/
+    schemas.py
+  services/
+    llm_service.py
+    rag_service.py
+data/
+  legal/
+frontend/
+  pages/
+    chat.html
+    dashboard.html
+  js/
+    chat.js
+```
 
-JURISAI-AUTH-API/
-├── app/
-│   ├── core/
-│   │   ├── db/
-│   │   │   └── database.py
-│   │   ├── config.py
-│   │   ├── crypto.py
-│   │   ├── dependencies.py
-│   │   └── security.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── PasswordResetToken.py
-│   │   ├── TokenBlacklistModel.py
-│   │   └── UserModel.py
-│   ├── routers/
-│   │   ├── auth.py
-│   │   ├── mfa.py
-│   │   ├── password_reset.py
-│   │   └── user.py
-│   ├── schema/
-│   │   └── schemas.py
-│   └── services/
-│       ├── auth_service.py
-│       ├── mfa_service.py
-│       ├── password_service.py
-│       └── user_service.py
-├── frontend/
-│   ├── assets/
-│   ├── css/
-│   │   ├── dashboardStyle.css
-│   │   ├── esqueci.css
-│   │   ├── loginStyle.css
-│   │   ├── recuperar-2fa.css
-│   │   └── registrar.css
-│   ├── js/
-│   │   ├── 2faRecupera.js
-│   │   ├── ativar-2fa.js
-│   │   ├── authGuard.js
-│   │   ├── dashboard.js
-│   │   ├── duasEtapa.js
-│   │   ├── esqueci.js
-│   │   ├── loginJs.js
-│   │   ├── perfil.js
-│   │   ├── redefinir.js
-│   │   └── registrar.js
-│   └── pages/
-│       ├── dashboard.html
-│       ├── duasEtapa.html
-│       ├── esqueci.html
-│       ├── login.html
-│       ├── perfil.html
-│       ├── recuperar-2fa.html
-│       ├── redefinir.html
-│       ├── register.html
-│       └── telaQr.html
-├── .pytest_cache/
-├── .vscode/
-├── venv/
-├── .env
-├── .gitignore
-├── banco.txt
-├── body.json
-├── main.py
-├── README.md
-├── ReadmeBiel.md
-└── requirements.txt
+## Variaveis de Ambiente
 
-text
+Copie `.env.example` para `.env` e configure:
 
----
+```env
+ENVIRONMENT=development
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+ALGORITHM=HS256
+SECRET_KEY=troque-por-uma-chave-gerada
+FERNET_KEY=troque-por-uma-chave-fernet-gerada
+DATABASE_URL=sqlite:///./jurisai_local.db
+LLM_PROVIDER=mock
+GROQ_API_KEY=
+GROQ_MODEL=llama-3.1-8b-instant
+```
 
-##  Como Executar
+Para usar Groq:
 
-### Pré-requisitos
-- Python 3.11+
-- PostgreSQL 14+
+```env
+LLM_PROVIDER=groq
+GROQ_API_KEY=sua_chave
+```
 
-### Instalação
+Sem `GROQ_API_KEY`, o chat funciona em modo demonstracao local.
 
-```cmd
-# 1. Criar o .Env na raiz:  (cuiado com a senha do db)
-DATABASE_URL="mysql+pymysql://root:sua_senha_aqui@localhost:3306/jurisai_db"
-SECRET_KEY=(ele muda)
-FERNET_KEY= (ele muda)
+Para deploy com MySQL/Railway, troque o `DATABASE_URL` para:
 
-# 2. Para descobrir o fernet_key coloque no terminal:
+```env
+DATABASE_URL=mysql+pymysql://usuario:senha@host:3306/jurisai_db
+```
 
-python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+## Como Rodar Localmente
 
-# Para descobrir o SECRET_KEY coloque no terminal:
-python -c "import secrets; print(secrets.token_hex(32))"
-
-# 3. Crie o ambiente virtual
+```powershell
 python -m venv venv
-
-# 4. Ative o ambiente virtual
-venv\Scripts\activate.bat       # CMD Windows
-# ou
-venv\Scripts\Activate.ps1       # PowerShell
-
-# 5. Instale as dependências
+venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-
-# 6. Execute o servidor
 python -m uvicorn main:app --reload
+```
 
+Acesse:
 
-Acesse
-API: http://127.0.0.1:8000
+```txt
+http://127.0.0.1:8000
+http://127.0.0.1:8000/docs
+```
 
-Documentação Swagger: http://127.0.0.1:8000/docs
- Exemplos de Uso
-text
-# Registro
-curl -X POST http://127.0.0.1:8000/auth/register -H "Content-Type: application/json" -d "{\"email\":\"user@email.com\",\"password\":\"Senha@123\"}"
+## Fluxo da IA
 
-# Login
-curl -X POST http://127.0.0.1:8000/auth/login -H "Content-Type: application/json" -d "{\"email\":\"user@email.com\",\"password\":\"Senha@123\"}"
+```txt
+Estudante envia caso
+Guardrail valida prompt injection e escopo juridico
+Backend busca fontes em data/legal
+RAG monta contexto juridico
+LLMService aplica o nivel por semestre e chama Groq ou modo mock
+Frontend mostra "JurisAI esta pensando", resposta, fontes e leitura por voz
+```
 
-# Setup 2FA
-curl -X POST http://127.0.0.1:8000/auth/2fa/setup -H "Authorization: Bearer SEU_TOKEN"
+Perguntas fora do juridico, como receita de comida, ou tentativas de comando como
+"ignore suas instrucoes", sao recusadas antes de chegar ao modelo.
 
-# Verificar 2FA
-curl -X POST http://127.0.0.1:8000/auth/2fa/verify -H "Authorization: Bearer SEU_TOKEN" -H "Content-Type: application/json" -d "{\"code\":\"123456\"}"
+O semestre pode ser escolhido no cadastro e alterado em `Meu Perfil`. A IA usa esse
+campo como nivel academico: 1-2 iniciante, 3-4 basico, 5-6 intermediario, 7-8
+avancado e 9-10 profissionalizante.
 
-# Logout
-curl -X POST http://127.0.0.1:8000/auth/logout -H "Authorization: Bearer SEU_TOKEN"
- Decisões de Segurança
-bcrypt: Algoritmo lento adaptativo, resistente a brute force, gera salt único automático (OWASP recomendado)
+## Testes
 
-JWT HS256: Stateless, expiração granular de 30 minutos (RFC 7519)
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
 
-TOTP RFC 6238: Códigos válidos por 30s, compatível com Google Authenticator
+## Observacao Academica
 
-Blacklist: Tokens invalidados no logout são rejeitados imediatamente
-
-Rate Limiting: 5 tentativas/min por IP, retorna HTTP 429 ao exceder
-
+O JurisAI e uma ferramenta de estudo. As respostas geradas pela IA nao substituem professor, advogado, jurisprudencia atualizada ou fonte oficial.

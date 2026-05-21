@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 # IMPORTAÇÕES ADICIONAIS PARA OS NOVOS ENDPOINTS
 from app.models.UserModel import User
 from app.core.crypto import decrypt
-from app.core.security import verify_totp, get_password_hash
+from app.core.security import verify_totp
+from app.services.password_service import PasswordService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ def check_email(data: schemas.EmailRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="E-mail não encontrado em nossa base.")
     
     # Se o usuário existe mas não tem 2FA, ele não conseguiria recuperar por esse fluxo
-    if not user.totp_secret:
+    if not user.totp_secret or not user.is_2fa_enabled:
         raise HTTPException(status_code=400, detail="Este usuário não possui 2FA configurado.")
 
     return {"message": "E-mail validado. Prossiga para o 2FA."}
@@ -39,7 +40,7 @@ def check_email(data: schemas.EmailRequest, db: Session = Depends(get_db)):
 def recuperar_confirmar(data: schemas.ValidarRecuperacaoRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     
-    if not user or not user.totp_secret:
+    if not user or not user.totp_secret or not user.is_2fa_enabled:
         raise HTTPException(status_code=404, detail="Usuário ou 2FA não encontrado")
 
     # Descriptografa e valida o TOTP
@@ -48,25 +49,22 @@ def recuperar_confirmar(data: schemas.ValidarRecuperacaoRequest, db: Session = D
     if not verify_totp(raw_secret, data.code):
         raise HTTPException(status_code=400, detail="Código 2FA inválido")
     
-    # Se chegou aqui, o código está certo! 
-    # O seu JS vai receber o "ok" e redirecionar para redefinir.html
-    return {"message": "2FA validado com sucesso"}
+    reset_payload = PasswordService.create_reset_token_for_user(db, user)
+    return {
+        "message": "2FA validado com sucesso",
+        "reset_token": reset_payload["reset_token"],
+        "expires_in_minutes": reset_payload["expires_in_minutes"],
+    }
 
 @router.post("/redefinir-senha")
 # Mude para o schema que criamos acima
 def redefinir_senha(data: schemas.NovaSenhaFinalRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == data.email).first()
-    
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
-
-    # Aqui você faz o hash da nova senha e salva
-    user.hashed_password = get_password_hash(data.new_password)
-    
-    db.commit()
-    logger.info(f"SERVICE: Senha alterada com sucesso para: {data.email}")
-    
-    return {"message": "Senha atualizada com sucesso! Faça login novamente."}
+    return PasswordService.reset_password_for_recovery(
+        db,
+        data.email,
+        data.reset_token,
+        data.new_password,
+    )
 
 @router.post("/login", response_model=schemas.TokenResponse)
 def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):

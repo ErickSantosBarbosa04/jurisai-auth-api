@@ -28,4 +28,4 @@ def verify_2fa_login(
     db: Session = Depends(get_db)
 ):
     # Note que aqui NÃO tem o current_user, por isso o erro 401 vai sumir!
-    return MFAService.verify_login_2fa(db, data.email, data.code)
+    return MFAService.verify_login_2fa(db, data.email, data.code, data.challenge_token)

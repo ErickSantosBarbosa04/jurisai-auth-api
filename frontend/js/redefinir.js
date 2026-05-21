@@ -115,6 +115,7 @@ async function salvarNovaSenha(e) {
     
     const urlParams = new URLSearchParams(window.location.search);
     const email = urlParams.get('email') || localStorage.getItem('reset_email');
+    const resetToken = sessionStorage.getItem('password_reset_token');
 
     if (!pInput || !cInput) {
         mostrarAviso("Erro: Campos de senha não localizados.");
@@ -126,6 +127,14 @@ async function salvarNovaSenha(e) {
 
     if (!email) {
         mostrarAviso("Erro: E-mail não identificado.");
+        return false;
+    }
+
+    if (!resetToken) {
+        mostrarAviso("Sessão de recuperação expirada. Valide o 2FA novamente.");
+        setTimeout(() => {
+            window.location.href = "esqueci.html";
+        }, 1800);
         return false;
     }
 
@@ -164,6 +173,7 @@ async function salvarNovaSenha(e) {
             },
             body: JSON.stringify({
                 email: email,
+                reset_token: resetToken,
                 new_password: newPass 
             })
         });
@@ -182,6 +192,7 @@ async function salvarNovaSenha(e) {
             
             setTimeout(() => {
                 localStorage.removeItem('reset_email');
+                sessionStorage.removeItem('password_reset_token');
                 window.location.href = "login.html";
             }, 1500);
             

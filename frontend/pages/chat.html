@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate Juridico | JurisAI</title>
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
+    <link rel="stylesheet" href="../css/chat.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">JurisAI</div>
+        <div class="nav-actions">
+            <a href="dashboard.html" class="nav-link">Voltar ao painel</a>
+            <button id="logoutBtn" class="nav-button" type="button">Sair</button>
+        </div>
+    </nav>
+
+    <main class="chat-shell">
+        <section class="chat-header">
+            <div>
+                <p class="eyebrow">Laboratorio academico</p>
+                <h1>Debate juridico com IA</h1>
+                <p class="chat-subtitle">
+                    Apresente um caso, responda as perguntas da IA e treine sua argumentacao com fontes.
+                </p>
+            </div>
+            <span id="providerBadge" class="status-pill">IA local</span>
+        </section>
+
+        <section class="study-controls" aria-label="Modo de estudo">
+            <button class="mode-btn active" type="button" data-mode="debate">Debate</button>
+            <button class="mode-btn" type="button" data-mode="estudo">Estudo</button>
+            <button class="mode-btn" type="button" data-mode="peticao">Peticao</button>
+        </section>
+
+        <section class="chat-layout">
+            <div class="chat-main">
+                <div id="messages" class="messages" aria-live="polite">
+                    <article class="message assistant">
+                        <div class="message-label">JurisAI</div>
+                        <p>
+                            Traga um caso concreto. Eu vou debater com voce como professor:
+                            primeiro enquadramento, depois fundamento legal, tese contraria e pedidos possiveis.
+                        </p>
+                    </article>
+                </div>
+
+                <form id="chatForm" class="composer">
+                    <label for="questionInput">Caso ou pergunta do estudante</label>
+                    <textarea id="questionInput" rows="5" placeholder="Ex: Uma consumidora comprou um celular online, recebeu com defeito e a loja recusou a troca. Como eu enquadro o caso?"></textarea>
+                    <div class="composer-actions">
+                        <button id="voiceBtn" class="btn-secondary compact-btn" type="button" title="Ditado por voz">Falar</button>
+                        <button id="speakBtn" class="btn-secondary compact-btn" type="button" title="Ler ultima resposta">Ouvir</button>
+                        <button id="sendBtn" class="btn-primary send-btn" type="submit">Enviar para debate</button>
+                    </div>
+                    <p id="voiceStatus" class="helper-text">Voz usa recursos do navegador. Se nao aparecer, digite normalmente.</p>
+                </form>
+            </div>
+
+            <aside class="sources-panel">
+                <div id="debateScoreCard" class="debate-score hidden">
+                    <span class="score-label">Chance academica de exito</span>
+                    <strong id="debateScorePercent">--%</strong>
+                    <div class="score-track">
+                        <div id="debateScoreBar" class="score-bar"></div>
+                    </div>
+                    <p id="debateScoreText">Envie uma tese no modo Debate para calcular a forca argumentativa.</p>
+                </div>
+
+                <h2>Fontes usadas</h2>
+                <div id="sourcesList" class="sources-list">
+                    <p class="empty-state">As fontes do RAG aparecem aqui depois da primeira pergunta.</p>
+                </div>
+                <div class="academic-note">
+                    <strong>Uso academico</strong>
+                    <p>O JurisAI apoia estudo e simulacao. Revise tudo com professor, advogado ou fonte oficial.</p>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script src="../js/authGuard.js"></script>
+    <script src="../js/chat.js"></script>
+</body>
+</html>

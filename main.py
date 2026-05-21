@@ -13,7 +13,7 @@ from app.models.UserModel import User
 # REMOVIDO: ensure_user_profile_columns (agora o MySQL cuida disso)
 from app.core.db.database import Base, engine
 from app.core.config import settings 
-from app.routers import auth, mfa, user, password_reset, admin
+from app.routers import auth, mfa, user, password_reset, admin, chat
 
 Base.metadata.create_all(bind=engine)
 # Configuração de Logs (Atende Requisito 5.1 e 5.2) 
@@ -88,6 +88,7 @@ app.include_router(mfa.router)
 app.include_router(user.router)           
 app.include_router(password_reset.router) 
 app.include_router(admin.router)
+app.include_router(chat.router)
 
 BASE_DIR = Path(__file__).resolve().parent
 FRONTEND_DIR = BASE_DIR / "frontend"

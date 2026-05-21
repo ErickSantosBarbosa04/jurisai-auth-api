@@ -36,9 +36,21 @@ def verify_password(plain: str, hashed: str) -> bool:
 # --- LÓGICA DE TOKENS (JWT)  Cria o token de acesso com tempo de expiração (Requsito 1.9)------------------------------------------------------------------------------
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
+    issued_at = datetime.now(timezone.utc)
+    expire = issued_at + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire, "iat": int(issued_at.timestamp())})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+def create_login_challenge_token(user_id: str) -> str:
+    issued_at = datetime.now(timezone.utc)
+    expire = issued_at + timedelta(minutes=5)
+    payload = {
+        "preauth_sub": str(user_id),
+        "purpose": "2fa_login",
+        "exp": expire,
+        "iat": int(issued_at.timestamp()),
+    }
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 # --- Validar Token -------------
 def verify_token(token: str) -> dict | None:
@@ -46,6 +58,12 @@ def verify_token(token: str) -> dict | None:
         return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     except JWTError:
         return None
+
+def verify_login_challenge_token(token: str) -> str | None:
+    payload = verify_token(token)
+    if not payload or payload.get("purpose") != "2fa_login":
+        return None
+    return payload.get("preauth_sub")
 
 # --- LÓGICA DE 2FA (TOTP) (Requisito 1.5) ---------------------------------------------------------------------------
 #--- Gera um segredo aleatório em Base32 para o 2FA
