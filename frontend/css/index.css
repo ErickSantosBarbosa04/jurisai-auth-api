@@ -39,7 +39,11 @@ header {
     font-weight: 700; 
     color: var(--primary-gold); 
     letter-spacing: -0.5px;
-    flex-grow: 1; /* Empurra os botões para a direita */
+    flex-grow: 1; 
+}
+.nav-links {
+    display: flex;
+    align-items: center;
 }
 .nav-links a {
     color: var(--text-light); 
@@ -181,7 +185,6 @@ header {
     align-items: center;
     height: 60px;
 }
-/* Regra para as novas imagens não quebrarem o tamanho do card */
 .icone-publico img {
     max-width: 48px;
     max-height: 48px;
@@ -293,4 +296,64 @@ footer {
     border-top: 1px solid var(--border); 
     color: #666; 
     font-size: 14px;
+}
+
+
+@media (max-width: 768px) {
+    /* Ajusta o Cabeçalho para empilhar os itens no celular */
+    header {
+        flex-direction: column;
+        padding: 15px 5%;
+        gap: 15px;
+    }
+    
+    /* Centraliza os links e tira a margem da esquerda */
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    .nav-links a {
+        margin-left: 0;
+        font-size: 14px;
+    }
+    
+    /* O botão de login ocupa a tela toda no celular para ficar fácil de clicar */
+    .btn-login {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    /* Reduz o tamanho da fonte do título principal para não quebrar a tela */
+    .hero {
+        padding: 60px 5%;
+    }
+    .hero h1 {
+        font-size: 34px;
+    }
+    .hero p {
+        font-size: 16px;
+    }
+
+    /* Ajusta os espaçamentos das seções */
+    .secao {
+        padding: 60px 5%;
+    }
+    .secao h2 {
+        font-size: 28px;
+    }
+
+    /* Transforma os cards de ferramentas em coluna única */
+    .grid-funcionalidades {
+        grid-template-columns: 1fr;
+    }
+
+    /* Ajusta o container da equipe para caber na tela do celular */
+    .equipe-container {
+        padding: 40px 5%;
+        margin: 40px auto;
+    }
 }
