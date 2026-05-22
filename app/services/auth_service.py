@@ -7,6 +7,7 @@ from app.core.security import hash_password, verify_password, create_access_toke
 from app.core.crypto import decrypt
 from app.models.TokenBlacklistModel import TokenBlacklist
 from datetime import datetime, timedelta, timezone
+from app.services.audit_service import AuditService
 
 # Defina o tempo de "esquecimento" (ex: 30 minutos)
 GRACE_PERIOD_MINUTES = 30
@@ -43,6 +44,9 @@ class AuthService:
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
+
+        # 📋 LOG DE AUDITORIA: Conta Criada
+        AuditService.registrar_acao(db, str(new_user.id), "Conta criada no sistema com aceite da LGPD.")
 
         token = create_access_token({"sub": str(new_user.id)})
         
@@ -94,7 +98,7 @@ class AuthService:
                 db.commit()
 
         if not verify_password(password, user.hashed_password):
-            AuthService._registrar_falha(db, user) # Ajuste integrado
+            AuthService._registrar_falha(db, user) 
             raise HTTPException(status_code=401, detail=msg_erro_padrao)
 
         if user.is_2fa_enabled:
@@ -117,8 +121,17 @@ class AuthService:
         user.last_failed_login = None
         db.commit()
 
+        # 📋 LOG DE AUDITORIA: Login com Sucesso
+        AuditService.registrar_acao(db, str(user.id), "Login realizado com sucesso.")
+
         token = create_access_token({"sub": str(user.id)})
-        return {"access_token": token, "token_type": "bearer"}
+        
+        # Correção Crucial: is_2fa_enabled adicionado para o JavaScript fazer o desvio!
+        return {
+            "access_token": token, 
+            "token_type": "bearer",
+            "is_2fa_enabled": user.is_2fa_enabled
+        }
     
     @staticmethod
     def _registrar_falha(db: Session, user: models.User):
@@ -129,11 +142,18 @@ class AuthService:
         if user.failed_login_attempts >= 5:
             user.lockout_until = agora + timedelta(minutes=15)
             db.commit()
+            
+            # 📋 LOG DE AUDITORIA: Conta Bloqueada
+            AuditService.registrar_acao(db, str(user.id), "Conta bloqueada por 15 minutos (excesso de tentativas falhas).")
+            
             raise HTTPException(
                 status_code=403, 
                 detail="Muitas tentativas falhas. Bloqueado por 15 minutos."
             )
+            
         db.commit()
+        # 📋 LOG DE AUDITORIA: Falha de Senha/2FA
+        AuditService.registrar_acao(db, str(user.id), f"Falha de autenticação (Tentativa {user.failed_login_attempts}/5).")
 
     @staticmethod
     def blacklist_token(db: Session, request: Request, current_user: models.User):
@@ -145,4 +165,8 @@ class AuthService:
         db_token = TokenBlacklist(token=token)
         db.add(db_token)
         db.commit()
+        
+        # 📋 LOG DE AUDITORIA: Logout
+        AuditService.registrar_acao(db, str(current_user.id), "Sessão encerrada (Logout).")
+        
         return {"detail": "Sessão encerrada com sucesso"}

@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.UserModel import User
+from app.services.audit_service import AuditService # <-- IMPORTADO AQUI
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +38,24 @@ class UserService:
         db.commit()
         db.refresh(user_to_update)
 
+        # ==========================================
+        # 📋 LOG DE AUDITORIA: Atualização de Dados
+        # ==========================================
+        AuditService.registrar_acao(db, str(current_user.id), "Perfil de usuário e dados pessoais atualizados.")
+
         logger.info(f"SERVICE: Perfil atualizado para user_id={user_to_update.id}")
         return user_to_update
 
     @staticmethod
     # Garante que todos os dados coletados sejam exportados. (Requisito 4.9)  
-    def export_user_data(current_user: User):
+    # ⚠️ ATENÇÃO: Adicionado 'db: Session' aqui para podermos gravar o log!
+    def export_user_data(db: Session, current_user: User):
         logger.info(f"SERVICE: Preparando exportação de dados para ID: {current_user.id}")
+        
+        # ==========================================
+        # 📋 LOG DE AUDITORIA: Exportação LGPD
+        # ==========================================
+        AuditService.registrar_acao(db, str(current_user.id), "Exportação de dados solicitada (Direito de Acesso LGPD).")
         
         # Incluímos os metadados de LGPD para transparência total
         return {
@@ -83,6 +95,12 @@ class UserService:
                 raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
             user_email = user_to_delete.email
+
+            # ==========================================
+            # 📋 LOG DE AUDITORIA: Exclusão da Conta
+            # ==========================================
+            # Registramos a intenção antes de apagar a conta (já que os logs podem sumir no modo CASCADE)
+            AuditService.registrar_acao(db, str(current_user.id), "Solicitação de exclusão permanente de conta (Direito ao Esquecimento).")
 
             # Deletamos, forçamos o flush e limpamos a sessão
             db.delete(user_to_delete)

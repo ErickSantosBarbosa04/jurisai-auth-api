@@ -24,11 +24,11 @@ def update_me(
     return UserService.update_user_profile(db, current_user, data)
 
 @router.get("/export-data")
-#Solicita a exportação de dados ao Service. (Requisito 4.9)
-def export_user_data(current_user=Depends(get_current_user)):
-    return UserService.export_user_data(current_user)
+def export_user_data(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    return UserService.export_user_data(db, current_user)
 
 @router.delete("/delete-account", status_code=status.HTTP_200_OK)
 #Recebe o comando de exclusão e delega ao Service. (Requisito 4.10)
 def delete_account(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     return UserService.delete_user_account(db, current_user)
+

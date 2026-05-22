@@ -46,14 +46,15 @@ class EmailService:
         msg.attach(MIMEText(html_content, 'html'))
 
         try:
-            # Conecta com os correios do Google (Gmail)
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls() # Liga a criptografia
+            # Adicionado o parâmetro timeout=15 para não travar o servidor se o Google não responder rápido
+            server = smtplib.SMTP('smtp.gmail.com', 587, timeout=15)
+            server.starttls() 
             server.login(sender_email, sender_password)
             server.send_message(msg)
             server.quit()
             logger.info(f"E-mail enviado com sucesso para: {to_email}")
             return True
         except Exception as e:
-            logger.error(f"Erro ao enviar email: {e}")
+            # Esse log vai te mostrar exatamente o motivo da rejeição lá no painel da Railway
+            logger.error(f"ERRO CRÍTICO NO SMTP SMTP_GMAIL: {str(e)}")
             return False

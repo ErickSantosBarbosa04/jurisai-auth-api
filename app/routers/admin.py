@@ -11,6 +11,8 @@ from app.models.UserModel import User
 from app.services.user_service import UserService
 from app.services.email_service import EmailService
 from app.services.password_service import PasswordService
+from app.models.AuditLogModel import AuditLog
+
 
 # Aqui definimos o prefixo isolado para o Admin!
 router = APIRouter(prefix="/admin", tags=["Admin Control"])
@@ -69,24 +71,25 @@ def alternar_status_usuario(user_id: str, db: Session = Depends(get_db), current
     return {"message": mensagem}
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
+
 @router.get("/users/{user_id}/logs")
 def ver_logs_do_usuario(user_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    # Trava de segurança: só entra se for Admin
+    # Garante que apenas administradores acessem o histórico
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Acesso negado")
     
-    # Se você tiver uma tabela separada de 'AuditLog' (Log de Auditoria), seria assim:
-    # logs = db.query(AuditLog).filter(AuditLog.user_id == user_id).order_by(AuditLog.timestamp.desc()).limit(50).all()
-    # return logs
+    # Busca os registros reais salvos na tabela, ordenando dos mais novos para os mais antigos
+    logs_reais = db.query(AuditLog).filter(AuditLog.user_id == user_id).order_by(AuditLog.timestamp.desc()).limit(50).all()
     
-    # Caso você ainda não tenha uma tabela de logs criada no banco de dados, 
-    # podemos simular uma resposta apenas para a janela não ficar vazia até você criar a tabela oficial:
-    return [
-        {"timestamp": "2026-05-22T10:00:00", "action": "Conta criada no sistema."},
-        {"timestamp": "2026-05-22T10:05:00", "action": "Login realizado com sucesso."},
-        {"timestamp": "2026-05-22T10:30:00", "action": "Segunda etapa (2FA) configurada."}
-    ]
-
+    # Transforma os dados no formato exato que o seu JavaScript e a sua janelinha esperam
+    resultado = []
+    for log in logs_reais:
+        resultado.append({
+            "timestamp": log.timestamp.isoformat(),
+            "action": log.action
+        })
+        
+    return resultado
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 @router.post("/force-reset")
 def forcar_reset_senha(email_data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
