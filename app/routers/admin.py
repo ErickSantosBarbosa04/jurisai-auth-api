@@ -130,14 +130,15 @@ def forcar_reset_senha(email_data: ForceResetRequest, db: Session = Depends(get_
     
 #-----------------------------------------------------------------------------------------------------------------------------------------------------    
 @router.get("/user-lgpd/{user_id}")
-def ver_dados_lgpd_usuario(user_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def ver_ficha_lgpd_admin(user_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # 1. Trava: Só admin entra
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Acesso negado")
-        
+    
+    # 2. Acha o usuário alvo no banco
     alvo = db.query(User).filter(User.id == user_id).first()
     if not alvo:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
-        
-    # Aproveita a função do UserService para puxar a ficha completa
-    dados = UserService.export_user_data(alvo)
-    return dados
+    
+    # 3. Pede para o serviço gerar a ficha (que também já vai gerar o Log de Auditoria que criamos!)
+    return UserService.export_user_data(db, alvo)
