@@ -274,19 +274,37 @@ window.alternarStatus = async (id) => {
     }
 };
 
-// Arquivo (📄): Ver a ficha de dados da LGPD
+// Arquivo (📄): Ver a ficha de dados da LGPD na Janela Flutuante
 window.verDetalhesLGPD = async (id) => {
+    const modal = document.getElementById("lgpdModal");
+    const content = document.getElementById("lgpdContent");
+    
+    // Mostra a janela com status de carregamento
+    content.innerText = "Buscando dados no servidor...";
+    modal.style.display = "flex";
+
     try {
         const response = await fetch(`${API_BASE_URL}/admin/user-lgpd/${id}`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
-        if(response.ok) {
+        
+        if (response.ok) {
             const dados = await response.json();
-            alert("FICHA DE DADOS LGPD:\n\n" + JSON.stringify(dados, null, 4));
+            // Injeta o JSON formatado bonitinho na tela
+            content.innerText = JSON.stringify(dados, null, 4);
+        } else {
+            content.innerText = "Erro ao puxar ficha da LGPD do banco de dados.";
+            content.style.color = "var(--error)";
         }
     } catch (error) {
-        alert("Erro ao puxar ficha da LGPD.");
+        content.innerText = "Erro de conexão com o servidor.";
+        content.style.color = "var(--error)";
     }
+};
+
+// Fecha a janela da LGPD
+window.fecharModalLGPD = () => {
+    document.getElementById("lgpdModal").style.display = "none";
 };
 
 // Prancheta (📋): Ver histórico do usuário na janela flutuante
