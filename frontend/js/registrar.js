@@ -31,6 +31,7 @@ if (passwordInput) {
         atualizarBarra(forca);
     });
 }
+
 // Funções de controle do Modal
 const modal = document.getElementById('modalTermos');
 const checkboxTermos = document.getElementById('lgpdConsent');

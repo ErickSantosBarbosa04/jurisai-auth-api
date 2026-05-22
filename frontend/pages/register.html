@@ -110,27 +110,59 @@
     </div>
 
     <div id="modalTermos" class="modal-overlay" onclick="fecharTermosClickFora(event)">
-        <div class="modal-content">
-            <h2>Termos de Uso e Privacidade</h2>
-            <div class="modal-body">
-                <p>Bem-vindo(a) ao <strong>JurisAI</strong>! Estes Termos de Uso regulam o seu acesso e uso da nossa plataforma. Ao criar uma conta e utilizar nossos serviços, você concorda com as regras descritas abaixo.</p>
+        <div class="modal-content" style="max-width: 700px; padding: 30px;">
+            <h2 style="color: var(--primary-gold); margin-bottom: 20px; font-size: 24px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Termos de Uso e Privacidade JurisAI</h2>
+            
+            <div class="modal-body" style="max-height: 50vh; overflow-y: auto; padding-right: 15px; margin-bottom: 25px;">
+                <p style="font-size: 14px; margin-bottom: 20px; color: var(--text-muted);">Ao se cadastrar e utilizar o JurisAI, o usuário declara ter lido, compreendido e concordado com os presentes Termos de Uso, Política de Cookies e Relatório de Impacto (RIPD). Clique nos tópicos abaixo para expandir os detalhes:</p>
                 
-                <h3>1. O que é o JurisAI?</h3>
-                <p>O JurisAI é uma plataforma de assistência baseada em inteligência artificial. <strong>Importante:</strong> As respostas geradas pela IA não substituem a consultoria jurídica oficial. O usuário é o único responsável por revisar qualquer informação antes de usá-la.</p>
-                
-                <h3>2. Segurança da Conta e Cookies</h3>
-                <p>Para manter sua conta segura, usamos o armazenamento local do seu navegador (uma tecnologia semelhante aos cookies) para guardar sua chave de acesso e lembrar suas preferências de tela. Não usamos cookies para rastreamento ou propagandas.</p>
-                
-                <h3>3. Proteção de Dados (LGPD)</h3>
-                <p>Levamos sua privacidade a sério. Consentindo com este termo, você permite o tratamento dos seus dados essenciais para o funcionamento da conta. Você pode exportar (baixar) ou excluir seus dados permanentemente no painel de perfil a qualquer momento.</p>
-                
-                <h3>4. Regras de Conduta</h3>
-                <p>Você concorda em não tentar burlar os sistemas de segurança, não sobrecarregar o sistema com bots e não usar a plataforma para gerar conteúdos ilícitos ou de desinformação.</p>
+                <details class="termo-detalhe">
+                    <summary>1. Responsabilidade e Natureza da Ferramenta</summary>
+                    <div class="detalhe-conteudo">
+                        <p>O JurisAI é uma plataforma de apoio tecnológico ao exercício da advocacia, fornecida "no estado em que se encontra" para fins acadêmicos e profissionais. O uso por pessoas não habilitadas (sem OAB, salvo estudantes em ambiente acadêmico) é vedado.</p>
+                        <p><strong>Atenção:</strong> O JurisAI é uma ferramenta de assistência e não substitui o julgamento técnico do advogado. Todas as análises, sugestões e rascunhos gerados pela IA devem ser revisados e validados pelo profissional. A equipe desenvolvedora não se responsabiliza por decisões tomadas com base exclusiva na IA sem revisão humana.</p>
+                        <p>É vedado realizar engenharia reversa, uso abusivo, ou criar conteúdos fraudulentos/antiéticos. Reservamo-nos o direito de suspender o acesso em caso de violação.</p>
+                    </div>
+                </details>
+
+                <details class="termo-detalhe">
+                    <summary>2. Proteção de Dados (Resumo do RIPD)</summary>
+                    <div class="detalhe-conteudo">
+                        <p>Em conformidade com o Art. 38 da LGPD, elaboramos um Relatório de Impacto (RIPD) para mitigar os riscos no tratamento de dados jurídicos sensíveis. Nossas principais medidas incluem:</p>
+                        <ul>
+                            <li><strong>Criptografia e Acesso:</strong> Dados em repouso são protegidos via AES-256 e trânsito via TLS 1.2/1.3. O acesso é blindado por Autenticação de 2 Fatores (2FA).</li>
+                            <li><strong>Privacidade da IA:</strong> Processamos o modelo Llama 3.2 localmente (via Ollama). Nenhuma informação processual sua sai da infraestrutura local ou é enviada para APIs externas de IA.</li>
+                            <li><strong>Prevenção de Vazamento:</strong> Senhas protegidas por bcrypt, limite de tentativas (Rate Limiting) e invalidação total de tokens via blacklist no logout.</li>
+                            <li><strong>Retenção:</strong> Política de retenção de dados por 5 anos, com posterior anonimização ou exclusão definitiva.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="termo-detalhe">
+                    <summary>3. Política de Cookies e Sessão</summary>
+                    <div class="detalhe-conteudo">
+                        <p>O JurisAI utiliza <strong>apenas cookies/tokens estritamente necessários</strong> para o funcionamento da plataforma e autenticação. Não empregamos cookies de rastreamento, publicidade ou análise (como Google Analytics ou Facebook Pixel).</p>
+                        <p>A sua sessão é mantida por um token JWT com validade de 30 minutos. Ao efetuar logout, o token é instantaneamente bloqueado na base de dados (blacklist), garantindo a sua segurança mesmo que o prazo de 30 minutos ainda não tenha acabado. Você pode limpar seus cookies a qualquer momento sem prejudicar sua conta.</p>
+                    </div>
+                </details>
+
+                <details class="termo-detalhe">
+                    <summary>4. Jurisdição e Atualizações</summary>
+                    <div class="detalhe-conteudo">
+                        <p>Estes termos são regidos pela LGPD (Lei nº 13.709/18) e pelo Marco Civil da Internet. Eventuais disputas serão submetidas ao foro da Comarca de Mogi das Cruzes/SP.</p>
+                        <p>Podemos atualizar estes termos mediante notificação por e-mail com antecedência mínima de 30 dias para atualizações nos Termos de Uso, e 15 dias para atualizações na Política de Cookies.</p>
+                    </div>
+                </details>
+
             </div>
-            <button type="button" class="btn-primary" onclick="aceitarTermos()">Li tudo</button>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <button type="button" class="btn-secondary" onclick="fecharTermos()">Cancelar</button>
+                <button type="button" class="btn-primary" onclick="aceitarTermos()" style="padding: 10px 25px;">Li e Concordo Integralmente</button>
+            </div>
         </div>
     </div>
-
+    
     <script src="../js/registrar.js"></script>
 </body>
 </html>
