@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 
 class AdminUpdateUser(BaseModel):
     email: EmailStr
+
+class ForceResetRequest(BaseModel):
+    email: EmailStr
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 @router.patch("/update-user/{user_id}")
 def admin_update_user(user_id: str, data: AdminUpdateUser, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -92,12 +95,12 @@ def ver_logs_do_usuario(user_id: str, db: Session = Depends(get_db), current_use
     return resultado
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 @router.post("/force-reset")
-def forcar_reset_senha(email_data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def forcar_reset_senha(email_data: ForceResetRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # 1. Trava de segurança: apenas admin
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Acesso negado")
         
-    email_alvo = email_data.get("email")
+    email_alvo = email_data.email
     if not email_alvo:
         raise HTTPException(status_code=400, detail="E-mail não fornecido")
 
