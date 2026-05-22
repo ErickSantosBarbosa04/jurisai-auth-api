@@ -94,3 +94,78 @@ body.dark-theme table {
     overflow-x: auto;
     border-radius: 8px 8px 0 0;
 }
+
+/* =========================================================
+   4. MELHORANDO OS FILTROS (Busca e Select)
+========================================================= */
+.auth-input {
+    padding: 10px 14px;
+    border: 1px solid var(--border, #ccc);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-light, #333);
+    background-color: var(--bg-panel, #fff);
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.auth-input:focus {
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+/* Estilizando a setinha do Select para ficar moderna */
+select.auth-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 36px;
+}
+
+/* =========================================================
+   5. FORÇANDO O MODO ESCURO NA TABELA (Blindagem)
+========================================================= */
+body.dark-theme {
+    background-color: #121214 !important;
+    color: #e1e1e6 !important;
+}
+
+body.dark-theme .page-shell {
+    background-color: transparent !important;
+}
+
+/* Força o painel da tabela a ficar escuro e com borda discreta */
+body.dark-theme .panel {
+    background-color: #1e1e24 !important;
+    border: 1px solid #333333 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important;
+}
+
+/* Força os botões de busca a ficarem escuros */
+body.dark-theme .auth-input {
+    background-color: #121214 !important;
+    border-color: #333333 !important;
+    color: #e1e1e6 !important;
+}
+
+/* Força o cabeçalho da tabela */
+body.dark-theme .admin-table th {
+    background-color: #2a2a33 !important;
+    color: #a3a3a3 !important;
+    border-bottom: 2px solid #d4af37 !important;
+}
+
+/* Força as linhas da tabela */
+body.dark-theme .admin-table td {
+    border-bottom: 1px solid #333333 !important;
+    color: #e1e1e6 !important;
+}
+
+/* Força o rodapé da paginação */
+body.dark-theme #paginationContainer {
+    background-color: #1e1e24 !important;
+    border-top: 1px solid #333333 !important;
+}
