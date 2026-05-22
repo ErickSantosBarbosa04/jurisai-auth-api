@@ -1,10 +1,41 @@
+// =========================================================================
+// 1. CONFIGURAÇÕES E MEMÓRIA (O "Cérebro" da página)
+// =========================================================================
+
 const API_BASE_URL = window.location.origin;
 const token = localStorage.getItem("access_token");
 
+// Se não tiver crachá, expulsa para o login
 if (!token) window.location.href = "login.html";
 
-// Variável global para guardar os usuários e permitir a pesquisa rápida
-let listaDeUsuarios = [];
+// Guardamos os usuários aqui para não precisar pedir ao servidor toda hora
+let listaDeUsuarios = []; 
+let usuariosFiltradosGlobais = []; 
+
+// Controle de quantas pessoas aparecem por vez na tela
+let paginaAtual = 1;
+const itensPorPagina = 10;
+
+
+// =========================================================================
+// 2. INICIALIZAÇÃO E EVENTOS (Os "Ouvidos" da página)
+// =========================================================================
+
+// Fica escutando a digitação na barra de busca e a mudança de ordem
+document.getElementById("userSearch")?.addEventListener("input", aplicarFiltrosEOrdenacao);
+document.getElementById("userSort")?.addEventListener("change", aplicarFiltrosEOrdenacao);
+
+// Fica escutando os cliques nos botões de passar página
+document.getElementById("btnPrevPage")?.addEventListener("click", () => mudarPagina('prev'));
+document.getElementById("btnNextPage")?.addEventListener("click", () => mudarPagina('next'));
+
+// Assim que o arquivo é lido, ele já busca os usuários para preencher a tabela
+carregarTodosUsuarios();
+
+
+// =========================================================================
+// 3. COMUNICAÇÃO COM O SERVIDOR (Busca de Dados)
+// =========================================================================
 
 async function carregarTodosUsuarios() {
     const tableBody = document.getElementById("fullUsersTable");
@@ -15,94 +46,108 @@ async function carregarTodosUsuarios() {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
-        // Se o token for velho ou inválido, desloga na hora!
+        // Trava de segurança: Se o crachá venceu, joga para o login na hora
         if (response.status === 401) {
-            console.warn("Token antigo detectado. Redirecionando para login...");
+            console.warn("Sessão antiga. Redirecionando para login...");
             localStorage.removeItem("access_token");
             window.location.href = "login.html?motivo=sessao_expirada";
             return;
         }
 
-        if (!response.ok) throw new Error("Erro ao buscar lista de usuários.");
+        if (!response.ok) throw new Error("Erro ao buscar a lista no banco de dados.");
 
+        // Salva os dados recebidos na nossa variável global e já organiza a tela
         listaDeUsuarios = await response.json();
         aplicarFiltrosEOrdenacao(); 
 
     } catch (error) {
         console.error(error);
-        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--error);">Erro de conexão ou rota não encontrada.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--error);">Erro de conexão. Tente atualizar a página.</td></tr>`;
     }
 }
 
-// ==========================================
-// SISTEMA DE PESQUISA E FILTROS
-// ==========================================
-const inputBusca = document.getElementById("userSearch");
-const selectOrdem = document.getElementById("userSort");
 
-// Fica "escutando" a digitação e a mudança de ordem
-inputBusca.addEventListener("input", aplicarFiltrosEOrdenacao);
-selectOrdem.addEventListener("change", aplicarFiltrosEOrdenacao);
+// =========================================================================
+// 4. ORGANIZAÇÃO DOS DADOS (Pesquisa e Matemática das Páginas)
+// =========================================================================
 
 function aplicarFiltrosEOrdenacao() {
-    const termoBusca = inputBusca.value.toLowerCase();
-    const ordem = selectOrdem.value;
+    const termoBusca = document.getElementById("userSearch")?.value.toLowerCase() || "";
+    const ordem = document.getElementById("userSort")?.value || "recente";
 
-    // 1. Filtra quem tem o nome ou e-mail parecido com a busca
-    let usuariosFiltrados = listaDeUsuarios.filter(user => {
+    // 4.1 Separa apenas quem bate com o texto da busca
+    usuariosFiltradosGlobais = listaDeUsuarios.filter(user => {
         const nome = (user.full_name || "").toLowerCase();
         const email = (user.email || "").toLowerCase();
         return nome.includes(termoBusca) || email.includes(termoBusca);
     });
 
-    // 2. Ordena a lista
+    // 4.2 Coloca em ordem alfabética, se solicitado
     if (ordem === "az") {
-        usuariosFiltrados.sort((a, b) => (a.full_name || "").localeCompare(b.full_name || ""));
+        usuariosFiltradosGlobais.sort((a, b) => (a.full_name || "").localeCompare(b.full_name || ""));
     } else if (ordem === "za") {
-        usuariosFiltrados.sort((a, b) => (b.full_name || "").localeCompare(a.full_name || ""));
+        usuariosFiltradosGlobais.sort((a, b) => (b.full_name || "").localeCompare(a.full_name || ""));
     }
-    // Se for "recente", deixa como vem do banco (que normalmente já é por ID/Data)
 
-    renderizarTabela(usuariosFiltrados);
+    // Toda vez que pesquisa algo novo, volta para a página 1 para não dar erro
+    paginaAtual = 1;
+    renderizarTabela();
 }
 
-// ==========================================
-// RENDERIZAR TABELA
-// ==========================================
-// ==========================================
-// RENDERIZAR TABELA
-// ==========================================
-function renderizarTabela(users) {
-    const tableBody = document.getElementById("fullUsersTable");
-    tableBody.innerHTML = "";
+window.mudarPagina = (direcao) => {
+    const totalPaginas = Math.ceil(usuariosFiltradosGlobais.length / itensPorPagina);
+    
+    if (direcao === 'next' && paginaAtual < totalPaginas) {
+        paginaAtual++;
+    } else if (direcao === 'prev' && paginaAtual > 1) {
+        paginaAtual--;
+    }
+    
+    renderizarTabela();
+};
 
-    if (users.length === 0) {
+
+// =========================================================================
+// 5. DESENHANDO NA TELA (A Criação Visual da Tabela)
+// =========================================================================
+
+function renderizarTabela() {
+    const tableBody = document.getElementById("fullUsersTable");
+    tableBody.innerHTML = ""; // Limpa a tabela antes de desenhar
+
+    // Se não achou ninguém, mostra o aviso
+    if (usuariosFiltradosGlobais.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">Nenhum usuário encontrado.</td></tr>`;
+        atualizarControlesPaginacao();
         return;
     }
 
-    users.forEach(user => {
+    // Corta a lista gigante para mostrar apenas os 10 da página atual
+    const inicio = (paginaAtual - 1) * itensPorPagina;
+    const fim = inicio + itensPorPagina;
+    const usuariosDaPagina = usuariosFiltradosGlobais.slice(inicio, fim);
+
+    // Para cada usuário dessa "fatia", cria uma linha na tabela
+    usuariosDaPagina.forEach(user => {
         const tr = document.createElement("tr");
         
-        // --- LÓGICA DE STATUS CORRIGIDA E MELHORADA ---
+        // Define o visual se a pessoa estiver ativa ou suspensa
         let statusClass = "success";
         let statusText = "Ativo";
-        let corBg = "#d4edda"; // Fundo verde clarinho
-        let corTexto = "#155724"; // Texto verde escuro
+        let corBg = "#d4edda"; 
+        let corTexto = "#155724"; 
 
         if (user.lockout_until) {
             const dataBloqueio = new Date(user.lockout_until);
-            const agora = new Date();
-            
-            // Se a data de bloqueio for maior que hoje (Ex: Ano 2999)
-            if (dataBloqueio > agora) {
+            if (dataBloqueio > new Date()) {
                 statusClass = "error";
                 statusText = "Suspenso";
-                corBg = "#f8d7da"; // Fundo vermelho clarinho
-                corTexto = "#721c24"; // Texto vermelho escuro
+                corBg = "#f8d7da"; 
+                corTexto = "#721c24"; 
             }
         }
 
+        // Escreve o HTML da linha
         tr.innerHTML = `
             <td>
                 <div style="font-weight: 600;">${user.full_name || 'Sem nome'}</div>
@@ -127,18 +172,42 @@ function renderizarTabela(users) {
         `;
         tableBody.appendChild(tr);
     });
+
+    // Depois de desenhar a tabela, atualiza os numerozinhos lá embaixo (ex: "Página 1 de 5")
+    atualizarControlesPaginacao();
 }
 
-// ==========================================
-// FUNÇÕES DE AÇÃO RÁPIDA
-// ==========================================
+function atualizarControlesPaginacao() {
+    const totalItens = usuariosFiltradosGlobais.length;
+    const totalPaginas = Math.ceil(totalItens / itensPorPagina);
 
-// 1. O LÁPIS (Mudar e-mail à força)
+    const btnPrev = document.getElementById("btnPrevPage");
+    const btnNext = document.getElementById("btnNextPage");
+    const pageDisplay = document.getElementById("currentPageDisplay");
+    const pageInfo = document.getElementById("paginationInfo");
+
+    if (!btnPrev || !btnNext || !pageDisplay || !pageInfo) return;
+
+    // Atualiza o texto visual
+    pageDisplay.textContent = paginaAtual;
+    const inicioRender = totalItens === 0 ? 0 : ((paginaAtual - 1) * itensPorPagina) + 1;
+    const fimRender = Math.min(paginaAtual * itensPorPagina, totalItens);
+    pageInfo.textContent = `Mostrando ${inicioRender} a ${fimRender} de ${totalItens} usuários`;
+
+    // Desliga os botões se estiver na primeira ou na última página
+    btnPrev.disabled = paginaAtual === 1;
+    btnNext.disabled = paginaAtual === totalPaginas || totalPaginas === 0;
+}
+
+
+// =========================================================================
+// 6. AÇÕES RÁPIDAS DOS BOTÕES DA TABELA
+// =========================================================================
+
+// Lápis (✏️): Trocar o e-mail caso a pessoa perca o acesso
 window.editarUsuario = async (id, emailAtual) => {
-    // Usamos o prompt nativo para ser rápido e direto
     const novoEmail = prompt(`ALTERAÇÃO DE EMERGÊNCIA:\nDigite o novo e-mail para substituir o atual (${emailAtual}):`, emailAtual);
     
-    // Se ele cancelou ou deixou em branco, não faz nada
     if (!novoEmail || novoEmail === emailAtual) return;
 
     if(confirm(`Tem certeza que deseja mudar o acesso de ${emailAtual} para ${novoEmail}?`)) {
@@ -155,19 +224,19 @@ window.editarUsuario = async (id, emailAtual) => {
             const data = await response.json();
             if(response.ok) {
                 alert(data.message);
-                carregarTodosUsuarios(); // Recarrega a tabela para mostrar o e-mail novo
+                carregarTodosUsuarios(); // Recarrega para ver a mudança
             } else {
                 alert("Erro: " + data.detail);
             }
         } catch (error) {
-            alert("Erro de conexão.");
+            alert("Erro de conexão com o servidor.");
         }
     }
 };
 
-// 2. O RESET (Dispara o fluxo do esqueci.html)
+// Chave (🔑): Dispara o e-mail de recuperação de senha
 window.forçarResetSenha = async (email) => {
-    if(confirm(`Enviar e-mail de recuperação com link direto para:\n${email}?`)) {
+    if(confirm(`Tem certeza que deseja enviar o e-mail de redefinição de senha para:\n${email}?`)) {
         try {
             const response = await fetch(`${API_BASE_URL}/admin/force-reset`, {
                 method: 'POST',
@@ -180,16 +249,17 @@ window.forçarResetSenha = async (email) => {
             const data = await response.json();
             
             if(response.ok) {
-                alert(data.message + "\n\n(O usuário receberá um botão que o levará para esqueci.html?email=" + email + ")");
+                alert("Sucesso! O usuário receberá um e-mail com o link seguro para alterar a senha.");
             } else {
-                alert("Erro: " + data.detail);
+                alert("Aviso: " + (data.detail || "Não foi possível enviar o e-mail."));
             }
         } catch (error) {
-            alert("Erro de conexão.");
+            alert("Erro de conexão ao tentar enviar o e-mail.");
         }
     }
 };
 
+// Proibido (🚫): Suspender ou reativar a conta
 window.alternarStatus = async (id) => {
     if(confirm("Tem certeza que deseja Suspender/Ativar esta conta?")) {
         try {
@@ -198,10 +268,13 @@ window.alternarStatus = async (id) => {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             if(response.ok) carregarTodosUsuarios(); 
-        } catch (error) {}
+        } catch (error) {
+            alert("Erro ao tentar mudar o status da conta.");
+        }
     }
 };
 
+// Arquivo (📄): Ver a ficha de dados da LGPD
 window.verDetalhesLGPD = async (id) => {
     try {
         const response = await fetch(`${API_BASE_URL}/admin/user-lgpd/${id}`, {
@@ -211,11 +284,52 @@ window.verDetalhesLGPD = async (id) => {
             const dados = await response.json();
             alert("FICHA DE DADOS LGPD:\n\n" + JSON.stringify(dados, null, 4));
         }
-    } catch (error) {}
+    } catch (error) {
+        alert("Erro ao puxar ficha da LGPD.");
+    }
 };
 
-window.verLogsUsuario = (id, nome) => {
+// Prancheta (📋): Ver histórico do usuário na janela flutuante
+window.verLogsUsuario = async (id, nome) => {
+    const modal = document.getElementById("logsModal");
+    const logsList = document.getElementById("logsList");
+    
     const nomeExibicao = nome !== 'null' && nome ? nome : 'Usuário';
-    alert(`Abrindo histórico de logs para: ${nomeExibicao}`);
+    document.getElementById("logsModalTitle").innerText = `Histórico de: ${nomeExibicao}`;
+    
+    logsList.innerHTML = "<li style='padding: 10px 0;'>Buscando histórico...</li>";
+    modal.style.display = "flex";
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${id}/logs`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const logs = await response.json();
+            logsList.innerHTML = ""; 
+            
+            if (logs.length === 0) {
+                logsList.innerHTML = "<li style='padding: 10px 0; text-align: center;'>Nenhum registro encontrado para este usuário.</li>";
+            } else {
+                logs.forEach(log => {
+                    const dataFormatada = new Date(log.timestamp).toLocaleString("pt-BR");
+                    logsList.innerHTML += `
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <span style="color: var(--primary-gold); font-weight: 600;">[${dataFormatada}]</span> 
+                            ${log.action}
+                        </li>`;
+                });
+            }
+        } else {
+            logsList.innerHTML = "<li style='color: var(--error); padding: 10px 0;'>Erro ao carregar o histórico.</li>";
+        }
+    } catch (error) {
+        logsList.innerHTML = "<li style='color: var(--error); padding: 10px 0;'>Sem conexão com o servidor.</li>";
+    }
 };
-carregarTodosUsuarios();
+
+// Fecha a janela do histórico
+window.fecharModalLogs = () => {
+    document.getElementById("logsModal").style.display = "none";
+};

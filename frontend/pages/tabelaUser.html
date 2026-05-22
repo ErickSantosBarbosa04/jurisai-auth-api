@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/dashboardADM.css?v=1.1">
 </head>
 <body>
+    
     <nav class="navbar">
         <div class="brand" style="color: var(--primary-gold);">JurisAI <span class="admin-badge">ADMIN</span></div>
         <div class="nav-actions">
@@ -16,6 +17,7 @@
     </nav>
 
     <main class="page-shell">
+        
         <header class="page-header">
             <div>
                 <p class="eyebrow">Administração > Usuários</p>
@@ -34,6 +36,7 @@
         </header>
 
         <section class="panel">
+            
             <div class="table-responsive">
                 <table class="admin-table">
                     <thead>
@@ -49,12 +52,37 @@
                         </tbody>
                 </table>
             </div>
+
+            <div id="paginationContainer" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-top: 1px solid var(--border); background: var(--bg-panel); border-radius: 0 0 8px 8px;">
+                <span id="paginationInfo" style="font-size: 13px; color: var(--text-muted);">Mostrando 0 de 0 usuários</span>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button id="btnPrevPage" class="btn-secondary" style="padding: 6px 12px; font-size: 13px; cursor: pointer;" disabled>&larr; Anterior</button>
+                    <span id="currentPageDisplay" style="font-size: 13px; font-weight: bold; padding: 6px 12px; background: var(--primary-gold); color: white; border-radius: 4px;">1</span>
+                    <button id="btnNextPage" class="btn-secondary" style="padding: 6px 12px; font-size: 13px; cursor: pointer;" disabled>Próxima &rarr;</button>
+                </div>
+            </div>
+
         </section>
     </main>
+
+    <div id="logsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: var(--bg-panel); padding: 24px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px;">
+                <h2 id="logsModalTitle" style="font-size: 18px; margin: 0; color: var(--text-main);">Histórico do Usuário</h2>
+                <button onclick="fecharModalLogs()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            
+            <div style="max-height: 300px; overflow-y: auto;">
+                <ul id="logsList" style="list-style: none; padding: 0; margin: 0; font-size: 13px; color: var(--text-secondary);">
+                    </ul>
+            </div>
+        </div>
+    </div>
 
     <div id="toast" role="status" aria-live="polite"></div>
 
     <script src="../js/authGuard.js"></script>
     <script src="../js/tabelaUser.js?v=1.2"></script>
+
 </body>
 </html>

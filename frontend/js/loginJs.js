@@ -83,7 +83,7 @@ function verificarBloqueioLocal() {
         const agora = Date.now();
         const segundosRestantes = Math.ceil((tempoBloqueio - agora) / 1000);
 
-        // 🛡️ FAXINA AUTOMÁTICA: Se o navegador estiver preso com um bloqueio eterno, ele apaga agora!
+        // FAXINA AUTOMÁTICA: Se o navegador estiver preso com um bloqueio eterno, ele apaga agora!
         if (segundosRestantes > 86400) {
             localStorage.removeItem('lockout_time');
             return false; // Libera a tela
@@ -163,10 +163,25 @@ async function realizarLogin() {
         if (response.ok) {
             salvarTentativas(0);
             localStorage.setItem("access_token", data.access_token);
-            mostrarAviso("Login realizado com sucesso! Redirecionando...", "success");
-            setTimeout(() => { 
-                window.location.replace("duasEtapa.html"); 
-            }, 800);
+            
+            // ========================================================
+            //  O GUARDA DE TRÂNSITO ENTRA AQUI 
+            // ========================================================
+            if (data.is_2fa_enabled === false) {
+                // Caiu aqui? É alguém que resetou a conta ou é um usuário novo!
+                mostrarAviso("Segurança: Configure seu novo Autenticador.", "success");
+                setTimeout(() => { 
+                    window.location.replace("configurar-2fa.html"); 
+                }, 1000);
+            } else {
+                // Usuário comum, vida que segue pro 2FA
+                mostrarAviso("Login realizado! Redirecionando...", "success");
+                setTimeout(() => { 
+                    window.location.replace("duasEtapa.html"); 
+                }, 800);
+            }
+            // ========================================================
+
         } else {
             let erros = obterTentativas() + 1;
             salvarTentativas(erros);

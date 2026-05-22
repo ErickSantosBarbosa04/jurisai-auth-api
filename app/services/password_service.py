@@ -59,9 +59,19 @@ class PasswordService:
         # Atualiza a senha com a nossa função segura (Bcrypt corrigido)
         user.hashed_password = hash_password(data.new_password)
         
+        # ========================================================
+        # TRAVA DE "PERDA TOTAL" (CORTANDO O VÍNCULO DO CELULAR)
+        # ========================================================
+        # Desliga a segunda etapa e apaga o código secreto antigo.
+        # Assim, o aplicativo no celular roubado/perdido fica inútil.
+        user.is_2fa_enabled = False
+        user.totp_secret = None
+        # ========================================================
+        
         # Limpa o token (Segurança: expiracao de token e uso único) (Requisito 2.3 e 2.4)
         db.delete(reset_token)
         db.commit()
 
-        logger.info(f"SERVICE: Senha alterada com sucesso para o usuário ID: {user.id}")
-        return {"message": "Senha alterada com sucesso!"}
+        # Atualizei o log e a mensagem para refletir que o 2FA também foi resetado
+        logger.info(f"SERVICE: Senha alterada e vínculo do autenticador quebrado com sucesso para o usuário ID: {user.id}")
+        return {"message": "Senha alterada com sucesso! Você precisará configurar seu autenticador novamente no próximo login."}
