@@ -1,0 +1,296 @@
+:root {
+    --bg-dark: #121214;
+    --bg-panel: #1e1e24;
+    --primary-gold: #d4af37;
+    --primary-gold-hover: #b5952f;
+    --text-light: #e1e1e6;
+    --text-muted: #a3a3a3;
+    --border: #333333;
+}
+
+body, html {
+    margin: 0; 
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    scroll-behavior: smooth;
+}
+
+/* --- MENU SUPERIOR --- */
+header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 20px 10%; 
+    background-color: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    position: sticky; 
+    top: 0; 
+    z-index: 100;
+}
+.logo-img {
+    width: 32px; 
+    height: 32px; 
+    margin-right: 10px;
+}
+.logo { 
+    font-size: 26px; 
+    font-weight: 700; 
+    color: var(--primary-gold); 
+    letter-spacing: -0.5px;
+    flex-grow: 1; /* Empurra os botões para a direita */
+}
+.nav-links a {
+    color: var(--text-light); 
+    text-decoration: none; 
+    margin-left: 25px; 
+    font-size: 15px; 
+    font-weight: 500; 
+    transition: color 0.3s;
+}
+.nav-links a:hover { 
+    color: var(--primary-gold); 
+}
+.btn-login {
+    background-color: var(--primary-gold); 
+    color: #000 !important; 
+    padding: 10px 24px;
+    border-radius: 6px; 
+    text-decoration: none; 
+    font-weight: 700; 
+    margin-left: 25px;
+    transition: background 0.3s;
+}
+.btn-login:hover { 
+    background-color: var(--primary-gold-hover); 
+}
+
+/* --- SESSÃO 1: BOAS VINDAS --- */
+.hero {
+    text-align: center; 
+    padding: 100px 20px;
+    background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-dark) 100%);
+}
+.hero h1 { 
+    font-size: 52px; 
+    margin-bottom: 20px; 
+    color: #fff; 
+    font-weight: 700; 
+    max-width: 800px; 
+    margin-left: auto; 
+    margin-right: auto; 
+    line-height: 1.2;
+}
+.hero h1 span { 
+    color: var(--primary-gold); 
+}
+.hero p { 
+    font-size: 18px; 
+    color: var(--text-muted); 
+    max-width: 650px; 
+    margin: 0 auto 40px auto; 
+    line-height: 1.6; 
+}
+.btn-grande {
+    background-color: var(--primary-gold); 
+    color: #000; 
+    padding: 16px 40px;
+    border-radius: 8px; 
+    text-decoration: none; 
+    font-size: 18px; 
+    font-weight: 700; 
+    display: inline-block; 
+    transition: transform 0.2s, background 0.3s;
+}
+.btn-grande:hover { 
+    transform: translateY(-2px); 
+    background-color: var(--primary-gold-hover); 
+}
+
+/* --- CONTAINERS GERAIS --- */
+.secao { 
+    padding: 80px 10%; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+}
+.texto-central { 
+    text-align: center; 
+    margin-bottom: 50px; 
+}
+.secao h2 { 
+    font-size: 36px; 
+    color: #fff; 
+    margin-bottom: 20px; 
+}
+.secao h2 span { 
+    color: var(--primary-gold); 
+}
+.secao p.subtitulo { 
+    font-size: 18px; 
+    color: var(--text-muted); 
+    line-height: 1.6; 
+    max-width: 800px; 
+    margin: 0 auto; 
+}
+
+/* --- SESSÃO 2: PÚBLICO ALVO --- */
+.publico-alvo { 
+    background-color: var(--bg-panel); 
+    border-top: 1px solid var(--border); 
+    border-bottom: 1px solid var(--border); 
+}
+.pad-especial {
+    padding-top: 60px;
+    padding-bottom: 60px;
+}
+.margin-bot {
+    margin-bottom: 30px;
+}
+.titulo-menor {
+    font-size: 28px;
+}
+.grid-publico { 
+    display: flex; 
+    justify-content: center; 
+    gap: 30px; 
+    flex-wrap: wrap; 
+    margin-top: 40px; 
+}
+.card-publico {
+    background-color: rgba(212, 175, 55, 0.05); 
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 30px; 
+    border-radius: 12px; 
+    width: 250px; 
+    text-align: center;
+    transition: border-color 0.3s;
+}
+.card-publico:hover { 
+    border-color: var(--primary-gold); 
+}
+.card-publico h3 { 
+    color: #fff; 
+    margin: 15px 0 0 0; 
+    font-size: 18px; 
+}
+.icone-publico { 
+    font-size: 40px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+}
+/* Regra para as novas imagens não quebrarem o tamanho do card */
+.icone-publico img {
+    max-width: 48px;
+    max-height: 48px;
+    object-fit: contain;
+}
+
+/* --- SESSÃO 3: FUNCIONALIDADES --- */
+.grid-funcionalidades { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 30px; 
+    margin-top: 50px; 
+}
+.card-funcionalidade {
+    background-color: var(--bg-panel); 
+    padding: 40px; 
+    border-radius: 12px;
+    border: 1px solid var(--border); 
+    position: relative; 
+    overflow: hidden;
+}
+.card-funcionalidade::before {
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 4px; 
+    height: 100%;
+    background-color: var(--primary-gold);
+}
+.card-funcionalidade h3 { 
+    color: #fff; 
+    font-size: 22px; 
+    margin-top: 0; 
+    margin-bottom: 15px; 
+}
+.card-funcionalidade p { 
+    color: var(--text-muted); 
+    line-height: 1.6; 
+    font-size: 15px; 
+    margin-bottom: 0; 
+}
+.tag { 
+    display: inline-block; 
+    background: rgba(212, 175, 55, 0.15); 
+    color: var(--primary-gold); 
+    padding: 5px 12px; 
+    border-radius: 20px; 
+    font-size: 12px; 
+    font-weight: 600; 
+    margin-bottom: 15px;
+}
+
+/* --- SESSÃO 4: EQUIPE --- */
+.espaco-topo {
+    padding-top: 20px;
+}
+.equipe-container { 
+    background-color: var(--bg-panel); 
+    text-align: center; 
+    padding: 60px 10%; 
+    border-radius: 16px; 
+    border: 1px solid var(--border); 
+    margin: 80px auto; 
+    max-width: 900px;
+}
+.titulo-equipe {
+    margin-bottom: 10px;
+}
+.subtitulo-equipe {
+    color: var(--text-muted);
+    margin-bottom: 40px;
+}
+.equipe-grid { 
+    display: flex; 
+    justify-content: center; 
+    gap: 40px; 
+    flex-wrap: wrap; 
+    margin-top: 30px; 
+}
+.membro { 
+    text-align: center; 
+}
+.avatar-placeholder { 
+    width: 80px; 
+    height: 80px; 
+    background-color: #2a2a33; 
+    border: 2px solid var(--primary-gold);
+    border-radius: 50%; 
+    margin: 0 auto 15px auto; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 24px; 
+    color: var(--text-muted); 
+    font-weight: bold;
+}
+.membro h4 { 
+    color: #fff; 
+    margin: 0; 
+    font-size: 16px; 
+}
+
+/* --- RODAPÉ --- */
+footer {
+    text-align: center; 
+    padding: 40px; 
+    background-color: #0d0d0f;
+    border-top: 1px solid var(--border); 
+    color: #666; 
+    font-size: 14px;
+}
