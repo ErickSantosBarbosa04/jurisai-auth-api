@@ -16,17 +16,20 @@ let usuariosFiltradosGlobais = [];
 let paginaAtual = 1;
 const itensPorPagina = 10;
 
-// Aplica o tema imediatamente ao abrir a página
+// Aplica o tema imediatamente ao abrir a página (Força Máxima)
 document.addEventListener("DOMContentLoaded", () => {
     // Busca a escolha salva. Se não achar nada, assume que é 'light' (claro)
     const temaSalvo = localStorage.getItem('theme') || 'light';
     
     if (temaSalvo === 'dark') {
         document.body.classList.add('dark-theme');
+        document.documentElement.setAttribute('data-theme', 'dark'); // Trava para o CSS base
     } else {
         document.body.classList.remove('dark-theme');
+        document.documentElement.setAttribute('data-theme', 'light');
     }
 });
+
 // =========================================================================
 // 2. INICIALIZAÇÃO E EVENTOS (Os "Ouvidos" da página)
 // =========================================================================
