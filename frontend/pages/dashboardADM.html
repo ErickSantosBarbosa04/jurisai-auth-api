@@ -42,9 +42,9 @@
 
         <section class="metrics-grid">
             <div class="metric-card">
-                <h3>Usuários Ativos</h3>
-                <p class="metric-number">124</p>
-                <p class="metric-subtitle success">+12 esta semana</p>
+                <h3>Total de Usuários</h3>
+                <p class="metric-number" id="totalUsersCount">...</p>
+                <p class="metric-subtitle success">Base de dados atualizada</p>
             </div>
             <div class="metric-card">
                 <h3>Requisições IA (Hoje)</h3>
@@ -60,23 +60,22 @@
             </div>
         </section>
 
-        <section class="panel panel-spacing" style="text-align: center; padding: 40px 20px;">
-            <h2>Central de Gerenciamento</h2>
-            <p class="panel-description" style="margin-bottom: 24px;">Acesse a tabela completa para gerenciar permissões, suspensões, ver detalhes de LGPD e consultar logs individuais dos usuários.</p>
-            <button class="btn-primary" onclick="window.location.href='tabelaUser.html'" style="max-width: 300px; margin: 0 auto;">
-                Acessar Tabela de Usuários
-            </button>
-        </section>
-
-        <section class="panel panel-spacing">
-            <h2>Logs Globais de Segurança</h2>
-            <div class="log-box" id="systemLogs">
-                <div class="log-entry"><span class="log-time">[15:42:01]</span> INFO: Novo usuário registrado (maria.adv@email.com)</div>
-                <div class="log-entry"><span class="log-time">[15:38:12]</span> WARNING: Falha de login para IP 192.168.1.5</div>
-                <div class="log-entry"><span class="log-time">[15:30:00]</span> INFO: Backup do banco de dados concluído com sucesso.</div>
-                <div class="log-entry"><span class="log-time">[15:15:22]</span> INFO: Admin gabriel.fernandez.a8 acessou o painel.</div>
+        <section class="panel panel-spacing" style="display: flex; align-items: center; justify-content: space-between; padding: 40px; background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(212, 175, 55, 0.05) 100%); border-left: 4px solid var(--primary-gold); flex-wrap: wrap; gap: 20px;">
+            <div style="flex: 1; min-width: 300px;">
+                <h2 style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px; font-size: 24px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Gestão de Acessos
+                </h2>
+                <p class="panel-description" style="margin: 0; max-width: 600px; line-height: 1.6;">Acesse o painel completo para gerenciar permissões, aplicar suspensões temporárias, validar a conformidade com a LGPD e consultar o histórico de auditoria individual.</p>
+            </div>
+            <div>
+                <button class="btn-primary" onclick="window.location.href='tabelaUser.html'" style="padding: 14px 28px; display: flex; align-items: center; gap: 10px; font-size: 15px;">
+                    Abrir Tabela de Usuários
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
             </div>
         </section>
+
     </main>
 
     <script src="../js/authGuard.js"></script>

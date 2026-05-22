@@ -16,7 +16,17 @@ let usuariosFiltradosGlobais = [];
 let paginaAtual = 1;
 const itensPorPagina = 10;
 
-
+// Aplica o tema imediatamente ao abrir a página
+document.addEventListener("DOMContentLoaded", () => {
+    // Busca a escolha salva. Se não achar nada, assume que é 'light' (claro)
+    const temaSalvo = localStorage.getItem('theme') || 'light';
+    
+    if (temaSalvo === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
+    }
+});
 // =========================================================================
 // 2. INICIALIZAÇÃO E EVENTOS (Os "Ouvidos" da página)
 // =========================================================================

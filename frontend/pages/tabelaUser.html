@@ -6,8 +6,10 @@
     <title>Gerenciar Usuários | JurisAI Admin</title>
     <link rel="stylesheet" href="../css/dashboardStyle.css">
     <link rel="stylesheet" href="../css/dashboardADM.css?v=1.1">
+    
+    <link rel="stylesheet" href="../css/adminBotoes.css">
+    
     <link rel="icon" href="../assets/—Pngtree—elegant golden business logo capital_20563813.png" type="image/png">
-
 </head>
 <body>
     
@@ -57,12 +59,22 @@
                         </tbody>
                 </table>
             </div>
+            
             <div id="paginationContainer" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-top: 1px solid var(--border); background: var(--bg-panel); border-radius: 0 0 8px 8px;">
                 <span id="paginationInfo" style="font-size: 13px; color: var(--text-muted);">Mostrando 0 de 0 usuários</span>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="btnPrevPage" class="btn-secondary" style="padding: 6px 12px; font-size: 13px; cursor: pointer;" disabled>&larr; Anterior</button>
-                    <span id="currentPageDisplay" style="font-size: 13px; font-weight: bold; padding: 6px 12px; background: var(--primary-gold); color: white; border-radius: 4px;">1</span>
-                    <button id="btnNextPage" class="btn-secondary" style="padding: 6px 12px; font-size: 13px; cursor: pointer;" disabled>Próxima &rarr;</button>
+                
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button id="btnPrevPage" class="btn-pagination" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Anterior
+                    </button>
+                    
+                    <span id="currentPageDisplay" style="font-size: 14px; font-weight: 700; padding: 6px 14px; background: var(--primary-gold); color: #000; border-radius: 6px; box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);">1</span>
+                    
+                    <button id="btnNextPage" class="btn-pagination" disabled>
+                        Próxima
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
                 </div>
             </div>
 

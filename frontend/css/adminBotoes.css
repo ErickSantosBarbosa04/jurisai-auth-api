@@ -1,0 +1,96 @@
+/* =========================================================
+   1. CORES DO TEMA ESCURO (Só ativa quando solicitado)
+========================================================= */
+body.dark-theme {
+    --bg-dark: #121214;
+    --bg-panel: #1e1e24;
+    --text-light: #e1e1e6;
+    --text-muted: #a3a3a3;
+    --border: #333333;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+}
+
+body.dark-theme .panel, 
+body.dark-theme .page-header,
+body.dark-theme table {
+    background-color: var(--bg-panel);
+    border-color: var(--border);
+}
+
+/* =========================================================
+   2. ESTILO PREMIUM PARA OS BOTÕES DE PAGINAÇÃO
+========================================================= */
+.btn-pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    background-color: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efeito quando passa o mouse */
+.btn-pagination:hover:not(:disabled) {
+    background-color: var(--primary-gold);
+    color: #000;
+    border-color: var(--primary-gold);
+    transform: translateY(-1px);
+}
+
+/* Estilo para quando o botão estiver desativado (Ex: Página 1) */
+.btn-pagination:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
+/* =========================================================
+   3. ESTILO PREMIUM PARA A TABELA DE USUÁRIOS
+========================================================= */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+/* Cabeçalho da Tabela */
+.admin-table th {
+    padding: 16px 20px;
+    font-size: 12px;
+    text-transform: uppercase; /* Letras maiúsculas para ficar chique */
+    letter-spacing: 1px;       /* Espacinho entre as letras */
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--primary-gold); /* Linha dourada de destaque */
+    background-color: rgba(0, 0, 0, 0.2); /* Fundo um pouco mais escuro no topo */
+}
+
+/* Células comuns */
+.admin-table td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text-light);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+/* Efeito Mágico: Acende a linha quando passa o mouse */
+.admin-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(212, 175, 55, 0.05); /* Um fundo dourado bem transparente */
+}
+
+/* Arredondar os cantos do painel da tabela para não ficar "quadradão" */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 8px 8px 0 0;
+}

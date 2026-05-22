@@ -6,6 +6,36 @@ const API_BASE_URL = window.location.origin;
 const token = localStorage.getItem("access_token");
 const timerDisplay = document.getElementById("timerDisplay");
 
+
+// --- CARREGAR CONTAGEM REAL DE USUÁRIOS ---
+async function carregarContagemUsuarios() {
+    const contador = document.getElementById('totalUsersCount');
+    if (!contador) return;
+
+    try {
+        const token = localStorage.getItem('access_token');
+        const API_BASE_URL = window.location.origin;
+
+        const response = await fetch(`${API_BASE_URL}/admin/users`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const usuarios = await response.json();
+            // Pega o tamanho da lista (total de usuários) e coloca na tela
+            contador.innerText = usuarios.length;
+        } else {
+            contador.innerText = "Erro";
+            contador.style.color = "var(--error)";
+        }
+    } catch (error) {
+        console.error("Erro ao buscar total de usuários:", error);
+        contador.innerText = "---";
+    }
+}
+
+// Executa a contagem assim que a página terminar de carregar
+document.addEventListener("DOMContentLoaded", carregarContagemUsuarios);
 // 1. Aplica o tema imediatamente
 if (localStorage.getItem("theme_mode") === "dark") {
     document.body.classList.add("dark-mode");
