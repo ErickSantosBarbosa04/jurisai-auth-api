@@ -64,29 +64,43 @@
         </section>
     </main>
 
-    <div id="logsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div id="logsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
         <div style="background: #1e1e24; border: 1px solid #3a3a42; padding: 24px; border-radius: 12px; width: 90%; max-width: 550px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); font-family: 'Inter', sans-serif;">
             
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3a3a42; padding-bottom: 14px; margin-bottom: 20px;">
-                <h2 id="logsModalTitle" style="font-size: 18px; margin: 0; color: #d4af37; font-weight: 700; letter-spacing: 0.5px;">📋 Histórico do Usuário</h2>
-                <button onclick="fecharModalLogs()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #a3a3a3; transition: color 0.2s;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#a3a3a3'">&times;</button>
+                <h2 id="logsModalTitle" style="font-size: 18px; margin: 0; color: #d4af37; font-weight: 700;">📋 Histórico do Usuário</h2>
+                <button onclick="fecharModalLogs()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #a3a3a3;">&times;</button>
             </div>
             
-            <div style="max-height: 320px; overflow-y: auto; padding-right: 5px;">
+            <div style="max-height: 320px; overflow-y: auto;">
+                <style>
+                    #logsList li { 
+                        color: #ffffff !important; /* FORÇA LETRAS BRANCAS */
+                        padding: 10px 0; 
+                        border-bottom: 1px solid #333;
+                        font-size: 13px;
+                    }
+                    #logsList li span.log-time {
+                        color: #d4af37 !important; /* Timestamps Dourados */
+                        font-weight: 600;
+                        margin-right: 8px;
+                    }
+                </style>
                 <ul id="logsList" style="list-style: none; padding: 0; margin: 0;">
                     </ul>
             </div>
         </div>
     </div>
-    <div id="lgpdModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: var(--bg-panel); padding: 24px; border-radius: 8px; width: 90%; max-width: 600px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px;">
-                <h2 style="font-size: 18px; margin: 0; color: var(--primary-gold);">📄 Ficha de Conformidade LGPD</h2>
-                <button onclick="fecharModalLGPD()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);">&times;</button>
+    <div id="lgpdModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
+        <div style="background: #1e1e24; border: 1px solid #3a3a42; padding: 24px; border-radius: 8px; width: 90%; max-width: 650px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3a3a42; padding-bottom: 12px; margin-bottom: 15px;">
+                <h2 style="font-size: 18px; margin: 0; color: #d4af37;">📄 Ficha de Conformidade LGPD</h2>
+                <button onclick="fecharModalLGPD()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #a3a3a3;">&times;</button>
             </div>
             
-            <div style="max-height: 400px; overflow-y: auto; font-size: 13px; color: var(--text-secondary);">
-                <pre id="lgpdContent" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; color: #a3a3a3;"></pre>
+            <div style="max-height: 420px; overflow-y: auto;">
+                <pre id="lgpdContent" style="background: #000000; color: #ffffff; padding: 20px; border-radius: 6px; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 12px; border: 1px solid #333; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);"></pre>
             </div>
         </div>
     </div>
