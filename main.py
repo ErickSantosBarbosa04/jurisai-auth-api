@@ -99,7 +99,7 @@ if FRONTEND_DIR.exists():
 async def root():
     login_page = FRONTEND_DIR / "pages" / "login.html"
     if login_page.exists():
-        return RedirectResponse(url="/frontend/pages/login.html", status_code=302)
+        return RedirectResponse(url="/frontend/pages/index.html", status_code=302)
     return {"message": f"API {settings.PROJECT_NAME} online", "status": "ok"}
 
 @app.get("/api/health", include_in_schema=False)
