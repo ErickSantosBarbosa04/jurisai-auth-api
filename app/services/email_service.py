@@ -1,3 +1,4 @@
+from http import server
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -47,8 +48,7 @@ class EmailService:
 
         try:
             # Adicionado o parâmetro timeout=15 para não travar o servidor se o Google não responder rápido
-            server = smtplib.SMTP('smtp.gmail.com', 587, timeout=15)
-            server.starttls() 
+            server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15)
             server.login(sender_email, sender_password)
             server.send_message(msg)
             server.quit()
