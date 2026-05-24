@@ -94,10 +94,12 @@ class UserResponse(BaseModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     lockout_until: Optional[datetime] = None
+    
+    # --- AQUI ESTÁ A CHAVE PARA A TRAVA MASTER FUNCIONAR ---
+    is_admin: Optional[bool] = False 
+    
     model_config = ConfigDict(from_attributes=True)
 
-class Config:
-    from_attributes = True
 # --- SEGURANÇA E MFA ---
 
 class TOTPSetupResponse(BaseModel):

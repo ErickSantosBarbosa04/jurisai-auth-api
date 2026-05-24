@@ -144,13 +144,12 @@ function renderizarTabela() {
         }
 
         // --- VERIFICAÇÃO DE ADMINISTRAÇÃO BLINDADA ---
-        // Checa todas as possibilidades que o banco pode estar enviando
         let ehAdmin = (
             user.is_admin == 1 || 
             user.is_admin === "1" || 
             user.is_admin === true || 
             String(user.is_admin).toLowerCase() === "true" ||
-            user.admin == 1 // Caso a coluna se chame apenas 'admin'
+            user.admin == 1 
         );
         
         let perfilExibicao = user.profile_type || 'N/A';
@@ -160,7 +159,7 @@ function renderizarTabela() {
             perfilExibicao = '<span style="color: var(--primary-gold); font-weight: bold;">Admin</span>';
         }
 
-        // Passamos o ehAdmin entre aspas simples ('${ehAdmin}') para evitar erro do HTML
+        // Passamos o ehAdmin entre aspas simples ('${ehAdmin}')
         tr.innerHTML = `
             <td>
                 <div style="font-weight: 600;">${user.full_name || 'Sem nome'}</div>
