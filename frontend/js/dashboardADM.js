@@ -16,7 +16,8 @@ async function carregarContagemUsuarios() {
         const token = localStorage.getItem('access_token');
         const API_BASE_URL = window.location.origin;
 
-        const response = await fetch(`${API_BASE_URL}/admin/users`, {
+        // CORREÇÃO AQUI: Mudamos de /admin/users para /admin/users-full
+        const response = await fetch(`${API_BASE_URL}/admin/users-full`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
@@ -36,6 +37,7 @@ async function carregarContagemUsuarios() {
 
 // Executa a contagem assim que a página terminar de carregar
 document.addEventListener("DOMContentLoaded", carregarContagemUsuarios);
+
 // 1. Aplica o tema imediatamente
 if (localStorage.getItem("theme_mode") === "dark") {
     document.body.classList.add("dark-mode");
