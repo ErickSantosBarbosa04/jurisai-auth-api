@@ -160,7 +160,15 @@ function renderizarTabela() {
             }
         }
 
-        // Escreve o HTML da linha
+        // VERIFICAÇÃO DE ADMINISTRAÇÃO (Substitui "outro" por "Admin")
+        let perfilExibicao = user.profile_type || 'N/A';
+        let ehAdmin = user.is_admin === true || user.is_admin === 1;
+        
+        if (ehAdmin) {
+            perfilExibicao = '<span style="color: var(--primary-gold); font-weight: bold;">Admin</span>';
+        }
+
+        // Escreve o HTML da linha (passando a informação se é admin para o botão de suspender)
         tr.innerHTML = `
             <td>
                 <div style="font-weight: 600;">${user.full_name || 'Sem nome'}</div>
@@ -171,13 +179,13 @@ function renderizarTabela() {
                     ${statusText}
                 </span>
             </td>
-            <td>${user.profile_type || 'N/A'}</td>
+            <td>${perfilExibicao}</td>
             <td>${user.legal_specialty || 'N/A'}</td>
             <td>
                 <div style="display: flex; gap: 8px;">
                     <button class="btn-action" title="Editar E-mail (Anti-Hacker)" onclick="editarUsuario('${user.id}', '${user.email}')">✏️</button>
                     <button class="btn-action" title="Resetar Senha" onclick="forçarResetSenha('${user.email}')">🔑</button>
-                    <button class="btn-action" title="Suspender/Ativar" onclick="alternarStatus('${user.id}')">🚫</button>
+                    <button class="btn-action" title="Suspender/Ativar" onclick="alternarStatus('${user.id}', ${ehAdmin})">🚫</button>
                     <button class="btn-action" title="Ver Dados LGPD" onclick="verDetalhesLGPD('${user.id}')">📄</button>
                     <button class="btn-action" title="Ver Logs do Usuário" onclick="verLogsUsuario('${user.id}', '${user.full_name}')">📋</button>
                 </div>
@@ -272,8 +280,14 @@ window.forçarResetSenha = async (email) => {
     }
 };
 
-// Proibido (🚫): Suspender ou reativar a conta
-window.alternarStatus = async (id) => {
+// Proibido (🚫): Suspender ou reativar a conta (AGORA COM TRAVA MASTER)
+window.alternarStatus = async (id, isAdmin) => {
+    // A trava de segurança atua aqui antes de qualquer coisa
+    if (isAdmin) {
+        alert("Apenas o master tem permissão para realizar isso.");
+        return; 
+    }
+
     if(confirm("Tem certeza que deseja Suspender/Ativar esta conta?")) {
         try {
             const response = await fetch(`${API_BASE_URL}/admin/toggle-status/${id}`, {
