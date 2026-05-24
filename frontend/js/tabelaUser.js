@@ -18,12 +18,11 @@ const itensPorPagina = 10;
 
 // Aplica o tema imediatamente ao abrir a página (Força Máxima)
 document.addEventListener("DOMContentLoaded", () => {
-    // Busca a escolha salva. Se não achar nada, assume que é 'light' (claro)
     const temaSalvo = localStorage.getItem('theme') || 'light';
     
     if (temaSalvo === 'dark') {
         document.body.classList.add('dark-theme');
-        document.documentElement.setAttribute('data-theme', 'dark'); // Trava para o CSS base
+        document.documentElement.setAttribute('data-theme', 'dark');
     } else {
         document.body.classList.remove('dark-theme');
         document.documentElement.setAttribute('data-theme', 'light');
@@ -34,17 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
 // 2. INICIALIZAÇÃO E EVENTOS (Os "Ouvidos" da página)
 // =========================================================================
 
-// Fica escutando a digitação na barra de busca e a mudança de ordem
 document.getElementById("userSearch")?.addEventListener("input", aplicarFiltrosEOrdenacao);
 document.getElementById("userSort")?.addEventListener("change", aplicarFiltrosEOrdenacao);
-
-// Fica escutando os cliques nos botões de passar página
 document.getElementById("btnPrevPage")?.addEventListener("click", () => mudarPagina('prev'));
 document.getElementById("btnNextPage")?.addEventListener("click", () => mudarPagina('next'));
 
-// Assim que o arquivo é lido, ele já busca os usuários para preencher a tabela
 carregarTodosUsuarios();
-
 
 // =========================================================================
 // 3. COMUNICAÇÃO COM O SERVIDOR (Busca de Dados)
@@ -59,7 +53,6 @@ async function carregarTodosUsuarios() {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
-        // Trava de segurança: Se o crachá venceu, joga para o login na hora
         if (response.status === 401) {
             console.warn("Sessão antiga. Redirecionando para login...");
             localStorage.removeItem("access_token");
@@ -69,7 +62,6 @@ async function carregarTodosUsuarios() {
 
         if (!response.ok) throw new Error("Erro ao buscar a lista no banco de dados.");
 
-        // Salva os dados recebidos na nossa variável global e já organiza a tela
         listaDeUsuarios = await response.json();
         aplicarFiltrosEOrdenacao(); 
 
@@ -79,7 +71,6 @@ async function carregarTodosUsuarios() {
     }
 }
 
-
 // =========================================================================
 // 4. ORGANIZAÇÃO DOS DADOS (Pesquisa e Matemática das Páginas)
 // =========================================================================
@@ -88,21 +79,18 @@ function aplicarFiltrosEOrdenacao() {
     const termoBusca = document.getElementById("userSearch")?.value.toLowerCase() || "";
     const ordem = document.getElementById("userSort")?.value || "recente";
 
-    // 4.1 Separa apenas quem bate com o texto da busca
     usuariosFiltradosGlobais = listaDeUsuarios.filter(user => {
         const nome = (user.full_name || "").toLowerCase();
         const email = (user.email || "").toLowerCase();
         return nome.includes(termoBusca) || email.includes(termoBusca);
     });
 
-    // 4.2 Coloca em ordem alfabética, se solicitado
     if (ordem === "az") {
         usuariosFiltradosGlobais.sort((a, b) => (a.full_name || "").localeCompare(b.full_name || ""));
     } else if (ordem === "za") {
         usuariosFiltradosGlobais.sort((a, b) => (b.full_name || "").localeCompare(a.full_name || ""));
     }
 
-    // Toda vez que pesquisa algo novo, volta para a página 1 para não dar erro
     paginaAtual = 1;
     renderizarTabela();
 }
@@ -119,32 +107,27 @@ window.mudarPagina = (direcao) => {
     renderizarTabela();
 };
 
-
 // =========================================================================
 // 5. DESENHANDO NA TELA (A Criação Visual da Tabela)
 // =========================================================================
 
 function renderizarTabela() {
     const tableBody = document.getElementById("fullUsersTable");
-    tableBody.innerHTML = ""; // Limpa a tabela antes de desenhar
+    tableBody.innerHTML = ""; 
 
-    // Se não achou ninguém, mostra o aviso
     if (usuariosFiltradosGlobais.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">Nenhum usuário encontrado.</td></tr>`;
         atualizarControlesPaginacao();
         return;
     }
 
-    // Corta a lista gigante para mostrar apenas os 10 da página atual
     const inicio = (paginaAtual - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
     const usuariosDaPagina = usuariosFiltradosGlobais.slice(inicio, fim);
 
-    // Para cada usuário dessa "fatia", cria uma linha na tabela
     usuariosDaPagina.forEach(user => {
         const tr = document.createElement("tr");
         
-        // Define o visual se a pessoa estiver ativa ou suspensa
         let statusClass = "success";
         let statusText = "Ativo";
         let corBg = "#d4edda"; 
@@ -160,15 +143,24 @@ function renderizarTabela() {
             }
         }
 
-        // VERIFICAÇÃO DE ADMINISTRAÇÃO (Substitui "outro" por "Admin")
-        let perfilExibicao = user.profile_type || 'N/A';
-        let ehAdmin = user.is_admin === true || user.is_admin === 1;
+        // --- VERIFICAÇÃO DE ADMINISTRAÇÃO BLINDADA ---
+        // Checa todas as possibilidades que o banco pode estar enviando
+        let ehAdmin = (
+            user.is_admin == 1 || 
+            user.is_admin === "1" || 
+            user.is_admin === true || 
+            String(user.is_admin).toLowerCase() === "true" ||
+            user.admin == 1 // Caso a coluna se chame apenas 'admin'
+        );
         
+        let perfilExibicao = user.profile_type || 'N/A';
+        
+        // Se for admin, o texto na tabela muda para dourado
         if (ehAdmin) {
             perfilExibicao = '<span style="color: var(--primary-gold); font-weight: bold;">Admin</span>';
         }
 
-        // Escreve o HTML da linha (passando a informação se é admin para o botão de suspender)
+        // Passamos o ehAdmin entre aspas simples ('${ehAdmin}') para evitar erro do HTML
         tr.innerHTML = `
             <td>
                 <div style="font-weight: 600;">${user.full_name || 'Sem nome'}</div>
@@ -185,7 +177,7 @@ function renderizarTabela() {
                 <div style="display: flex; gap: 8px;">
                     <button class="btn-action" title="Editar E-mail (Anti-Hacker)" onclick="editarUsuario('${user.id}', '${user.email}')">✏️</button>
                     <button class="btn-action" title="Resetar Senha" onclick="forçarResetSenha('${user.email}')">🔑</button>
-                    <button class="btn-action" title="Suspender/Ativar" onclick="alternarStatus('${user.id}', ${ehAdmin})">🚫</button>
+                    <button class="btn-action" title="Suspender/Ativar" onclick="alternarStatus('${user.id}', '${ehAdmin}')">🚫</button>
                     <button class="btn-action" title="Ver Dados LGPD" onclick="verDetalhesLGPD('${user.id}')">📄</button>
                     <button class="btn-action" title="Ver Logs do Usuário" onclick="verLogsUsuario('${user.id}', '${user.full_name}')">📋</button>
                 </div>
@@ -194,7 +186,6 @@ function renderizarTabela() {
         tableBody.appendChild(tr);
     });
 
-    // Depois de desenhar a tabela, atualiza os numerozinhos lá embaixo (ex: "Página 1 de 5")
     atualizarControlesPaginacao();
 }
 
@@ -209,26 +200,21 @@ function atualizarControlesPaginacao() {
 
     if (!btnPrev || !btnNext || !pageDisplay || !pageInfo) return;
 
-    // Atualiza o texto visual
     pageDisplay.textContent = paginaAtual;
     const inicioRender = totalItens === 0 ? 0 : ((paginaAtual - 1) * itensPorPagina) + 1;
     const fimRender = Math.min(paginaAtual * itensPorPagina, totalItens);
     pageInfo.textContent = `Mostrando ${inicioRender} a ${fimRender} de ${totalItens} usuários`;
 
-    // Desliga os botões se estiver na primeira ou na última página
     btnPrev.disabled = paginaAtual === 1;
     btnNext.disabled = paginaAtual === totalPaginas || totalPaginas === 0;
 }
-
 
 // =========================================================================
 // 6. AÇÕES RÁPIDAS DOS BOTÕES DA TABELA
 // =========================================================================
 
-// Lápis (✏️): Trocar o e-mail caso a pessoa perca o acesso
 window.editarUsuario = async (id, emailAtual) => {
     const novoEmail = prompt(`ALTERAÇÃO DE EMERGÊNCIA:\nDigite o novo e-mail para substituir o atual (${emailAtual}):`, emailAtual);
-    
     if (!novoEmail || novoEmail === emailAtual) return;
 
     if(confirm(`Tem certeza que deseja mudar o acesso de ${emailAtual} para ${novoEmail}?`)) {
@@ -245,7 +231,7 @@ window.editarUsuario = async (id, emailAtual) => {
             const data = await response.json();
             if(response.ok) {
                 alert(data.message);
-                carregarTodosUsuarios(); // Recarrega para ver a mudança
+                carregarTodosUsuarios(); 
             } else {
                 alert("Erro: " + data.detail);
             }
@@ -255,7 +241,6 @@ window.editarUsuario = async (id, emailAtual) => {
     }
 };
 
-// Chave (🔑): Dispara o e-mail de recuperação de senha
 window.forçarResetSenha = async (email) => {
     if(confirm(`Tem certeza que deseja enviar o e-mail de redefinição de senha para:\n${email}?`)) {
         try {
@@ -280,10 +265,10 @@ window.forçarResetSenha = async (email) => {
     }
 };
 
-// Proibido (🚫): Suspender ou reativar a conta (AGORA COM TRAVA MASTER)
+// --- TRAVA MASTER DEFINITIVA ---
 window.alternarStatus = async (id, isAdmin) => {
-    // A trava de segurança atua aqui antes de qualquer coisa
-    if (isAdmin) {
+    // Agora verificamos se o HTML mandou a palavra 'true' em vez do valor boolean
+    if (isAdmin === 'true' || isAdmin === true) {
         alert("Apenas o master tem permissão para realizar isso.");
         return; 
     }
@@ -301,12 +286,10 @@ window.alternarStatus = async (id, isAdmin) => {
     }
 };
 
-// Arquivo (📄): Ver a ficha de dados da LGPD na Janela Flutuante
 window.verDetalhesLGPD = async (id) => {
     const modal = document.getElementById("lgpdModal");
     const content = document.getElementById("lgpdContent");
     
-    // Mostra a janela com status de carregamento
     content.innerText = "Buscando dados no servidor...";
     modal.style.display = "flex";
 
@@ -317,7 +300,6 @@ window.verDetalhesLGPD = async (id) => {
         
         if (response.ok) {
             const dados = await response.json();
-            // Injeta o JSON formatado bonitinho na tela
             content.innerText = JSON.stringify(dados, null, 4);
         } else {
             content.innerText = "Erro ao puxar ficha da LGPD do banco de dados.";
@@ -329,12 +311,10 @@ window.verDetalhesLGPD = async (id) => {
     }
 };
 
-// Fecha a janela da LGPD
 window.fecharModalLGPD = () => {
     document.getElementById("lgpdModal").style.display = "none";
 };
 
-// Prancheta (📋): Ver histórico do usuário na janela flutuante
 window.verLogsUsuario = async (id, nome) => {
     const modal = document.getElementById("logsModal");
     const logsList = document.getElementById("logsList");
@@ -374,7 +354,6 @@ window.verLogsUsuario = async (id, nome) => {
     }
 };
 
-// Fecha a janela do histórico
 window.fecharModalLogs = () => {
     document.getElementById("logsModal").style.display = "none";
 };
