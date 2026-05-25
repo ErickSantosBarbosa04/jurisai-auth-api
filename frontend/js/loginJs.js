@@ -203,6 +203,15 @@ async function realizarLogin() {
                     mostrarAviso("Esta conta foi suspensa pelo Administrador do sistema.", "error");
                     btn.innerText = "CONTA SUSPENSA";
                     btn.disabled = true;
+
+                    // O SEGREDO ESTÁ AQUI: Destrava se a pessoa começar a digitar outro e-mail
+                    emailInput.addEventListener('input', function destravaAdmin() {
+                        btn.disabled = false;
+                        btn.innerText = "Entrar";
+                        mostrarAviso("", "error");
+                        emailInput.removeEventListener('input', destravaAdmin); // Remove o escutador após destravar
+                    });
+
                 } else {
                     // É um bloqueio comum de 15 min. Salva no PC e inicia o relógio.
                     const tempoExpiracao = Date.now() + (tempoSegundos * 1000);
