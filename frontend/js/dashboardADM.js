@@ -150,6 +150,7 @@ function resetSessionTimer() {
     }
 }
 
+
 ["click", "keydown", "mousemove"].forEach((eventName) => {
     window.addEventListener(eventName, resetSessionTimer, { passive: true });
 });

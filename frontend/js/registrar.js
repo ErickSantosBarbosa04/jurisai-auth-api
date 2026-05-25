@@ -5,6 +5,8 @@ const confirmInput = document.getElementById("confirmPassword");
 const strengthBar = document.getElementById("strengthBar");
 const strengthText = document.getElementById("strengthText");
 
+
+
 // Lógica de Potência da Senha (Nível 1 a 5)
 if (passwordInput) {
     passwordInput.addEventListener('input', () => {
@@ -39,6 +41,9 @@ const checkboxTermos = document.getElementById('lgpdConsent');
 function abrirTermos(event) {
     event.preventDefault();
     modal.classList.add('show');
+}
+function fecharTermos() {
+    modal.classList.remove('show');
 }
 
 function aceitarTermos() {
