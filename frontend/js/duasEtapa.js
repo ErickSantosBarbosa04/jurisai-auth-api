@@ -59,15 +59,19 @@ async function confirmarLogin2FA() {
             // 3. Salva o token de acesso final para entrar no sistema
             if (data.access_token) {
                 localStorage.setItem('access_token', data.access_token);
+                
+                // Limpamos o cronômetro antigo da memória. A Dashboard vai criar um novo do zero!
+                localStorage.removeItem('session_expiration');
+                
                 mostrarAviso("Sucesso! Entrando no JurisAI...", "success");
                 
-                // Redirecionamento Inteligente (A MÁGICA ESTÁ AQUI)
+                // Redirecionamento Inteligente com Blindagem Tripla
                 setTimeout(() => {
-                    if (data.is_admin === true || data.is_admin === 1) {
-                        // Se a etiqueta de chefe veio no JSON, manda pro painel Admin
+                    let ehAdmin = (data.is_admin === true || data.is_admin === 1 || String(data.is_admin).toLowerCase() === "true");
+                    
+                    if (ehAdmin) {
                         window.location.href = "dashboardADM.html";
                     } else {
-                        // Se não, manda pro painel comum
                         window.location.href = "dashboard.html";
                     }
                 }, 1000);
