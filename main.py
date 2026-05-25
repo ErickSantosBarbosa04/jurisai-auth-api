@@ -5,41 +5,34 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-from app.models.UserModel import User
 
-# REMOVIDO: ensure_user_profile_columns (agora o MySQL cuida disso)
+# 1. Puxando as funções de erro do SlowAPI e o nosso limitador do "terreno neutro"
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from app.core.limiter import limiter
+
+# 2. Configurações de Banco e Sistema
+from app.models.UserModel import User
 from app.core.db.database import Base, engine
 from app.core.config import settings 
-from app.routers import auth, mfa, user, password_reset, admin
 
-Base.metadata.create_all(bind=engine)
 # Configuração de Logs (Atende Requisito 5.1 e 5.2) 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# criando o rastreador de IP
-limiter = Limiter(key_func=get_remote_address)
-
-app = FastAPI()
-
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Inicialização do Banco de Dados
 Base.metadata.create_all(bind=engine)
-# A execução do ensure_user_profile_columns foi apagada daqui.
 
-# Configuração do Rate Limit (Atende Requisito 1.11) 
-limiter = Limiter(key_func=get_remote_address)
+# 3. Criação do App (Agora de forma única e limpa)
 app = FastAPI(
     title=settings.PROJECT_NAME,
     docs_url="/docs" if settings.ENVIRONMENT != "production" else None, # Esconde docs em produção
     redoc_url=None
 )
+
+# Acoplando o limitador de IP no FastAPI
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -88,13 +81,16 @@ async def add_security_headers(request: Request, call_next):
     return response
 
 # --- Registro das Rotas (Requisito 6.2) ---
+# Dica de ouro: Importar as rotas AQUI garante que o App já está 100% pronto antes delas lerem o código
+from app.routers import auth, mfa, user, password_reset, admin
 
-app.include_router(auth.router)           
+app.include_router(auth.router)          
 app.include_router(mfa.router)            
 app.include_router(user.router)           
 app.include_router(password_reset.router) 
 app.include_router(admin.router)
 
+# --- Configuração de Frontend / Rotas Raiz ---
 BASE_DIR = Path(__file__).resolve().parent
 FRONTEND_DIR = BASE_DIR / "frontend"
 

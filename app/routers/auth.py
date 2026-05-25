@@ -11,6 +11,7 @@ from app.services.auth_service import AuthService
 from app.models.UserModel import User
 from app.core.crypto import decrypt
 from app.core.security import verify_totp, get_password_hash
+from app.core.limiter import limiter
 
 # Limiter contra Força Bruta (Atende Requisito 1.11)
 from app.main import limiter 
