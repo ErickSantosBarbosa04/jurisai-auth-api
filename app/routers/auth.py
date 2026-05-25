@@ -27,7 +27,7 @@ def register(request: Request, data: schemas.RegisterRequest, db: Session = Depe
 #verifica se o email existe e se o usuário tem 2FA para iniciar o processo de recuperação de senha seguro
 @router.post("/check-email")
 @limiter.limit("3/minute") # evita tentativa e erro para acertar o email 
-def check_email(data: schemas.EmailRequest, db: Session = Depends(get_db)):
+def check_email(request: Request, data: schemas.EmailRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     
     if not user:
