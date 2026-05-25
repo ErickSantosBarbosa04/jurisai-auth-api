@@ -76,6 +76,7 @@ async function loadAdminProfile() {
         if (!response.ok) throw new Error("Sessão inválida");
 
         const user = await response.json();
+        console.log("Resposta /user/me:", user);
 
         // Checa se é admin (aceita roles OU is_admin)
         const isAdmin = (user.roles && user.roles.includes("admin")) || user.is_admin === true || user.is_admin === 1;
@@ -97,6 +98,7 @@ async function loadAdminProfile() {
         window.location.href = "login.html?motivo=erro_api";
     }
 }
+
 
 
 // --- LOGOUT ---
