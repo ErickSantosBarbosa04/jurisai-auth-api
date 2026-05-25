@@ -2,7 +2,8 @@
 // JURISAI - SCRIPT DO PAINEL DE ADMINISTRAÇÃO
 // ==========================================
 
-const API_BASE_URL = window.location.origin;
+// SE SUA API TIVER UM PREFIXO (ex: /api/v1), ALTERE A STRING ABAIXO:
+const API_BASE_URL = window.location.origin; 
 const token = localStorage.getItem("access_token");
 const timerDisplay = document.getElementById("timerDisplay");
 
@@ -25,7 +26,6 @@ async function carregarContagemUsuarios() {
             const usuarios = await response.json();
             contador.innerText = usuarios.length;
         } else if (response.status === 403) {
-            // Não é admin → força logout
             localStorage.removeItem("access_token");
             window.location.href = "login.html?motivo=sem_permissao";
         } else {
@@ -38,7 +38,55 @@ async function carregarContagemUsuarios() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", carregarContagemUsuarios);
+// --- PERFIL ADMIN (VALIDAÇÃO DE ACESSO) ---
+async function loadAdminProfile() {
+    try {
+        console.log("Validando token no endpoint:", `${API_BASE_URL}/user/me`);
+        const response = await fetch(`${API_BASE_URL}/user/me`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (response.status === 401) {
+            localStorage.removeItem("access_token");
+            window.location.href = "login.html?motivo=inatividade";
+            return;
+        }
+
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+
+        const user = await response.json();
+        console.log("Resposta /user/me:", user);
+
+        // Checa permissões de admin
+        const isAdmin = (user.roles && user.roles.includes("admin")) || user.is_admin === true || user.is_admin === 1;
+
+        if (!isAdmin) {
+            localStorage.removeItem("access_token");
+            window.location.href = "login.html?motivo=sem_permissao";
+            return;
+        }
+
+        // Atualiza interface caso passe na validação
+        const primeironome = user.full_name ? user.full_name.split(" ")[0] : "Admin";
+        
+        const dropdownName = document.getElementById("dropdownName");
+        const dropdownEmail = document.getElementById("dropdownEmail");
+        const avatarBtn = document.getElementById("userAvatarBtn");
+
+        if (dropdownName) dropdownName.textContent = primeironome;
+        if (dropdownEmail) dropdownEmail.textContent = user.email;
+        if (avatarBtn) avatarBtn.textContent = primeironome.charAt(0).toUpperCase();
+
+        // Só carrega os dados sensíveis da dashboard após confirmar que é Admin
+        carregarContagemUsuarios();
+
+    } catch (error) {
+        console.error("Erro crítico ao carregar perfil admin:", error);
+        // COMENTE a linha abaixo temporariamente se quiser testar o layout sem deslogar por erro de URL
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html?motivo=erro_api";
+    }
+}
 
 // --- TEMA ---
 if (localStorage.getItem("theme_mode") === "dark") {
@@ -51,55 +99,14 @@ const dropdownMenu = document.getElementById("dropdownMenu");
 
 avatarBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
-    dropdownMenu.classList.toggle("hidden");
+    dropdownMenu?.classList.toggle("hidden");
 });
 
 document.addEventListener("click", (e) => {
-    if (!dropdownMenu.contains(e.target) && e.target !== avatarBtn) {
+    if (dropdownMenu && !dropdownMenu.contains(e.target) && e.target !== avatarBtn) {
         dropdownMenu.classList.add("hidden");
     }
 });
-
-// --- PERFIL ADMIN ---
-async function loadAdminProfile() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/user/me`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-
-        if (response.status === 401) {
-            localStorage.removeItem("access_token");
-            window.location.href = "login.html?motivo=inatividade";
-            return;
-        }
-
-        if (!response.ok) throw new Error("Sessão inválida");
-
-        const user = await response.json();
-        console.log("Resposta /user/me:", user);
-
-        // Checa se é admin (aceita roles OU is_admin)
-        const isAdmin = (user.roles && user.roles.includes("admin")) || user.is_admin === true || user.is_admin === 1;
-
-        if (!isAdmin) {
-            localStorage.removeItem("access_token");
-            window.location.href = "login.html?motivo=sem_permissao";
-            return;
-        }
-
-        const primeironome = user.full_name ? user.full_name.split(" ")[0] : "Admin";
-        document.getElementById("dropdownName").textContent = primeironome;
-        document.getElementById("dropdownEmail").textContent = user.email;
-        avatarBtn.textContent = primeironome.charAt(0).toUpperCase();
-
-    } catch (error) {
-        console.error("Erro ao carregar perfil admin:", error);
-        localStorage.removeItem("access_token");
-        window.location.href = "login.html?motivo=erro_api";
-    }
-}
-
-
 
 // --- LOGOUT ---
 async function handleLogout(e) {
@@ -109,8 +116,11 @@ async function handleLogout(e) {
             method: "POST",
             headers: { "Authorization": `Bearer ${token}` }
         });
+    } catch(err) {
+        console.error("Erro na rota de logout:", err);
     } finally {
         localStorage.removeItem("access_token");
+        localStorage.removeItem("session_expiration");
         window.location.href = "login.html?motivo=logout";
     }
 }
@@ -157,5 +167,7 @@ function resetSessionTimer() {
 
 // --- INICIALIZAÇÃO ---
 setInterval(updateTimer, 1000);
-loadAdminProfile();
 resetSessionTimer();
+
+// Dispara a cadeia de validação ao carregar o DOM
+document.addEventListener("DOMContentLoaded", loadAdminProfile);
