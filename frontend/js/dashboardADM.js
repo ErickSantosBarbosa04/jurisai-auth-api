@@ -6,6 +6,8 @@ const API_BASE_URL = window.location.origin;
 const token = localStorage.getItem("access_token");
 const timerDisplay = document.getElementById("timerDisplay");
 
+console.log("Iniciando Dashboard ADM...");
+
 // --- GARANTIA DE TOKEN ---
 if (!token) {
     console.warn(" Token não encontrado, redirecionando para login...");
@@ -83,7 +85,7 @@ async function loadAdminProfile() {
         carregarContagemUsuarios();
 
     } catch (error) {
-        console.error(" Erro ao carregar perfil:", error);
+        console.error("🔥 Erro ao carregar perfil:", error);
         document.getElementById("welcomeTitle").textContent = "Erro interno no script";
     }
 }
@@ -164,7 +166,81 @@ function resetSessionTimer() {
     window.addEventListener(eventName, resetSessionTimer, { passive: true });
 });
 
+// ==========================================
+// MÓDULOS DE INTERFACE (GRÁFICOS E AÇÕES)
+// ==========================================
+
+// Lógica visual do botão de emergência
+window.confirmarBloqueioEmergencia = function() {
+    const confirmacao = prompt("ATENÇÃO: Você está prestes a bloquear o acesso de todos os usuários comuns.\n\nDigite 'CONFIRMAR' para prosseguir com o Protocolo de Emergência:");
+    if (confirmacao === "CONFIRMAR") {
+        alert("Protocolo ativado! O sistema entrará em modo de manutenção e o acesso restrito será comunicado à API.");
+    } else {
+        alert("Operação cancelada.");
+    }
+};
+
+// Lógica de desenho do Gráfico Chart.js
+function renderizarGraficoIA() {
+    const canvasElement = document.getElementById('aiUsageChart');
+    if (!canvasElement) return; // Se o canvas não existir na tela, ele ignora silenciosamente
+
+    const ctx = canvasElement.getContext('2d');
+    const goldColor = '#c5a059'; // O nosso dourado padrão
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+            datasets: [{
+                label: 'Requisições Geradas pela IA',
+                data: [420, 650, 580, 890, 750, 400, 1248],
+                borderColor: goldColor,
+                backgroundColor: 'rgba(197, 160, 89, 0.1)', // Dourado transparente
+                borderWidth: 3,
+                pointBackgroundColor: '#1a1c1e',
+                pointBorderColor: goldColor,
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                fill: true,
+                tension: 0.4 // Deixa a linha curvada
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e1e24',
+                    titleColor: goldColor,
+                    bodyColor: '#e1e1e6',
+                    borderColor: '#333',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#a3a3a3' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#a3a3a3' }
+                }
+            }
+        }
+    });
+}
+
+
 // --- START ---
 setInterval(updateTimer, 1000);
 resetSessionTimer();
-document.addEventListener("DOMContentLoaded", loadAdminProfile);
+
+// Assim que a página abrir, ele carrega o perfil e depois desenha o gráfico!
+document.addEventListener("DOMContentLoaded", () => {
+    loadAdminProfile();
+    renderizarGraficoIA();
+});
