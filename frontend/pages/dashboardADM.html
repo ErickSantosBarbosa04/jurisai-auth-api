@@ -7,6 +7,60 @@
     <link rel="stylesheet" href="../css/dashboardStyle.css">
     <link rel="stylesheet" href="../css/dashboardADM.css?v=1.0">
     <link rel="icon" href="../assets/—Pngtree—elegant golden business logo capital_20563813.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Estilos específicos para o novo design do painel Administrativo */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .danger-card {
+            border: 1px solid rgba(251, 113, 133, 0.3) !important;
+            background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(251, 113, 133, 0.05) 100%) !important;
+        }
+        
+        .btn-danger-solid {
+            background: #e11d48;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-danger-solid:hover {
+            background: #be123c;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
+        }
+
+        .chart-container {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .action-row { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -40,45 +94,146 @@
             <span id="specialtyBadge" class="status-pill success" style="font-size: 14px;">Acesso Nível Máximo</span>
         </header>
 
-        <section class="metrics-grid">
+        <section class="admin-grid">
             <div class="metric-card">
                 <h3>Total de Usuários</h3>
-                <p class="metric-number" id="totalUsersCount">...</p>
-                <p class="metric-subtitle success">Base de dados atualizada</p>
+                <p class="metric-number" id="totalUsersCount" style="color: var(--primary-gold);">...</p>
+                <p class="metric-subtitle success">Base de dados sincronizada</p>
             </div>
             <div class="metric-card">
                 <h3>Requisições IA (Hoje)</h3>
-                <p class="metric-number">845</p>
-                <p class="metric-subtitle success">Sistema operando normalmente</p>
+                <p class="metric-number">1.248</p>
+                <p class="metric-subtitle" style="color: #60a5fa;">↑ 12% em relação a ontem</p>
             </div>
             <div class="metric-card">
-                <h3>Status do Servidor</h3>
+                <h3>Status da API / Banco</h3>
                 <p class="metric-status success">
-                    <span class="status-dot"></span> ONLINE
+                    <span class="status-dot"></span> SERVIÇOS ONLINE
                 </p>
-                <button class="btn-secondary btn-full-width">Reiniciar Serviços</button>
+                <p class="metric-subtitle" style="margin-top: 10px;">Latência: 45ms</p>
             </div>
-        </section>
-
-        <section class="panel panel-spacing" style="display: flex; align-items: center; justify-content: space-between; padding: 40px; background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(212, 175, 55, 0.05) 100%); border-left: 4px solid var(--primary-gold); flex-wrap: wrap; gap: 20px;">
-            <div style="flex: 1; min-width: 300px;">
-                <h2 style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px; font-size: 24px;">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    Gestão de Acessos
-                </h2>
-                <p class="panel-description" style="margin: 0; max-width: 600px; line-height: 1.6;">Acesse o painel completo para gerenciar permissões, aplicar suspensões temporárias, validar a conformidade com a LGPD e consultar o histórico de auditoria individual.</p>
-            </div>
-            <div>
-                <button class="btn-primary" onclick="window.location.href='tabelaUser.html'" style="padding: 14px 28px; display: flex; align-items: center; gap: 10px; font-size: 15px;">
-                    Abrir Tabela de Usuários
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            
+            <div class="metric-card danger-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h3 style="color: #fb7185;">Protocolo de Segurança</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">Paralisa o sistema. Exibe tela de manutenção para usuários comuns.</p>
+                </div>
+                <button class="btn-danger-solid" style="width: 100%; margin-top: 15px;" onclick="confirmarBloqueioEmergencia()">
+                    ⚠ Bloqueio de Emergência
                 </button>
             </div>
         </section>
 
-    </main>
+        <section class="chart-container">
+            <h2 style="font-size: 18px; margin-bottom: 5px; color: var(--text-main);">Monitoramento de Uso da IA</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Volume de requisições de tokens gerados pelo sistema de inteligência artificial nos últimos 7 dias.</p>
+            
+            <div style="height: 300px; width: 100%;">
+                <canvas id="aiUsageChart"></canvas>
+            </div>
+        </section>
 
+        <section class="action-row">
+            
+            <div class="panel" style="padding: 30px; background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(212, 175, 55, 0.05) 100%); border-left: 4px solid var(--primary-gold);">
+                <h2 style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px; font-size: 22px;">
+                    👥 Gestão de Acessos
+                </h2>
+                <p style="color: var(--text-muted); margin-bottom: 25px; line-height: 1.5; font-size: 14px;">
+                    Acesse a central de usuários para gerenciar permissões, suspensões temporárias, fichas de conformidade LGPD e reset de senhas.
+                </p>
+                <button class="btn-primary" onclick="window.location.href='tabelaUser.html'" style="padding: 12px 24px; display: inline-flex; align-items: center; gap: 10px;">
+                    Visualizar Tabela de Usuários
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
+
+            <div class="panel" style="padding: 25px;">
+                <h3 style="font-size: 16px; margin-bottom: 8px;">🧠 Motor de IA (Ollama)</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Monitoramento do modelo de processamento local.</p>
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; font-size: 12px; color: var(--success); text-align: center; margin-bottom: 15px; border: 1px solid #333;">
+                    Modelo Ativo: Llama 3.2
+                </div>
+                <button class="btn-secondary" style="width: 100%; font-size: 13px;" disabled>Ajustar Parâmetros (Em breve)</button>
+            </div>
+
+            <div class="panel" style="padding: 25px;">
+                <h3 style="font-size: 16px; margin-bottom: 8px;">🗄️ Auditoria MySQL</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Exportação de logs globais e backup estrutural.</p>
+                <button class="btn-secondary" style="width: 100%; font-size: 13px; margin-bottom: 10px;" disabled>Baixar Logs Gerais (Em breve)</button>
+                <button class="btn-secondary" style="width: 100%; font-size: 13px; border-color: rgba(96, 165, 250, 0.5); color: #60a5fa;" disabled>Forçar Backup DB (Em breve)</button>
+            </div>
+
+        </section>
+
+    </main>
     <script src="../js/authGuard.js"></script>
-    <script src="../js/dashboardADM.js"></script>
+    <script src="../js/dashboard.js"></script>
+    
+    <script>
+        // Lógica visual do botão de emergência
+        function confirmarBloqueioEmergencia() {
+            const confirmacao = prompt("ATENÇÃO: Você está prestes a bloquear o acesso de todos os usuários comuns.\n\nDigite 'CONFIRMAR' para prosseguir com o Protocolo de Emergência:");
+            if (confirmacao === "CONFIRMAR") {
+                alert("Protocolo ativado! O sistema entrará em modo de manutenção e o acesso restrito será comunicado à API.");
+                // Aqui no futuro você colocará a chamada fetch() para a sua API FastAPI avisando do bloqueio.
+            } else {
+                alert("Operação cancelada.");
+            }
+        }
+
+        // Lógica de desenho do Gráfico Chart.js
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('aiUsageChart').getContext('2d');
+            
+            // Pega a cor principal do seu CSS (Dourado)
+            const goldColor = '#c5a059';
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                    datasets: [{
+                        label: 'Requisições Geradas pela IA',
+                        data: [420, 650, 580, 890, 750, 400, 1248],
+                        borderColor: goldColor,
+                        backgroundColor: 'rgba(197, 160, 89, 0.1)', // Dourado transparente pro fundo
+                        borderWidth: 3,
+                        pointBackgroundColor: '#1a1c1e',
+                        pointBorderColor: goldColor,
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4 // Deixa a linha suave/curvada
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e1e24',
+                            titleColor: goldColor,
+                            bodyColor: '#e1e1e6',
+                            borderColor: '#333',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#a3a3a3' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#a3a3a3' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

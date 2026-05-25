@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel | JurisAI</title>
     <link rel="stylesheet" href="../css/dashboardStyle.css">
+    <link rel="icon" href="../assets/—Pngtree—elegant golden business logo capital_20563813.png" type="image/png">
 </head>
 <body>
     <nav class="navbar">
@@ -38,30 +39,68 @@
             <span id="specialtyBadge" class="status-pill success" style="font-size: 14px;">Carregando área...</span>
         </header>
 
+        <div style="margin-top: 30px; margin-bottom: 15px;">
+            <h2 style="font-size: 20px; color: var(--primary-gold);"> Inteligência Artificial</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Suas ferramentas de apoio jurídico e criação.</p>
+        </div>
         <section class="metrics-grid">
             <div class="metric-card">
-                <h3>Nova Petição Inicial</h3>
-                <p>Use a IA para estruturar peças jurídicas complexas.</p>
-                <button class="btn-primary" style="width: 100%; margin-top: 15px;">Criar Documento</button>
+                <h3> Chat Jurídico</h3>
+                <p>Inicie uma conversa livre com o JurisAI para tirar dúvidas ou debater teses.</p>
+                <button class="btn-primary" style="width: 100%; margin-top: 15px;">Nova Conversa</button>
             </div>
             <div class="metric-card">
-                <h3>Análise de Jurisprudência</h3>
-                <p>Encontre decisões recentes nos tribunais superiores.</p>
-                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Buscar Casos</button>
+                <h3> Treino de Argumentação</h3>
+                <p>Simule um juiz ou advogado da parte contrária para testar seus argumentos.</p>
+                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Iniciar Simulação</button>
             </div>
             <div class="metric-card">
-                <h3>Resumo de Processo</h3>
-                <p>Faça upload de um PDF longo e receba um resumo imediato.</p>
+                <h3> Leitura Inteligente</h3>
+                <p>Faça upload de contratos ou processos longos e receba um resumo imediato.</p>
                 <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Analisar PDF</button>
             </div>
         </section>
 
-        <section class="panel" style="margin-top: 24px;">
-            <h2>Notícias e Atualizações: <span id="dynamicTopic">Sua Área</span></h2>
-            <p id="dynamicContent" style="color: var(--text-muted); margin-top: 10px; line-height: 1.6;">
-                Buscando as últimas movimentações do STF e STJ referentes à sua especialidade...
-            </p>
+        <div style="margin-top: 40px; margin-bottom: 15px;">
+            <h2 style="font-size: 20px; color: var(--primary-gold);"> Estudos e Acervo</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Materiais de consulta e decisões dos tribunais.</p>
+        </div>
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <h3> Biblioteca Digital</h3>
+                <p>Acesse resumos de doutrinas, leis secas e guias de estudo para estudantes.</p>
+                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Acessar Biblioteca</button>
+            </div>
+            <div class="metric-card">
+                <h3> Jurisprudência</h3>
+                <p>Busque decisões recentes e casos similares nos tribunais superiores (STF/STJ).</p>
+                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Buscar Casos</button>
+            </div>
+            <div class="metric-card">
+                <h3> Gerador de Peças</h3>
+                <p>Estruture o esqueleto de petições, recursos e contratos em poucos minutos.</p>
+                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">Criar Documento</button>
+            </div>
         </section>
+
+        <section class="panel" style="margin-top: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h2>Notícias e Atualizações: <span id="dynamicTopic" style="color: var(--primary-gold);">Sua Área</span></h2>
+                <p id="dynamicContent" style="color: var(--text-muted); margin-top: 10px; line-height: 1.6; max-width: 600px;">
+                    Buscando as últimas movimentações do STF e STJ referentes à sua especialidade...
+                </p>
+            </div>
+            
+            <div style="min-width: 250px;">
+                <h3 style="margin-bottom: 10px; font-size: 16px;">Seu Histórico</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Retome análises e conversas antigas.</p>
+                <button class="btn-secondary" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+                    Histórico de Interações
+                </button>
+            </div>
+        </section>
+
     </main>
     <script src="../js/authGuard.js"></script>
     <script src="../js/dashboard.js"></script>
