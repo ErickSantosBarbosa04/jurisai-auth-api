@@ -64,7 +64,7 @@ def recuperar_confirmar(data: schemas.ValidarRecuperacaoRequest, db: Session = D
 
 @router.post("/redefinir-senha")
 @limiter.limit("3/minute") # Limita tentativas de redefinição para evitar abuso
-def redefinir_senha(data: schemas.NovaSenhaFinalRequest, db: Session = Depends(get_db)):
+def redefinir_senha(request: Request, data: schemas.NovaSenhaFinalRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     
     if not user:
