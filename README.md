@@ -75,11 +75,11 @@ Crie um arquivo .env na raiz do projeto com as seguintes variáveis:
 ENVIRONMENT=development
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-# Chaves de Segurança (Gere novas chaves para produção!)
-# Comando para gerar SECRET_KEY: python -c "import secrets; print(secrets.token_hex(32))"
+Chaves de Segurança (Gere novas chaves para produção!)
+Comando para gerar SECRET_KEY: python -c "import secrets; print(secrets.token_hex(32))"
 SECRET_KEY=sua_secret_key_jwt_aqui
 
-# Comando para gerar FERNET_KEY: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+Comando para gerar FERNET_KEY: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 FERNET_KEY=sua_fernet_key_aqui
 
 # Banco de Dados (Ajuste usuário e senha)
@@ -93,17 +93,17 @@ GROQ_MODEL=llama-3.1-8b-instant
 3. Instalação e Execução
 Abra o terminal na pasta do projeto e execute:
 
-# 1. Crie o ambiente virtual
+1. Crie o ambiente virtual
 python -m venv venv
 
-# 2. Ative o ambiente virtual
+2. Ative o ambiente virtual
 venv\Scripts\Activate.ps1       # PowerShell (Windows)
-# ou: source venv/bin/activate  # Linux/Mac
+ ou: source venv/bin/activate  # Linux/Mac
 
-# 3. Instale as dependências
+3. Instale as dependências
 pip install -r requirements.txt
 
-# 4. Inicie o servidor
+4. Inicie o servidor
 python -m uvicorn app.main:app --reload
 
 ## Acessos Locais:
