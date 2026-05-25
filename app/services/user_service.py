@@ -96,10 +96,7 @@ class UserService:
 
             user_email = user_to_delete.email
 
-            # ==========================================
-            # 📋 LOG DE AUDITORIA: Exclusão da Conta
-            # ==========================================
-            # Registramos a intenção antes de apagar a conta (já que os logs podem sumir no modo CASCADE)
+            
             AuditService.registrar_acao(db, str(current_user.id), "Solicitação de exclusão permanente de conta (Direito ao Esquecimento).")
 
             # Deletamos, forçamos o flush e limpamos a sessão

@@ -1,3 +1,4 @@
+import logging
 import os
 from dotenv import load_dotenv
 
@@ -19,8 +20,9 @@ class Settings:
     # Requisito 1.9: Tempo de expiração da sessão (JWT)
     try:
         ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 2))
-    except (ValueError, TypeError):
-        ACCESS_TOKEN_EXPIRE_MINUTES: int = 2 # Fallback caso o .env esteja mal formatado
+    except (ValueError, TypeError) as e:
+        logging.warning(f"Erro ao ler os minutos do .env. Usando o tempo de segurança (2 min). Erro: {e}")
+        ACCESS_TOKEN_EXPIRE_MINUTES: int = 2
 
     def __init__(self):
         # Validação Crítica (Requisito 1.12)

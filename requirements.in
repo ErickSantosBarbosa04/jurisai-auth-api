@@ -1,0 +1,14 @@
+fastapi
+fastapi-mail
+uvicorn
+SQLAlchemy
+pymysql
+python-jose
+passlib
+bcrypt
+pyotp
+cryptography
+python-dotenv
+python-multipart
+email-validator
+slowapi

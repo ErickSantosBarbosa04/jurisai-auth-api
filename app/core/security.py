@@ -4,6 +4,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 import pyotp
 from app.core.config import settings 
+import logging
 
 # Configuração do algoritmo de Hash (Requisito 1.1) a (Requisito 1.4)
 # Mas porque? Gera o hash da senha usando bcrypt direto.
@@ -44,7 +45,8 @@ def create_access_token(data: dict) -> str:
 def verify_token(token: str) -> dict | None:
     try:
         return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-    except JWTError:
+    except JWTError as e:
+        logging.warning(f"Token recusado ou expirado. Motivo: {e}")
         return None
 
 # --- LÓGICA DE 2FA (TOTP) (Requisito 1.5) ---------------------------------------------------------------------------

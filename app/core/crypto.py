@@ -1,5 +1,6 @@
 from cryptography.fernet import Fernet
 from app.core.config import settings 
+import logging
 
 # O segredo do Fernet (AES) agora vem do nosso validador central
 # Isso atende ao Requisito 3.6 de Proteção de Chaves
@@ -16,6 +17,6 @@ def decrypt(value: str) -> str:
         return ""
     try:
         return fernet.decrypt(value.encode()).decode()
-    except Exception:
-        # Retorna vazio ou trata erro se o token for inválido
+    except Exception as e:
+        logging.error(f"Falha Crítica na Criptografia: Tentativa de descriptografar valor inválido. Erro: {e}")
         return ""

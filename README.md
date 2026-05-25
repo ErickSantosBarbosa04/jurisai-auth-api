@@ -5,6 +5,10 @@
 O objetivo do projeto é permitir que o estudante apresente casos concretos e debata com a IA atuando como orientadora, garantindo a proteção total dos dados e o nível de dificuldade adequado ao seu semestre atual.
 
 ---
+# Acesso ao site
+https://jurisai-auth-api-production.up.railway.app/frontend/pages/index.html
+
+---
 
 ##  Funcionalidades Principais
 
@@ -59,8 +63,10 @@ JURISAI/
 │   └── pages/          # Páginas (login, dashboard, chat, tabelaUser, admin)
 ├── tests/              # Suíte de testes unitários
 ├── .env.example        # Modelo de variáveis de ambiente
-└── requirements.txt    # Dependências do Python
+├── requirements.in     # Lista das bibliotecas principais
+└── requirements.txt    # Dependências com assinaturas de segurança (Hashes)
 ```
+---
 
 ## Como Executar Localmente
 1. Pré-requisitos
@@ -71,7 +77,11 @@ Banco de Dados MySQL operando localmente ou em nuvem (ex: Railway)
 2. Configuração do Ambiente (.env)
 Crie um arquivo .env na raiz do projeto com as seguintes variáveis:
 
-# Configurações Base
+---
+
+# Configuração do Ambiente (.env)
+Crie um arquivo .env na raiz do projeto com as seguintes variáveis:
+
 ENVIRONMENT=development
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
@@ -82,8 +92,12 @@ SECRET_KEY=sua_secret_key_jwt_aqui
 Comando para gerar FERNET_KEY: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 FERNET_KEY=sua_fernet_key_aqui
 
+---
+
 # Banco de Dados (Ajuste usuário e senha)
 DATABASE_URL=mysql+pymysql://usuario:senha@localhost:3306/jurisai_db
+
+---
 
 # Configurações de IA
 LLM_PROVIDER=groq
@@ -106,6 +120,8 @@ pip install -r requirements.txt
 4. Inicie o servidor
 python -m uvicorn app.main:app --reload
 
+---
+
 ## Acessos Locais:
 
 Frontend: Abra os arquivos .html da pasta frontend/pages/ no seu navegador (utilize Live Server se preferir).
@@ -120,6 +136,8 @@ Segregação de Privilégios: Rotas /admin possuem verificação estrita is_admi
 Blacklist Dinâmica: Ao realizar logout, o token atual é invalidado imediatamente no banco, impedindo reutilização (mesmo que ainda esteja no prazo de 30 min).
 
 Fluxo RAG Seguro: O modelo LLM não acessa a internet livremente. As respostas são aterradas (grounded) nos arquivos locais em data/legal, reduzindo a chance de alucinações jurídicas.
+
+---
 
 ## IMPORTANTE:
 O JurisAI é um projeto acadêmico em constante desenvolvimento.

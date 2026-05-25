@@ -22,6 +22,13 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+# criando o rastreador de IP
+limiter = Limiter(key_func=get_remote_address)
+
+app = FastAPI()
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Inicialização do Banco de Dados
 Base.metadata.create_all(bind=engine)
 # A execução do ensure_user_profile_columns foi apagada daqui.
@@ -41,14 +48,13 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # CORS (Requisito 3.6)
 app.add_middleware(
     CORSMiddleware, 
-    allow_origins=["*"], # Mantido "*" para facilitar o TCC, mas aceita credenciais
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"], 
     allow_headers=["*"],
 )
 
 # Captura de Erros 500
-# DICA: Esse middleware é vital para o Requisito 5.2 (Registro de falhas)
 @app.middleware("http")
 async def catch_exceptions_middleware(request: Request, call_next):
     try:
