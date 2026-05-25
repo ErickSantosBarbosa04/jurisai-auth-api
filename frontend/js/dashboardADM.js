@@ -2,13 +2,13 @@
 // JURISAI - SCRIPT DO PAINEL DE ADMINISTRAÇÃO
 // ==========================================
 
-// SE SUA API TIVER UM PREFIXO (ex: /api/v1), ALTERE A STRING ABAIXO:
 const API_BASE_URL = window.location.origin; 
 const token = localStorage.getItem("access_token");
 const timerDisplay = document.getElementById("timerDisplay");
 
 // --- GARANTIA DE TOKEN ---
 if (!token) {
+    console.warn("Token não encontrado, redirecionando...");
     window.location.href = "login.html?motivo=sem_token";
 }
 
@@ -26,9 +26,11 @@ async function carregarContagemUsuarios() {
             const usuarios = await response.json();
             contador.innerText = usuarios.length;
         } else if (response.status === 403) {
-            localStorage.removeItem("access_token");
-            window.location.href = "login.html?motivo=sem_permissao";
+            console.warn("Usuário sem permissão admin para /admin/users-full");
+            contador.innerText = "Sem permissão";
+            contador.style.color = "var(--error)";
         } else {
+            console.error("Erro HTTP em /admin/users-full:", response.status);
             contador.innerText = "Erro";
             contador.style.color = "var(--error)";
         }
@@ -47,12 +49,17 @@ async function loadAdminProfile() {
         });
 
         if (response.status === 401) {
+            console.warn("Token expirado ou inválido.");
             localStorage.removeItem("access_token");
             window.location.href = "login.html?motivo=inatividade";
             return;
         }
 
-        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+        if (!response.ok) {
+            console.error("Falha ao carregar perfil admin:", response.status);
+            document.getElementById("welcomeTitle").textContent = "Erro ao carregar perfil";
+            return;
+        }
 
         const user = await response.json();
         console.log("Resposta /user/me:", user);
@@ -61,8 +68,8 @@ async function loadAdminProfile() {
         const isAdmin = (user.roles && user.roles.includes("admin")) || user.is_admin === true || user.is_admin === 1;
 
         if (!isAdmin) {
-            localStorage.removeItem("access_token");
-            window.location.href = "login.html?motivo=sem_permissao";
+            console.warn("Usuário não tem permissão admin.");
+            document.getElementById("welcomeTitle").textContent = "Sem permissão de administrador";
             return;
         }
 
@@ -82,9 +89,7 @@ async function loadAdminProfile() {
 
     } catch (error) {
         console.error("Erro crítico ao carregar perfil admin:", error);
-        // COMENTE a linha abaixo temporariamente se quiser testar o layout sem deslogar por erro de URL
-        localStorage.removeItem("access_token");
-        window.location.href = "login.html?motivo=erro_api";
+        document.getElementById("welcomeTitle").textContent = "Erro de conexão com API";
     }
 }
 
@@ -168,6 +173,4 @@ function resetSessionTimer() {
 // --- INICIALIZAÇÃO ---
 setInterval(updateTimer, 1000);
 resetSessionTimer();
-
-// Dispara a cadeia de validação ao carregar o DOM
 document.addEventListener("DOMContentLoaded", loadAdminProfile);
