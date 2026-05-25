@@ -1,6 +1,3 @@
-// js/2faRecupera.js
-
-// CONFIGURAÇÃO: URL do servidor Backend
 const API_BASE_URL = window.location.origin;
 
 window.onload = () => {
@@ -37,7 +34,6 @@ async function validarEVoltar() {
     try {
         console.log(`Enviando validação para ${email}...`);
 
-        // CORREÇÃO: Adicionado o API_BASE_URL para apontar para a porta 8000
         const response = await fetch(`${API_BASE_URL}/auth/recuperar-confirmar`, {
             method: 'POST',
             headers: { 
@@ -50,7 +46,6 @@ async function validarEVoltar() {
             })
         });
         
-        // Lê a resposta como texto primeiro para evitar erro se não for JSON
         const responseText = await response.text();
         let data = {};
         try {
@@ -61,7 +56,6 @@ async function validarEVoltar() {
 
         if (response.ok) {
             alert("Sucesso! 2FA validado.");
-            // Redireciona para a tela de redefinir a senha passando o email
             window.location.href = `redefinir.html?email=${encodeURIComponent(email)}`;
         } else {
             let mensagemErro = data.detail || "Código incorreto ou expirado.";
@@ -75,7 +69,6 @@ async function validarEVoltar() {
     }
 }
 
-// Permitir o uso do Enter
 const inputCode = document.getElementById('totpCode');
 if (inputCode) {
     inputCode.addEventListener('keypress', (e) => {

@@ -11,7 +11,6 @@ from app.models.UserModel import User
 router = APIRouter(prefix="/user", tags=["User Profile & LGPD"])
 
 @router.get("/me", response_model=schemas.UserResponse)
-#Apenas encaminha o usuário autenticado para o Service. (Requisito 4.8)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
@@ -28,7 +27,6 @@ def export_user_data(db: Session = Depends(get_db), current_user=Depends(get_cur
     return UserService.export_user_data(db, current_user)
 
 @router.delete("/delete-account", status_code=status.HTTP_200_OK)
-#Recebe o comando de exclusão e delega ao Service. (Requisito 4.10)
 def delete_account(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     return UserService.delete_user_account(db, current_user)
 

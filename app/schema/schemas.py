@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Literal, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
-# --- ENUMS (Sincronizados com os <option> do seu HTML) ---
+# --- ENUMS  -------------------------------
 ProfileType = Literal["estudante", "advogado", "outro"]
 
 LegalSpecialty = Literal[
@@ -14,7 +14,7 @@ LegalSpecialty = Literal[
     "Direito Previdenciario", "Direito Ambiental", "Direito Digital",
 ]
 
-# --- BASE PARA PERFIL (Reutilizável) ---
+# --- BASE PARA PERFIL (Reutilizável) --------------------------------------------
 class UserProfileFields(BaseModel):
     full_name: Optional[str] = Field(default=None, min_length=3, max_length=120)
     profile_type: Optional[ProfileType] = "estudante"
@@ -28,16 +28,14 @@ class UserProfileFields(BaseModel):
         if value is None: return value
         value = str(value).strip()
         if value:
-            # Proteção XSS: Transforma tags HTML em texto seguro
             value = html.escape(value)
         return value or None
 
-# --- REQUISIÇÕES DE ACESSO ---
+# --- REQUISIÇÕES DE ACESSO -------------------------------------------------
 
 class RegisterRequest(BaseModel):
-    # Requisito: Campos obrigatórios para criação no banco
     email: EmailStr
-    password: str = Field(..., min_length=8) # Tamanho mínimo ajustado para 8
+    password: str = Field(..., min_length=8)
     full_name: str
     university: str
     semester: int
@@ -56,7 +54,6 @@ class RegisterRequest(BaseModel):
     @field_validator('password')
     @classmethod
     def validate_password(cls, senha):
-        # Fiscal de Senhas Fortes
         if len(senha) < 8:
             raise ValueError('A senha deve ter no mínimo 8 caracteres.')
         if not re.search(r"\d", senha):
@@ -71,10 +68,9 @@ class LoginRequest(BaseModel):
     totp_code: Optional[str] = None 
 
 class EmailRequest(BaseModel):
-    """Necessário para validar existência de e-mail (Requisito 2.7)"""
     email: EmailStr
 
-# --- RESPOSTAS ---
+# --- RESPOSTAS --------------------------------------------------------
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -100,7 +96,7 @@ class UserResponse(BaseModel):
     
     model_config = ConfigDict(from_attributes=True)
 
-# --- SEGURANÇA E MFA ---
+# --- SEGURANÇA E MFA ---------------------------------------------
 
 class TOTPSetupResponse(BaseModel):
     secret: str
@@ -110,15 +106,13 @@ class TOTPVerifyRequest(BaseModel):
     email: str  
     code: str   
 
-# --- RECUPERAÇÃO E ATUALIZAÇÃO ---
+# --- RECUPERAÇÃO E ATUALIZAÇÃO ------------------------------------------
 
 class ValidarRecuperacaoRequest(BaseModel):
-    """Para validar e-mail + código 2FA (Requisito 2.7)"""
     email: EmailStr
     code: str
 
 class NovaSenhaFinalRequest(BaseModel):
-    """Para salvar a nova senha após validações"""
     email: EmailStr
     new_password: str = Field(..., min_length=8) # Tamanho mínimo ajustado para 8
 

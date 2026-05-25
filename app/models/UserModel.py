@@ -14,23 +14,23 @@ class User(Base):
     updated_at = Column(DateTime, nullable=True, onupdate=lambda: datetime.now(timezone.utc))
     tokens_valid_after = Column(DateTime, nullable=True)
 
-    # --- PERFIL EDITAVEL DO USUARIO ---
+    #  PERFIL EDITAVEL DO USUARIO 
     full_name = Column(String(120), nullable=True)
-    profile_type = Column(String(30), nullable=True)  # estudante, advogado ou outro
+    profile_type = Column(String(30), nullable=True) 
     university = Column(String(160), nullable=True)
     semester = Column(Integer, nullable=True)
     legal_specialty = Column(String(80), nullable=True)
 
-    # --- CONTROLE DE ACESSO ---
+    #  CONTROLE DE ACESSO 
     is_admin = Column(Boolean, default=False) 
 
-    # --- NOVOS CAMPOS PARA REQUISITO 1.11 ---
+    #  NOVOS CAMPOS PARA REQUISITO 
     last_failed_login = Column(DateTime, nullable=True)
     failed_login_attempts = Column(Integer, default=0)
     lockout_until = Column(DateTime, nullable=True)
 
-    # --- CAMPOS LGPD (Requisitos 4.4 a 4.7) ---
-    lgpd_consent = Column(Boolean, default=False) # Req 4.4: Registro explícito
-    consent_purpose = Column(String(255), nullable=True) # Req 4.5: Finalidade associada
-    consent_date = Column(DateTime, nullable=True) # Req 4.7: Registro de data
-    terms_version = Column(String(50), default="1.0") # Req 4.7: Registro de versão
+    # CAMPOS LGPD 
+    lgpd_consent = Column(Boolean, default=False)
+    consent_purpose = Column(String(255), nullable=True) 
+    consent_date = Column(DateTime, nullable=True)
+    terms_version = Column(String(50), default="1.0")

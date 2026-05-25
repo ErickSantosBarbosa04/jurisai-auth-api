@@ -1,7 +1,6 @@
-// js/ativar-2fa.js
 
 let setupCarregado = false;
-let currentUserEmail = ""; // Variável vital que agora será preenchida pela rota /me
+let currentUserEmail = "";
 const API_BASE_URL = window.location.origin;
 
 function mostrarAviso(msg, tipo = "error") {
@@ -10,7 +9,6 @@ function mostrarAviso(msg, tipo = "error") {
     aviso.innerText = msg;
     aviso.style.display = "block";
     
-    // Cores baseadas no tipo de mensagem
     if (tipo === "success") {
         aviso.style.color = "#155724";
         aviso.style.background = "#d4edda";
@@ -90,7 +88,7 @@ window.onload = async () => {
 };
 
 async function ativar2FA(event) {
-    // 1. Bloqueio absoluto de qualquer evento padrão do navegador
+    
     if (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -103,7 +101,7 @@ async function ativar2FA(event) {
     
     const code = codeInput.value.trim();
 
-    // Validação básica: garante que são 6 números
+    
     if (code.length !== 6 || isNaN(code)) {
         mostrarAviso("Digite os 6 números exibidos no seu celular.");
         return;
@@ -128,16 +126,16 @@ async function ativar2FA(event) {
         if (response.ok) {
             console.log("6. 2FA ATIVADO COM SUCESSO!");
             
-            // Salva o estado localmente antes de partir
+           
             localStorage.setItem("2fa_enabled", "true");
             
             mostrarAviso("Sucesso! Redirecionando...", "success");
 
-            // Redirecionamento instantâneo com replace para evitar atropelos
+           
             console.log("Encerrando sessão local e voltando para o login.");
             window.location.replace("login.html");
             
-            // Retorno falso para garantir que nenhuma bolha de evento suba
+           
             return false;
 
         } else {
@@ -149,7 +147,6 @@ async function ativar2FA(event) {
         console.error("Erro na ativação:", error);
         mostrarAviso(error.message, "error");
         
-        // Reativa o botão se der erro para o usuário tentar de novo
         btn.disabled = false;
         btn.innerText = "Vincular e Entrar";
     }

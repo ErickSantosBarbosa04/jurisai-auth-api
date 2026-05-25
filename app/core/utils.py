@@ -6,7 +6,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "legal"
 
 def ler_documento_juridico_seguro(nome_arquivo: str):
 
-    # Se a pasta não existir ainda, cria para evitar erros
     if not BASE_DIR.exists():
         BASE_DIR.mkdir(parents=True, exist_ok=True)
         

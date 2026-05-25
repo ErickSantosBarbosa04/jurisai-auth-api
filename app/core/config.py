@@ -12,12 +12,10 @@ class Settings:
     # Banco de Dados
     DATABASE_URL: str = os.getenv("DATABASE_URL")
     
-    # Segurança, Impedir que as chaves fiquem expostas no codigo principal (Requisito 3.6)
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     FERNET_KEY: str = os.getenv("FERNET_KEY")
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
     
-    # Requisito 1.9: Tempo de expiração da sessão (JWT)
     try:
         ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 2))
     except (ValueError, TypeError) as e:

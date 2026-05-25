@@ -10,13 +10,10 @@ logger = logging.getLogger(__name__)
 
 class PasswordService:
     @staticmethod
-    #Gera um token de recuperação de 32 caracteres e salva no banco. (Requisito 2.1 e 2.2)
-    #Utilização de logger.info e logger.warning. (Requisito 2.6 e 2.7)
     def create_reset_token(db: Session, email: str):
     
         user = db.query(models.User).filter(models.User.email == email).first()
         
-        # Logica de segurança: Não confirmamos se o e-mail existe para evitar enumeração
         if not user:
             logger.info(f"SERVICE: Solicitação de reset para e-mail inexistente: {email}")
             return {"message": "Se o e-mail existir, enviaremos as instruções."}
@@ -35,7 +32,6 @@ class PasswordService:
         db.commit()
 
         logger.info(f"SERVICE: Token de recuperação gerado para user_id={user.id}")
-        # Em produção, aqui dispararíamos o e-mail real
         return {"message": "Instruções enviadas.", "token": token}
 
     @staticmethod
@@ -56,22 +52,14 @@ class PasswordService:
         if not user:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-        # Atualiza a senha com a nossa função segura (Bcrypt corrigido)
         user.hashed_password = hash_password(data.new_password)
         
-        # ========================================================
-        # TRAVA DE "PERDA TOTAL" (CORTANDO O VÍNCULO DO CELULAR)
-        # ========================================================
-        # Desliga a segunda etapa e apaga o código secreto antigo.
-        # Assim, o aplicativo no celular roubado/perdido fica inútil.
+
         user.is_2fa_enabled = False
         user.totp_secret = None
-        # ========================================================
         
-        # Limpa o token (Segurança: expiracao de token e uso único) (Requisito 2.3 e 2.4)
         db.delete(reset_token)
         db.commit()
 
-        # Atualizei o log e a mensagem para refletir que o 2FA também foi resetado
         logger.info(f"SERVICE: Senha alterada e vínculo do autenticador quebrado com sucesso para o usuário ID: {user.id}")
         return {"message": "Senha alterada com sucesso! Você precisará configurar seu autenticador novamente no próximo login."}

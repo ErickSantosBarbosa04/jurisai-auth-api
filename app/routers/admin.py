@@ -14,7 +14,6 @@ from app.services.password_service import PasswordService
 from app.models.AuditLogModel import AuditLog
 
 
-# Aqui definimos o prefixo isolado para o Admin!
 router = APIRouter(prefix="/admin", tags=["Admin Control"])
 logger = logging.getLogger(__name__)
 
@@ -110,7 +109,6 @@ def forcar_reset_senha(email_data: ForceResetRequest, db: Session = Depends(get_
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
         
     # 2. GERA O TOKEN SEGURO (usando o serviço que criamos)
-    # Isso cria a sopa de letrinhas e salva no banco com validade de 15 minutos
     resultado_token = PasswordService.create_reset_token(db, email_alvo)
     token_seguro = resultado_token.get("token")
 
@@ -131,14 +129,11 @@ def forcar_reset_senha(email_data: ForceResetRequest, db: Session = Depends(get_
 #-----------------------------------------------------------------------------------------------------------------------------------------------------    
 @router.get("/user-lgpd/{user_id}")
 def ver_ficha_lgpd_admin(user_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    # 1. Trava: Só admin entra
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Acesso negado")
     
-    # 2. Acha o usuário alvo no banco
     alvo = db.query(User).filter(User.id == user_id).first()
     if not alvo:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
-    # 3. Pede para o serviço gerar a ficha (que também já vai gerar o Log de Auditoria que criamos!)
     return UserService.export_user_data(db, alvo)
