@@ -60,8 +60,9 @@ JURISAI/
 ├── tests/              # Suíte de testes unitários
 ├── .env.example        # Modelo de variáveis de ambiente
 └── requirements.txt    # Dependências do Python
+```
 
-Como Executar Localmente
+## Como Executar Localmente
 1. Pré-requisitos
 Python 3.11+
 
@@ -105,7 +106,7 @@ pip install -r requirements.txt
 # 4. Inicie o servidor
 python -m uvicorn app.main:app --reload
 
-Acessos Locais:
+## Acessos Locais:
 
 Frontend: Abra os arquivos .html da pasta frontend/pages/ no seu navegador (utilize Live Server se preferir).
 
@@ -120,6 +121,6 @@ Blacklist Dinâmica: Ao realizar logout, o token atual é invalidado imediatamen
 
 Fluxo RAG Seguro: O modelo LLM não acessa a internet livremente. As respostas são aterradas (grounded) nos arquivos locais em data/legal, reduzindo a chance de alucinações jurídicas.
 
-IMPORTANTE:
+## IMPORTANTE:
 O JurisAI é um projeto acadêmico em constante desenvolvimento.
 Importante: As respostas geradas pela Inteligência Artificial não substituem o julgamento técnico de um professor, a atuação de um advogado licenciado, ou a consulta a jurisprudências atualizadas e fontes oficiais. Sempre revise os embasamentos legais gerados.
