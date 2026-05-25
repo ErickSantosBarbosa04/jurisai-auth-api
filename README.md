@@ -1,173 +1,125 @@
-#  JurisAI Auth API
-API de autenticação segura desenvolvida com FastAPI, PostgreSQL e 2FA via TOTP.
+# JurisAI
+
+**Plataforma acadêmica para estudantes de Direito**, com foco em alta segurança (MFA/LGPD), gestão administrativa e imersão prática através de um Chat Jurídico com Inteligência Artificial (RAG).
+
+O objetivo do projeto é permitir que o estudante apresente casos concretos e debata com a IA atuando como orientadora, garantindo a proteção total dos dados e o nível de dificuldade adequado ao seu semestre atual.
 
 ---
 
-##  Sobre o Projeto
+##  Funcionalidades Principais
 
-Sistema de autenticação RESTful que implementa:
-- Hash de senhas com **bcrypt** (custo 12)
-- Sessões com **JWT** (expiração 30 minutos)
-- **Blacklist de tokens** no logout
-- **2FA TOTP** compatível com Google Authenticator
-- **Rate limiting** 5 tentativas/minuto no login
+###  Segurança, Autenticação e LGPD
+- **Cadastro e Login Blindado:** Sessões via JWT (expiração de 30 min) e hash de senhas com `bcrypt`.
+- **MFA (Múltiplos Fatores):** Autenticação 2FA TOTP compatível com Google Authenticator.
+- **Gestão de Sessão:** Blacklist de tokens no logout e rate limiting (SlowAPI) para evitar ataques de força bruta.
+- **Conformidade LGPD:** Ficha de transparência, consentimento explícito, exportação e exclusão permanente de dados (Direito ao Esquecimento).
+- **Painel Administrativo:** Dashboard exclusivo para Admins com métricas, logs de auditoria, trava de segurança global (Lockdown) e suspensão de contas.
 
----
----
-juri_db
-admin
----
-##  Tecnologias
-
-| Tecnologia | Finalidade |
-|------------|------------|
-| FastAPI | Framework web async |
-| PostgreSQL | Banco de dados |
-| SQLAlchemy | ORM |
-| bcrypt / passlib | Hash de senhas |
-| python-jose | JWT HS256 |
-| pyotp | 2FA TOTP |
-| SlowAPI | Rate limiting |
+###  Inteligência Artificial e Estudos
+- **Chat Jurídico Autenticado:** Ambiente de simulação, debate e criação de petições.
+- **RAG Local Integrado:** Base de dados com arquivos Markdown (`data/legal`) cobrindo as principais áreas do Direito (Civil, Penal, Trabalho, etc.).
+- **Escalabilidade de Dificuldade:** A IA adapta a exigência e o vocabulário de acordo com o semestre cadastrado pelo aluno (1º ao 10º).
+- **Guardrails de Segurança:** Filtros anti-prompt injection; o sistema se recusa a responder assuntos fora do escopo jurídico.
+- **Acessibilidade:** Suporte a entrada e leitura de respostas por voz (TTS).
+- **Integração LLM Flexível:** Uso da API Groq (Llama 3) para alta performance, com modo `mock` para desenvolvimento e testes sem custos.
 
 ---
 
-##  Estrutura do Projeto
+##  Stack Tecnológico
 
-JURISAI-AUTH-API/
+| Camada | Tecnologia | Finalidade |
+|--------|------------|------------|
+| **Backend** | FastAPI | Framework web assíncrono de alta performance |
+| **Banco de Dados** | MySQL | Armazenamento relacional robusto |
+| **ORM** | SQLAlchemy | Mapeamento de objetos e queries seguras |
+| **Segurança** | bcrypt / pyotp | Hash de senhas e geração de tokens 2FA (TOTP) |
+| **Sessão** | python-jose | Autenticação via JSON Web Tokens (JWT HS256) |
+| **Criptografia** | Fernet | Proteção do segredo 2FA em repouso no banco |
+| **IA / LLM** | Groq API (Llama) | Motor de processamento de linguagem natural |
+| **Frontend** | HTML/CSS/JS | Interface responsiva com isolamento de privilégios |
+
+---
+
+##  Estrutura Principal do Projeto
+
+```text
+JURISAI/
 ├── app/
-│   ├── core/
-│   │   ├── db/
-│   │   │   └── database.py
-│   │   ├── config.py
-│   │   ├── crypto.py
-│   │   ├── dependencies.py
-│   │   └── security.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── PasswordResetToken.py
-│   │   ├── TokenBlacklistModel.py
-│   │   └── UserModel.py
-│   ├── routers/
-│   │   ├── auth.py
-│   │   ├── mfa.py
-│   │   ├── password_reset.py
-│   │   └── user.py
-│   ├── schema/
-│   │   └── schemas.py
-│   └── services/
-│       ├── auth_service.py
-│       ├── mfa_service.py
-│       ├── password_service.py
-│       └── user_service.py
+│   ├── core/           # Configurações, Segurança, Database e Conexões
+│   ├── models/         # Modelos SQLAlchemy (Users, Logs, Tokens)
+│   ├── routers/        # Rotas da API (auth.py, chat.py, admin.py, user.py)
+│   ├── schema/         # Pydantic Schemas (Validação de entrada/saída)
+│   └── services/       # Regras de Negócio (llm_service, auth_service, rag_service)
+├── data/
+│   └── legal/          # Base de conhecimento Markdown para o RAG
 ├── frontend/
-│   ├── assets/
-│   ├── css/
-│   │   ├── dashboardStyle.css
-│   │   ├── esqueci.css
-│   │   ├── loginStyle.css
-│   │   ├── recuperar-2fa.css
-│   │   └── registrar.css
-│   ├── js/
-│   │   ├── 2faRecupera.js
-│   │   ├── ativar-2fa.js
-│   │   ├── authGuard.js
-│   │   ├── dashboard.js
-│   │   ├── duasEtapa.js
-│   │   ├── esqueci.js
-│   │   ├── loginJs.js
-│   │   ├── perfil.js
-│   │   ├── redefinir.js
-│   │   └── registrar.js
-│   └── pages/
-│       ├── dashboard.html
-│       ├── duasEtapa.html
-│       ├── esqueci.html
-│       ├── login.html
-│       ├── perfil.html
-│       ├── recuperar-2fa.html
-│       ├── redefinir.html
-│       ├── register.html
-│       └── telaQr.html
-├── .pytest_cache/
-├── .vscode/
-├── venv/
-├── .env
-├── .gitignore
-├── banco.txt
-├── body.json
-├── main.py
-├── README.md
-├── ReadmeBiel.md
-└── requirements.txt
+│   ├── assets/         # Imagens e ícones
+│   ├── css/            # Estilizações globais e específicas (Dark Theme)
+│   ├── js/             # Lógica client-side e integrações com API
+│   └── pages/          # Páginas (login, dashboard, chat, tabelaUser, admin)
+├── tests/              # Suíte de testes unitários
+├── .env.example        # Modelo de variáveis de ambiente
+└── requirements.txt    # Dependências do Python
 
-text
+Como Executar Localmente
+1. Pré-requisitos
+Python 3.11+
 
----
+Banco de Dados MySQL operando localmente ou em nuvem (ex: Railway)
 
-##  Como Executar
+2. Configuração do Ambiente (.env)
+Crie um arquivo .env na raiz do projeto com as seguintes variáveis:
 
-### Pré-requisitos
-- Python 3.11+
-- PostgreSQL 14+
+# Configurações Base
+ENVIRONMENT=development
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-### Instalação
+# Chaves de Segurança (Gere novas chaves para produção!)
+# Comando para gerar SECRET_KEY: python -c "import secrets; print(secrets.token_hex(32))"
+SECRET_KEY=sua_secret_key_jwt_aqui
 
-```cmd
-# 1. Criar o .Env na raiz:  (cuiado com a senha do db)
-DATABASE_URL="mysql+pymysql://root:sua_senha_aqui@localhost:3306/jurisai_db"
-SECRET_KEY=(ele muda)
-FERNET_KEY= (ele muda)
+# Comando para gerar FERNET_KEY: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+FERNET_KEY=sua_fernet_key_aqui
 
-# 2. Para descobrir o fernet_key coloque no terminal:
+# Banco de Dados (Ajuste usuário e senha)
+DATABASE_URL=mysql+pymysql://usuario:senha@localhost:3306/jurisai_db
 
-python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# Configurações de IA
+LLM_PROVIDER=groq
+GROQ_API_KEY=sua_chave_groq_aqui
+GROQ_MODEL=llama-3.1-8b-instant
 
-# Para descobrir o SECRET_KEY coloque no terminal:
-python -c "import secrets; print(secrets.token_hex(32))"
+3. Instalação e Execução
+Abra o terminal na pasta do projeto e execute:
 
-# 3. Crie o ambiente virtual
+# 1. Crie o ambiente virtual
 python -m venv venv
 
-# 4. Ative o ambiente virtual
-venv\Scripts\activate.bat       # CMD Windows
-# ou
-venv\Scripts\Activate.ps1       # PowerShell
+# 2. Ative o ambiente virtual
+venv\Scripts\Activate.ps1       # PowerShell (Windows)
+# ou: source venv/bin/activate  # Linux/Mac
 
-# 5. Instale as dependências
+# 3. Instale as dependências
 pip install -r requirements.txt
 
-# 6. Execute o servidor
-python -m uvicorn main:app --reload
+# 4. Inicie o servidor
+python -m uvicorn app.main:app --reload
 
+Acessos Locais:
 
-Acesse
-API: http://127.0.0.1:8000
+Frontend: Abra os arquivos .html da pasta frontend/pages/ no seu navegador (utilize Live Server se preferir).
 
-Documentação Swagger: http://127.0.0.1:8000/docs
- Exemplos de Uso
-text
-# Registro
-curl -X POST http://127.0.0.1:8000/auth/register -H "Content-Type: application/json" -d "{\"email\":\"user@email.com\",\"password\":\"Senha@123\"}"
+Documentação da API (Swagger): http://127.0.0.1:8000/docs
 
-# Login
-curl -X POST http://127.0.0.1:8000/auth/login -H "Content-Type: application/json" -d "{\"email\":\"user@email.com\",\"password\":\"Senha@123\"}"
+Decisões de Arquitetura e Segurança
+Bcrypt + Salt: Algoritmo adaptativo e resistente a brute-force.
 
-# Setup 2FA
-curl -X POST http://127.0.0.1:8000/auth/2fa/setup -H "Authorization: Bearer SEU_TOKEN"
+Segregação de Privilégios: Rotas /admin possuem verificação estrita is_admin=True no token e no banco, impedindo elevação de privilégios.
 
-# Verificar 2FA
-curl -X POST http://127.0.0.1:8000/auth/2fa/verify -H "Authorization: Bearer SEU_TOKEN" -H "Content-Type: application/json" -d "{\"code\":\"123456\"}"
+Blacklist Dinâmica: Ao realizar logout, o token atual é invalidado imediatamente no banco, impedindo reutilização (mesmo que ainda esteja no prazo de 30 min).
 
-# Logout
-curl -X POST http://127.0.0.1:8000/auth/logout -H "Authorization: Bearer SEU_TOKEN"
- Decisões de Segurança
-bcrypt: Algoritmo lento adaptativo, resistente a brute force, gera salt único automático (OWASP recomendado)
+Fluxo RAG Seguro: O modelo LLM não acessa a internet livremente. As respostas são aterradas (grounded) nos arquivos locais em data/legal, reduzindo a chance de alucinações jurídicas.
 
-JWT HS256: Stateless, expiração granular de 30 minutos (RFC 7519)
-
-TOTP RFC 6238: Códigos válidos por 30s, compatível com Google Authenticator
-
-Blacklist: Tokens invalidados no logout são rejeitados imediatamente
-
-Rate Limiting: 5 tentativas/min por IP, retorna HTTP 429 ao exceder
-
+IMPORTANTE:
+O JurisAI é um projeto acadêmico em constante desenvolvimento.
+Importante: As respostas geradas pela Inteligência Artificial não substituem o julgamento técnico de um professor, a atuação de um advogado licenciado, ou a consulta a jurisprudências atualizadas e fontes oficiais. Sempre revise os embasamentos legais gerados.
