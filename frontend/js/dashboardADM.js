@@ -77,8 +77,10 @@ async function loadAdminProfile() {
 
         const user = await response.json();
 
-        // Checa se é admin
-        if (!user.roles || !user.roles.includes("admin")) {
+        // Checa se é admin (aceita roles OU is_admin)
+        const isAdmin = (user.roles && user.roles.includes("admin")) || user.is_admin === true || user.is_admin === 1;
+
+        if (!isAdmin) {
             localStorage.removeItem("access_token");
             window.location.href = "login.html?motivo=sem_permissao";
             return;
@@ -95,6 +97,7 @@ async function loadAdminProfile() {
         window.location.href = "login.html?motivo=erro_api";
     }
 }
+
 
 // --- LOGOUT ---
 async function handleLogout(e) {
