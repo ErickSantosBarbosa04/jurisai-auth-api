@@ -19,12 +19,14 @@ logger = logging.getLogger(__name__)
 
 #registro de novos usuários (Requisito 1.2) e (Requisito 1.3) - A validação de regras de negócio e segurança está isolada no AuthService para manter o router limpo e focado em rotas.
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(data: schemas.RegisterRequest, db: Session = Depends(get_db)):
+@limiter.limit("3/minute") # Maximo 3 cadastros por minuto
+def register(request: Request, data: schemas.RegisterRequest, db: Session = Depends(get_db)):
 
     return AuthService.register_user(db, data)
 
 #verifica se o email existe e se o usuário tem 2FA para iniciar o processo de recuperação de senha seguro
 @router.post("/check-email")
+@limiter.limit("3/minute") # evita tentativa e erro para acertar o email 
 def check_email(data: schemas.EmailRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     
@@ -61,6 +63,7 @@ def recuperar_confirmar(data: schemas.ValidarRecuperacaoRequest, db: Session = D
 
 
 @router.post("/redefinir-senha")
+@limiter.limit("3/minute") # Limita tentativas de redefinição para evitar abuso
 def redefinir_senha(data: schemas.NovaSenhaFinalRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     
@@ -88,6 +91,7 @@ def login(request: Request, data: schemas.LoginRequest, db: Session = Depends(ge
 
 #uso do blackslist para invalidar tokens (Requisito 1.10)
 @router.post("/logout")
+@limiter.limit("5/minute")
 def logout(request: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     logger.info(f"SESSÃO: Usuário {current_user.email} encerrou a sessão (Logout simples).")
     return AuthService.blacklist_token(db, request, current_user)

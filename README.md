@@ -128,14 +128,17 @@ Frontend: Abra os arquivos .html da pasta frontend/pages/ no seu navegador (util
 
 Documentação da API (Swagger): http://127.0.0.1:8000/docs
 
-Decisões de Arquitetura e Segurança
-Bcrypt + Salt: Algoritmo adaptativo e resistente a brute-force.
+---
 
-Segregação de Privilégios: Rotas /admin possuem verificação estrita is_admin=True no token e no banco, impedindo elevação de privilégios.
-
-Blacklist Dinâmica: Ao realizar logout, o token atual é invalidado imediatamente no banco, impedindo reutilização (mesmo que ainda esteja no prazo de 30 min).
-
-Fluxo RAG Seguro: O modelo LLM não acessa a internet livremente. As respostas são aterradas (grounded) nos arquivos locais em data/legal, reduzindo a chance de alucinações jurídicas.
+## Decisões de Arquitetura e Segurança:
+- Criptografia Parametrizada (Argon2/Bcrypt):** Uso de `CryptContext` com *Work Factors* rigorosamente ajustados (controle de custo de tempo, memória e paralelismo) para garantir alta resistência a ataques de força bruta sem causar exaustão de CPU no servidor.
+- Proteção contra Força Bruta e DoS (Rate Limiting):** Implementação de "Gateways de Tráfego" via `SlowAPI` limitando acessos por IP nas rotas críticas (Login, Registro e Recuperação de Senha), mitigando ataques de sobrecarga.
+- Gestão de Segredos e KMS (Trade-off Arquitetural):** Segregação estrita de variáveis de ambiente (`.env`). Optou-se por não integrar um *Key Management System* (KMS) automatizado de terceiros devido ao escopo do projeto. A rotação de chaves é executada de forma controlada e manual via ambiente de deploy (Railway), garantindo segurança sem inflar custos operacionais.
+- Segurança da Cadeia de Suprimentos (Supply Chain):** O arquivo de dependências (`requirements.txt`) é travado via `pip-tools` com *hashes* únicos (SHA-256) para cada biblioteca, blindando o servidor contra a injeção de pacotes maliciosos durante o processo de *build*.
+- Observabilidade e Tratamento de Erros:** Exceções não são silenciadas. O sistema utiliza a biblioteca `logging` para registrar anomalias de I/O e segurança de forma oculta, garantindo rastreabilidade para a equipe técnica sem expor detalhes sensíveis na tela do usuário.
+- Segregação de Privilégios: Rotas `/admin` possuem verificação estrita de `is_admin=True` decodificada no token e validada no banco de dados, tornando impossível a elevação de privilégios.
+- Blacklist Dinâmica (Lockdown):** Ao realizar logout ou acionar o encerramento global de sessões, o token atual é invalidado imediatamente no banco, impedindo a reutilização mesmo que ainda esteja dentro do prazo de 30 minutos.
+- Fluxo RAG Seguro:** O modelo LLM não acessa a internet livremente. As respostas são aterradas (*grounded*) estritamente nos arquivos locais em `data/legal`, reduzindo drasticamente a chance de alucinações jurídicas.
 
 ---
 
