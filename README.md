@@ -5,7 +5,10 @@
 O objetivo do projeto é permitir que o estudante apresente casos concretos e debata com a IA atuando como orientadora, garantindo a proteção total dos dados e o nível de dificuldade adequado ao seu semestre atual.
 
 ---
+# Acesso ao site
+https://jurisai-auth-api-production.up.railway.app/frontend/pages/index.html
 
+---
 ##  Funcionalidades Principais
 
 ###  Segurança, Autenticação e LGPD
